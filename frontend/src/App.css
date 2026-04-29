@@ -1,34 +1,247 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* ==========================================
+   IELTS Mock Exam - PlayStation-Inspired Light Theme
+   ========================================== */
+
+/* Display headlines - weight 300 "quiet authority" */
+.display-xl { font-size: 3.375rem; font-weight: 300; line-height: 1.25; letter-spacing: -0.1px; }
+.display-lg { font-size: 2.75rem; font-weight: 300; line-height: 1.25; letter-spacing: 0.1px; }
+.display-md { font-size: 2.2rem; font-weight: 300; line-height: 1.25; }
+.display-sm { font-size: 1.75rem; font-weight: 300; line-height: 1.25; letter-spacing: 0.1px; }
+.display-compact { font-size: 1.375rem; font-weight: 300; line-height: 1.25; letter-spacing: 0.1px; }
+
+/* PlayStation-inspired buttons */
+.btn-ps {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  border-radius: 999px; font-weight: 500; font-size: 1.125rem;
+  letter-spacing: 0.4px; padding: 12px 28px; cursor: pointer;
+  transition: background 180ms ease, transform 180ms ease, box-shadow 180ms ease, border 180ms ease;
+  border: 2px solid transparent; outline: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.btn-ps-primary {
+  background: var(--ps-blue); color: var(--ps-white);
+}
+.btn-ps-primary:hover {
+  background: var(--ps-cyan); border-color: var(--ps-white);
+  box-shadow: 0 0 0 2px var(--ps-blue); transform: scale(1.05);
+}
+.btn-ps-primary:active { opacity: 0.7; }
+
+.btn-ps-secondary {
+  background: var(--ps-white); color: var(--ps-blue);
+  border: 2px solid var(--ps-blue);
+}
+.btn-ps-secondary:hover {
+  background: var(--ps-cyan); color: var(--ps-white);
+  border-color: var(--ps-white); box-shadow: 0 0 0 2px var(--ps-blue);
+  transform: scale(1.05);
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.btn-ps-orange {
+  background: var(--ps-orange); color: var(--ps-white); font-weight: 700;
+}
+.btn-ps-orange:hover {
+  background: var(--ps-cyan); border-color: var(--ps-white);
+  box-shadow: 0 0 0 2px var(--ps-blue); transform: scale(1.05);
 }
 
-.App-link {
-    color: #61dafb;
+.btn-ps-ghost {
+  background: transparent; color: var(--ps-charcoal);
+  border: 1px solid #dedede; padding: 8px 20px; font-size: 0.875rem;
+}
+.btn-ps-ghost:hover {
+  background: var(--ps-cyan); color: var(--ps-white);
+  border-color: var(--ps-white); transform: scale(1.05);
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+/* Card styles */
+.card-ps {
+  background: var(--ps-white);
+  border-radius: 19px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 5px 9px 0px;
+  transition: box-shadow 200ms ease, transform 200ms ease;
+}
+.card-ps:hover {
+  box-shadow: rgba(0, 0, 0, 0.16) 0px 5px 9px 0px;
+}
+
+/* Panel styles */
+.panel-dark {
+  background: linear-gradient(180deg, #121314 0%, #000000 100%);
+  color: var(--ps-white);
+}
+.panel-light {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f7fa 100%);
+  color: var(--ps-charcoal);
+}
+.panel-blue {
+  background: var(--ps-blue);
+  color: var(--ps-white);
+}
+
+/* Nav bar */
+.nav-ps {
+  background: var(--ps-black);
+  color: var(--ps-white);
+  position: sticky; top: 0; z-index: 50;
+  padding: 0 48px;
+  height: 56px;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.nav-ps a { color: var(--ps-white); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 180ms ease; }
+.nav-ps a:hover { color: var(--ps-cyan); }
+
+/* Exam interface */
+.exam-topbar {
+  background: var(--ps-black);
+  color: var(--ps-white);
+  padding: 12px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 40;
+}
+
+.exam-body {
+  display: flex;
+  min-height: calc(100vh - 56px - 60px);
+}
+
+.exam-left {
+  flex: 1; padding: 32px;
+  overflow-y: auto;
+  border-right: 1px solid var(--ps-divider);
+  max-height: calc(100vh - 56px - 60px);
+}
+
+.exam-right {
+  flex: 1; padding: 32px;
+  overflow-y: auto;
+  max-height: calc(100vh - 56px - 60px);
+}
+
+.exam-bottombar {
+  background: var(--ps-ice);
+  border-top: 1px solid var(--ps-divider);
+  padding: 12px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; bottom: 0; z-index: 40;
+}
+
+/* Question navigator pills */
+.q-pill {
+  width: 32px; height: 32px;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem; font-weight: 600;
+  cursor: pointer; transition: all 180ms ease;
+  border: 1px solid var(--ps-divider);
+  background: var(--ps-white); color: var(--ps-charcoal);
+}
+.q-pill.answered { background: var(--ps-blue); color: var(--ps-white); border-color: var(--ps-blue); }
+.q-pill.flagged { background: var(--ps-orange); color: var(--ps-white); border-color: var(--ps-orange); }
+.q-pill.current { border-color: var(--ps-cyan); box-shadow: 0 0 0 2px var(--ps-cyan); }
+
+/* Audio waveform indicator */
+.audio-playing {
+  display: flex; align-items: flex-end; gap: 2px; height: 24px;
+}
+.audio-playing span {
+  width: 3px; background: var(--ps-cyan); border-radius: 2px;
+  animation: audioWave 1.2s ease-in-out infinite;
+}
+.audio-playing span:nth-child(2) { animation-delay: 0.1s; }
+.audio-playing span:nth-child(3) { animation-delay: 0.2s; }
+.audio-playing span:nth-child(4) { animation-delay: 0.3s; }
+.audio-playing span:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes audioWave {
+  0%, 100% { height: 6px; }
+  50% { height: 24px; }
+}
+
+/* Timer */
+.timer-display {
+  font-variant-numeric: tabular-nums;
+  font-size: 1.25rem; font-weight: 600;
+  color: var(--ps-white);
+  background: rgba(255,255,255,0.1);
+  padding: 4px 16px; border-radius: 6px;
+}
+.timer-warning { color: var(--ps-orange); }
+.timer-critical { color: var(--ps-error); animation: timerPulse 1s infinite; }
+
+@keyframes timerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* Section indicator */
+.section-tab {
+  padding: 8px 20px; border-radius: 999px; font-size: 0.875rem; font-weight: 500;
+  cursor: pointer; transition: all 180ms ease;
+  background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.6);
+}
+.section-tab.active {
+  background: var(--ps-blue); color: var(--ps-white);
+}
+
+/* Loading spinner */
+.spinner {
+  width: 48px; height: 48px;
+  border: 3px solid var(--ps-divider);
+  border-top-color: var(--ps-blue);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Progress ring */
+.progress-ring { transition: stroke-dashoffset 0.3s ease; }
+
+/* Passage text formatting */
+.passage-text {
+  font-size: 1rem; line-height: 1.8;
+  color: var(--ps-charcoal);
+}
+.passage-text p { margin-bottom: 1rem; }
+
+/* Question styling */
+.question-block {
+  padding: 20px; margin-bottom: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--ps-divider);
+  transition: border-color 180ms ease;
+}
+.question-block:focus-within {
+  border-color: var(--ps-blue);
+}
+
+/* Form inputs (exam style) */
+.exam-input {
+  width: 100%; padding: 8px 12px;
+  border: 1px solid var(--ps-mute); border-radius: 3px;
+  font-size: 1rem; font-family: inherit;
+  transition: border-color 180ms ease, box-shadow 180ms ease;
+}
+.exam-input:focus {
+  outline: none; border-color: var(--ps-blue);
+  box-shadow: 0 0 0 2px rgba(0, 112, 204, 0.2);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .display-xl { font-size: 2.2rem; }
+  .display-lg { font-size: 1.75rem; }
+  .exam-body { flex-direction: column; }
+  .exam-left, .exam-right {
+    max-height: none;
+    border-right: none;
+    border-bottom: 1px solid var(--ps-divider);
+  }
+  .nav-ps { padding: 0 16px; }
+}
+
+@media (max-width: 640px) {
+  .display-xl { font-size: 1.75rem; }
+  .display-lg { font-size: 1.375rem; }
+  .exam-left, .exam-right { padding: 16px; }
 }
