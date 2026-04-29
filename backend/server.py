@@ -274,7 +274,11 @@ Return JSON: {{"fluency_coherence":{{"band":6.0,"feedback":"..."}},"lexical_reso
         {"role": "system", "content": "You are an IELTS examiner. Return only valid JSON."},
         {"role": "user", "content": prompt}
     ], model="openai/gpt-4o")
-    return json.loads(result)
+    try:
+        return json.loads(result)
+    except json.JSONDecodeError:
+        logger.error(f"Failed to parse speaking score JSON: {result[:200]}")
+        raise HTTPException(500, "AI scoring returned invalid format")
 
 # ==========================================
 # EXAM ENDPOINTS
@@ -300,7 +304,8 @@ async def get_exam(exam_id: str):
 
 @api_router.get("/exams/{exam_id}/full")
 async def get_exam_full(exam_id: str, request: Request):
-    """Get exam with answers (for scoring)"""
+    """Get exam with answers (for internal scoring only)"""
+    await get_current_user(request)
     exam = await db.exams.find_one({"exam_id": exam_id}, {"_id": 0})
     if not exam:
         raise HTTPException(404, "Exam not found")
