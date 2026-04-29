@@ -3,6 +3,7 @@ import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { API, useAuth } from "@/App";
 import { Headphones, BookOpen, Pen, Mic, Clock, Flag, ArrowLeft, ArrowRight, Send, AlertCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { motion, AnimatePresence } from "framer-motion";
 import ListeningModule from "@/components/exam/ListeningModule";
 import ReadingModule from "@/components/exam/ReadingModule";
 import WritingModule from "@/components/exam/WritingModule";
@@ -95,10 +96,24 @@ export default function ExamPage() {
       if (module === "listening") {
         const sections = examData?.listening?.sections || [];
         let loaded = 0;
-        const totalAudios = sections.reduce((acc, s) => acc + (s.script_segments?.filter(seg => seg.audio_id)?.length || 0), 0);
+        const totalAudios = sections.reduce((acc, s) => {
+          let count = (s.script_segments?.filter(seg => seg.audio_id)?.length || 0);
+          if (s.instruction_audio_id) count++;
+          return acc + count;
+        }, 0);
 
         for (const section of sections) {
           const sectionAudios = [];
+          // Load instruction audio first
+          if (section.instruction_audio_id) {
+            try {
+              const res = await fetch(`${API}/audio/${section.instruction_audio_id}`);
+              const blob = await res.blob();
+              cache[`instruction_${section.section_num}`] = URL.createObjectURL(blob);
+              loaded++;
+              setAudioProgress(Math.round((loaded / totalAudios) * 100));
+            } catch { /* skip */ }
+          }
           for (const seg of (section.script_segments || [])) {
             if (seg.audio_id) {
               try {

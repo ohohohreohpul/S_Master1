@@ -9,6 +9,7 @@ export default function ListeningModule({ exam, audioCache, answers, updateAnswe
   const [audioProgress, setAudioProgress] = useState(0);
   const [sectionStarted, setSectionStarted] = useState({});
   const [sectionCompleted, setSectionCompleted] = useState({});
+  const [playingInstruction, setPlayingInstruction] = useState(false);
   const audioRef = useRef(null);
   const progressIntervalRef = useRef(null);
 
@@ -68,19 +69,41 @@ export default function ListeningModule({ exam, audioCache, answers, updateAnswe
 
   // Auto-play next segment when audioIndex changes
   useEffect(() => {
-    if (sectionStarted[currentSection] && audioIndex < sectionAudios.length) {
+    if (sectionStarted[currentSection] && !playingInstruction && audioIndex < sectionAudios.length) {
       playNextSegment();
     } else if (audioIndex >= sectionAudios.length && sectionStarted[currentSection]) {
       setIsPlaying(false);
       setSectionCompleted(prev => ({ ...prev, [currentSection]: true }));
     }
-  }, [audioIndex, sectionStarted, currentSection, sectionAudios.length]);
+  }, [audioIndex, sectionStarted, currentSection, sectionAudios.length, playingInstruction]);
 
-  // Start section audio
+  // Start section audio (with instruction first)
   const startSection = () => {
     setSectionStarted(prev => ({ ...prev, [currentSection]: true }));
-    setAudioIndex(0);
-    setAudioProgress(0);
+    // Play instruction audio first if available
+    const instrUrl = audioCache[`instruction_${currentSection}`];
+    if (instrUrl) {
+      setPlayingInstruction(true);
+      const instrAudio = new Audio(instrUrl);
+      instrAudio.addEventListener("ended", () => {
+        setPlayingInstruction(false);
+        setAudioIndex(0);
+        setAudioProgress(0);
+      });
+      instrAudio.addEventListener("error", () => {
+        setPlayingInstruction(false);
+        setAudioIndex(0);
+        setAudioProgress(0);
+      });
+      instrAudio.play().catch(() => {
+        setPlayingInstruction(false);
+        setAudioIndex(0);
+        setAudioProgress(0);
+      });
+    } else {
+      setAudioIndex(0);
+      setAudioProgress(0);
+    }
   };
 
   // Switch section

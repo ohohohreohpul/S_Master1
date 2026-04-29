@@ -42,16 +42,20 @@ export default function ResultsPage() {
     return (
       <div data-testid="objective-results">
         {/* Band score */}
-        <div className="card-ps p-8 text-center mb-8" data-testid="band-score-card">
-          <p className="text-sm text-[var(--ps-body-gray)] mb-2">Your Band Score</p>
-          <div className="text-6xl font-light mb-2" style={{ color: getBandColor(scores.band_score) }}>
-            {scores.band_score}
+        <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: "spring" }}
+          className="card-ps p-8 text-center mb-8 relative overflow-hidden" data-testid="band-score-card">
+          <div className="absolute inset-0" style={{ background: `radial-gradient(circle at 50% 0%, ${getBandColor(scores.band_score)}10 0%, transparent 60%)` }} />
+          <div className="relative">
+            <p className="text-xs font-semibold text-[var(--ps-body-gray)] mb-2 uppercase tracking-wider">Your Band Score</p>
+            <div className="text-7xl font-extralight mb-2" style={{ color: getBandColor(scores.band_score) }}>
+              {scores.band_score}
+            </div>
+            <p className="text-sm text-[var(--ps-body-gray)]">
+              {scores.correct} of {scores.total} correct
+            </p>
+            <Progress value={(scores.correct / scores.total) * 100} className="mt-4 max-w-xs mx-auto h-2" />
           </div>
-          <p className="text-sm text-[var(--ps-body-gray)]">
-            {scores.correct} of {scores.total} correct
-          </p>
-          <Progress value={(scores.correct / scores.total) * 100} className="mt-4 max-w-xs mx-auto" />
-        </div>
+        </motion.div>
 
         {/* Question details */}
         <div className="card-ps p-6" data-testid="answer-details">

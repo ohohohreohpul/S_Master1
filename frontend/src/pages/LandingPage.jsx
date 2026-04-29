@@ -1,6 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/App";
-import { BookOpen, Headphones, Pen, Mic, ArrowRight, Shield, Zap, BarChart3 } from "lucide-react";
+import { BookOpen, Headphones, Pen, Mic, ArrowRight, Shield, Zap, BarChart3, Users, Globe, Award } from "lucide-react";
+import { motion } from "framer-motion";
+
+const fadeUp = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } };
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.12 } } };
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -13,20 +17,21 @@ export default function LandingPage() {
   };
 
   const modules = [
-    { icon: Headphones, title: "Listening", desc: "4 sections, 40 questions. Natural AI-generated audio with British accents.", color: "#0070cc" },
-    { icon: BookOpen, title: "Reading", desc: "3 passages, 40 questions. Academic texts with authentic question types.", color: "#1eaedb" },
-    { icon: Pen, title: "Writing", desc: "2 tasks with AI scoring against official IELTS band descriptors.", color: "#0070cc" },
-    { icon: Mic, title: "Speaking", desc: "3 parts with AI examiner. Record responses and get instant feedback.", color: "#1eaedb" },
+    { icon: Headphones, title: "Listening", desc: "4 sections, 40 questions with natural AI audio and British accents.", time: "30 min" },
+    { icon: BookOpen, title: "Reading", desc: "3 academic passages with authentic IELTS question formats.", time: "60 min" },
+    { icon: Pen, title: "Writing", desc: "2 tasks scored by AI against official band descriptors.", time: "60 min" },
+    { icon: Mic, title: "Speaking", desc: "3 parts with AI examiner voice and instant scoring.", time: "14 min" },
   ];
 
-  const features = [
-    { icon: Shield, title: "Exam Fidelity", desc: "Replicates the official IELTS Computer-Based Test interface with 1:1 accuracy." },
-    { icon: Zap, title: "AI-Powered Audio", desc: "ElevenLabs V3 generates natural, multi-accent audio. Pre-loaded before every exam." },
-    { icon: BarChart3, title: "Band Score Analytics", desc: "Detailed scoring against official IELTS criteria with improvement suggestions." },
+  const stats = [
+    { value: "9.0", label: "Max Band Score" },
+    { value: "40+", label: "Questions per Module" },
+    { value: "4", label: "Full Modules" },
+    { value: "AI", label: "Powered Scoring" },
   ];
 
   return (
-    <div data-testid="landing-page">
+    <div data-testid="landing-page" className="overflow-hidden">
       {/* Nav */}
       <nav className="nav-ps" data-testid="nav-bar">
         <div className="flex items-center gap-3">
@@ -49,79 +54,105 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero - Dark */}
-      <section className="panel-dark py-24 px-8 md:px-16 lg:px-24" data-testid="hero-section">
-        <div className="max-w-5xl mx-auto text-center">
-          <p className="text-[var(--ps-cyan)] font-medium text-sm tracking-widest mb-6 uppercase">Computer-based IELTS simulation</p>
-          <h1 className="display-xl mb-6 text-white">
-            The most authentic IELTS mock exam
-          </h1>
-          <p className="text-lg font-light text-gray-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Full four-module practice tests with AI-generated audio, real-time scoring, and detailed band feedback. Pre-loaded audio ensures perfect exam timing.
-          </p>
-          <div className="flex items-center justify-center gap-4 flex-wrap">
+      <section className="panel-dark relative py-28 px-8 md:px-16 lg:px-24" data-testid="hero-section">
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "40px 40px" }} />
+        <motion.div className="max-w-5xl mx-auto text-center relative" initial="hidden" animate="show" variants={stagger}>
+          <motion.p variants={fadeUp} className="text-[var(--ps-cyan)] font-medium text-xs tracking-[0.25em] mb-8 uppercase">
+            Computer-based IELTS simulation
+          </motion.p>
+          <motion.h1 variants={fadeUp} className="display-xl mb-6 text-white">
+            The most authentic<br />IELTS mock exam
+          </motion.h1>
+          <motion.p variants={fadeUp} className="text-lg font-light text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
+            Full practice tests with AI-generated audio, real-time scoring, and detailed band feedback. Audio pre-loads before every exam for perfect timing.
+          </motion.p>
+          <motion.div variants={fadeUp} className="flex items-center justify-center gap-4 flex-wrap">
             <button data-testid="hero-start-btn" onClick={user ? () => navigate("/dashboard") : handleLogin}
-              className="btn-ps btn-ps-orange" style={{ fontSize: "1rem", padding: "14px 36px" }}>
+              className="btn-ps btn-ps-orange" style={{ fontSize: "1rem", padding: "16px 40px" }}>
               Start Practice Test <ArrowRight size={18} />
             </button>
-            <button className="btn-ps btn-ps-ghost" style={{ color: "white", borderColor: "rgba(255,255,255,0.3)" }}>
-              View Sample Results
-            </button>
-          </div>
-        </div>
+          </motion.div>
+
+          {/* Stats row */}
+          <motion.div variants={fadeUp} className="grid grid-cols-4 gap-6 mt-16 max-w-2xl mx-auto">
+            {stats.map((s, i) => (
+              <div key={i} className="text-center">
+                <div className="text-2xl font-light text-white mb-1">{s.value}</div>
+                <div className="text-xs text-gray-500">{s.label}</div>
+              </div>
+            ))}
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* Modules - Light */}
-      <section className="panel-light py-20 px-8 md:px-16 lg:px-24" data-testid="modules-section">
+      <section className="panel-light py-24 px-8 md:px-16 lg:px-24" data-testid="modules-section">
         <div className="max-w-6xl mx-auto">
-          <h2 className="display-sm text-center mb-4" style={{ color: "var(--ps-black)" }}>All four IELTS modules</h2>
-          <p className="text-center text-[var(--ps-body-gray)] mb-12 text-base">Exactly as you'll experience on test day</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
+            <h2 className="display-sm text-center mb-2" style={{ color: "var(--ps-black)" }}>All four IELTS modules</h2>
+            <p className="text-center text-[var(--ps-body-gray)] mb-14 text-base">Exactly as you'll experience on test day</p>
+          </motion.div>
+          <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5"
+            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}>
             {modules.map((m, i) => (
-              <div key={i} className="card-ps p-8 text-center" data-testid={`module-card-${m.title.toLowerCase()}`}>
-                <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: `${m.color}10` }}>
-                  <m.icon size={28} style={{ color: m.color }} />
+              <motion.div key={i} variants={fadeUp} whileHover={{ y: -6, boxShadow: "0 12px 40px rgba(0,0,0,0.1)" }}
+                className="card-ps p-7 cursor-default" data-testid={`module-card-${m.title.toLowerCase()}`}>
+                <div className="flex items-center justify-between mb-5">
+                  <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-[var(--ps-blue)]/5">
+                    <m.icon size={24} className="text-[var(--ps-blue)]" />
+                  </div>
+                  <span className="text-xs font-medium text-[var(--ps-mute)]">{m.time}</span>
                 </div>
-                <h3 className="font-semibold text-lg mb-2" style={{ color: "var(--ps-charcoal)" }}>{m.title}</h3>
+                <h3 className="font-semibold text-base mb-2" style={{ color: "var(--ps-charcoal)" }}>{m.title}</h3>
                 <p className="text-sm text-[var(--ps-body-gray)] leading-relaxed">{m.desc}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
-      {/* Features - Dark */}
-      <section className="panel-dark py-20 px-8 md:px-16 lg:px-24" data-testid="features-section">
+      {/* How it works - Dark */}
+      <section className="panel-dark py-24 px-8 md:px-16 lg:px-24" data-testid="features-section">
         <div className="max-w-5xl mx-auto">
-          <h2 className="display-sm text-center mb-12 text-white">Built for serious preparation</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {features.map((f, i) => (
-              <div key={i} className="text-center">
-                <div className="w-12 h-12 rounded-xl mx-auto mb-4 flex items-center justify-center" style={{ background: "rgba(255,255,255,0.1)" }}>
-                  <f.icon size={24} className="text-[var(--ps-cyan)]" />
+          <motion.h2 initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+            className="display-sm text-center mb-16 text-white">How it works</motion.h2>
+          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-12"
+            initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}>
+            {[
+              { step: "01", icon: Shield, title: "Choose your test", desc: "Select Academic or General Training. Pick a full test or individual module." },
+              { step: "02", icon: Zap, title: "Audio pre-loads", desc: "All listening audio generates via ElevenLabs V3 and loads before your timer starts. Zero buffering." },
+              { step: "03", icon: BarChart3, title: "Get your band score", desc: "AI scores your responses against official IELTS criteria with detailed feedback." },
+            ].map((f, i) => (
+              <motion.div key={i} variants={fadeUp} className="text-center">
+                <div className="text-5xl font-extralight text-white/10 mb-4">{f.step}</div>
+                <div className="w-14 h-14 rounded-2xl mx-auto mb-5 flex items-center justify-center" style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(8px)" }}>
+                  <f.icon size={26} className="text-[var(--ps-cyan)]" />
                 </div>
                 <h3 className="font-medium text-base mb-2 text-white">{f.title}</h3>
                 <p className="text-sm text-gray-400 leading-relaxed">{f.desc}</p>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* CTA - Light */}
-      <section className="panel-light py-20 px-8 text-center" data-testid="cta-section">
-        <div className="max-w-2xl mx-auto">
+      <section className="panel-light py-24 px-8 text-center" data-testid="cta-section">
+        <motion.div className="max-w-2xl mx-auto" initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
           <h2 className="display-sm mb-4" style={{ color: "var(--ps-black)" }}>Ready to practice?</h2>
-          <p className="text-[var(--ps-body-gray)] mb-8">Sign in with Google to access your first full practice test.</p>
-          <button data-testid="cta-start-btn" onClick={user ? () => navigate("/dashboard") : handleLogin} className="btn-ps btn-ps-primary" style={{ fontSize: "1rem", padding: "14px 36px" }}>
-            Get Started Free <ArrowRight size={18} />
+          <p className="text-[var(--ps-body-gray)] mb-8 text-base">Sign in with Google to access your first full practice test. Free.</p>
+          <button data-testid="cta-start-btn" onClick={user ? () => navigate("/dashboard") : handleLogin}
+            className="btn-ps btn-ps-primary" style={{ fontSize: "1rem", padding: "16px 40px" }}>
+            Get Started <ArrowRight size={18} />
           </button>
-        </div>
+        </motion.div>
       </section>
 
       {/* Footer - Blue */}
-      <footer className="panel-blue py-10 px-8 text-center" data-testid="footer">
-        <p className="text-sm text-white/70">IELTS Pro Mock Exam Platform. Powered by AI.</p>
-        <p className="text-xs text-white/40 mt-2">Not affiliated with IDP or British Council. All content is AI-generated for practice purposes.</p>
+      <footer className="panel-blue py-12 px-8 text-center" data-testid="footer">
+        <p className="text-sm text-white/80 font-light">IELTS Pro Mock Exam Platform</p>
+        <p className="text-xs text-white/40 mt-2">Not affiliated with IDP or British Council. All content is AI-generated.</p>
       </footer>
     </div>
   );

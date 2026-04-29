@@ -58,11 +58,11 @@
 .card-ps {
   background: var(--ps-white);
   border-radius: 19px;
-  box-shadow: rgba(0, 0, 0, 0.08) 0px 5px 9px 0px;
-  transition: box-shadow 200ms ease, transform 200ms ease;
+  box-shadow: rgba(0, 0, 0, 0.04) 0px 2px 12px 0px, rgba(0, 0, 0, 0.02) 0px 1px 4px 0px;
+  transition: box-shadow 250ms ease, transform 250ms ease;
 }
 .card-ps:hover {
-  box-shadow: rgba(0, 0, 0, 0.16) 0px 5px 9px 0px;
+  box-shadow: rgba(0, 0, 0, 0.08) 0px 8px 24px 0px, rgba(0, 0, 0, 0.04) 0px 2px 8px 0px;
 }
 
 /* Panel styles */
@@ -84,11 +84,12 @@
   background: var(--ps-black);
   color: var(--ps-white);
   position: sticky; top: 0; z-index: 50;
-  padding: 0 48px;
-  height: 56px;
+  padding: 0 32px;
+  height: 52px;
   display: flex; align-items: center; justify-content: space-between;
+  backdrop-filter: blur(12px);
 }
-.nav-ps a { color: var(--ps-white); text-decoration: none; font-size: 0.875rem; font-weight: 500; transition: color 180ms ease; }
+.nav-ps a { color: var(--ps-white); text-decoration: none; font-size: 0.8rem; font-weight: 500; transition: color 180ms ease; }
 .nav-ps a:hover { color: var(--ps-cyan); }
 
 /* Exam interface */
@@ -206,25 +207,36 @@
 
 /* Question styling */
 .question-block {
-  padding: 20px; margin-bottom: 16px;
+  padding: 20px; margin-bottom: 12px;
   border-radius: 12px;
   border: 1px solid var(--ps-divider);
-  transition: border-color 180ms ease;
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+  background: var(--ps-white);
 }
 .question-block:focus-within {
   border-color: var(--ps-blue);
+  box-shadow: 0 0 0 3px rgba(0, 112, 204, 0.08);
+  background: rgba(0, 112, 204, 0.01);
+}
+.question-block:hover {
+  border-color: rgba(0, 112, 204, 0.2);
 }
 
 /* Form inputs (exam style) */
 .exam-input {
-  width: 100%; padding: 8px 12px;
-  border: 1px solid var(--ps-mute); border-radius: 3px;
-  font-size: 1rem; font-family: inherit;
+  width: 100%; padding: 10px 14px;
+  border: 1.5px solid var(--ps-divider); border-radius: 8px;
+  font-size: 0.9rem; font-family: inherit;
   transition: border-color 180ms ease, box-shadow 180ms ease;
+  background: var(--ps-ice);
 }
 .exam-input:focus {
   outline: none; border-color: var(--ps-blue);
-  box-shadow: 0 0 0 2px rgba(0, 112, 204, 0.2);
+  box-shadow: 0 0 0 3px rgba(0, 112, 204, 0.1);
+  background: var(--ps-white);
+}
+.exam-input::placeholder {
+  color: var(--ps-mute);
 }
 
 /* Responsive */

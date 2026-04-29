@@ -1,0 +1,34 @@
+{
+  "summary": "Iteration 2: Re-tested IELTS Mock Exam after admin panel + improved scoring + section instruction audio updates. 22/22 backend pytest tests passed (added 7 new tests for /api/admin/exams, /api/admin/stats, DELETE admin/exams, instruction_audio_id presence/fetchability, and case-insensitive listening scoring). Frontend e2e validated: Landing (framer-motion sections render), Dashboard (4 progress cards + exam card + admin link), Admin page (stats: 1 exam / 65 audio files / 2 users / 10 attempts; exam row with regenerate+delete), Listening preparation -> in-progress (timer ticking, 4 section tabs, play button toggles paused state, question navigator 1-10, input accepts text), Reading preparation page renders. Section instruction audio is generated and stored (instruction_audio_id present, audio fetchable as audio/mpeg).",
+  "backend_issues": {"critical": [], "minor": []},
+  "frontend_issues": {
+    "ui_bugs": [],
+    "integration_issues": [],
+    "design_issues": [
+      {"screen": "Admin page nav", "issues": ["Top nav uses dark background while body uses light bg-[--ps-ice]; consistent with PRD's mixed theme but admin page has no clear page title heading inside content area (only nav text). Minor."]},
+      {"screen": "LandingPage hero & ExamPage header", "issues": ["Carry-over from iteration 1: PRD specifies 'PlayStation-inspired LIGHT MODE' but landing hero, exam header, and admin nav still use dark bg. Decision needed for theme consistency."]}
+    ]
+  },
+  "test_report_links": ["/app/backend/tests/backend_test.py", "/app/test_reports/pytest/iteration_2.xml"],
+  "action_items": [
+    "OPTIONAL: align entire UI to LIGHT MODE per PRD; landing hero, exam page header, and admin nav still dark.",
+    "NOTE: review_request mentions normalize_answer() / answers_match() helper functions but server.py uses inline .strip().lower() + '|' split inside score_objective(). Functionality is equivalent and case-insensitive scoring + variation matching VERIFIED working (test_case_insensitive_and_variations passes with mixed-case answers). Consider extracting helpers for clarity (matches the documented intent).",
+    "Consider gating /api/admin/* endpoints behind an is_admin role check; currently any authenticated user can list/delete exams and trigger expensive audio regeneration."
+  ],
+  "critical_code_review_comments": [
+    "Admin endpoints have NO authorization beyond authentication - any logged-in user can DELETE exams and call regenerate-audio (which is expensive). Add role check (e.g., user.is_admin or env-allowlisted emails).",
+    "/api/exams/{exam_id}/full still leaks correct_answer fields without auth (carry-over from iteration 1).",
+    "score_objective() still inline (no normalize_answer/answers_match helpers as described in change list) - works but doesn't match documented intent.",
+    "server.py is now ~1023 lines with seed/auth/scoring/audio/admin all in one file - increasingly violates 700-line guideline; modularization recommended.",
+    "admin_delete_exam returns deleted:True even when exam_id doesn't exist (no 404). Acceptable as idempotent but inconsistent with REST conventions.",
+    "Audio still base64-stored in MongoDB (65 files for one exam) - no GridFS migration; fine for MVP scale."
+  ],
+  "updated_files": ["/app/backend/tests/backend_test.py"],
+  "success_rate": {"backend": "100% (22/22)", "frontend": "100% of attempted flows: landing, dashboard, admin, listening prep+in-progress, reading prep"},
+  "test_credentials": "session_token=test_session_1777464282346 (Bearer header for API, cookie for browser). user_id=test-user-1777464282346, email=tester@example.com.",
+  "seed_data_creation": "Reused iteration 1's seeded user/session. No new seed needed.",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "Backend pytest /app/backend/tests/backend_test.py now has 22 tests across TestExams/TestAudio/TestAuth/TestAttempts/TestProgress/TestAdmin/TestInstructionAudio/TestImprovedScoring. NOTE: TestAudio.test_get_audio_returns_mpeg now discovers audio_id dynamically from the exam (audio IDs change after admin regenerate-audio). Exam exam_academic_001 currently has 65 audio files (4 instruction + 61 segment). Frontend cookie auth verified. Listening/Reading prep screens use buttons 'Begin Listening Test' / 'Begin Reading Test' (not 'Start'). Writing/Speaking module UIs were NOT exercised - next agent can validate. Admin panel route is /admin and is reachable from dashboard via [data-testid=admin-link].",
+  "rca of the issue": "N/A - no defects this iteration."
+}

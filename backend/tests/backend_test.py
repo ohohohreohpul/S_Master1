@@ -62,7 +62,19 @@ class TestExams:
 # --- Audio ---
 class TestAudio:
     def test_get_audio_returns_mpeg(self, client):
-        r = client.get(f"{BASE_URL}/api/audio/{AUDIO_ID}")
+        # Dynamically discover a real audio_id from exam (regen invalidates hardcoded ones)
+        r0 = client.get(f"{BASE_URL}/api/exams/{EXAM_ID}")
+        assert r0.status_code == 200
+        audio_id = None
+        for s in r0.json().get("listening", {}).get("sections", []):
+            for seg in s.get("script_segments", []):
+                if seg.get("audio_id"):
+                    audio_id = seg["audio_id"]
+                    break
+            if audio_id:
+                break
+        assert audio_id, "No script_segment audio_id found"
+        r = client.get(f"{BASE_URL}/api/audio/{audio_id}")
         assert r.status_code == 200
         assert r.headers.get("content-type", "").startswith("audio/mpeg")
         assert len(r.content) > 1000  # non-trivial mp3
@@ -147,3 +159,96 @@ class TestProgress:
         for m in ["listening", "reading", "writing", "speaking"]:
             assert m in d["modules"]
             assert "attempts" in d["modules"][m]
+
+
+# --- Admin Endpoints (NEW) ---
+class TestAdmin:
+    def test_admin_exams_unauth(self, client):
+        r = client.get(f"{BASE_URL}/api/admin/exams")
+        assert r.status_code == 401
+
+    def test_admin_exams_list(self, auth_client):
+        r = auth_client.get(f"{BASE_URL}/api/admin/exams")
+        assert r.status_code == 200
+        data = r.json()
+        assert isinstance(data, list)
+        assert any(e["exam_id"] == EXAM_ID for e in data)
+        e = next(x for x in data if x["exam_id"] == EXAM_ID)
+        assert "audio_files_count" in e
+        assert isinstance(e["audio_files_count"], int)
+        assert e["audio_files_count"] > 0
+        assert e["status"] == "ready"
+
+    def test_admin_stats_unauth(self, client):
+        r = client.get(f"{BASE_URL}/api/admin/stats")
+        assert r.status_code == 401
+
+    def test_admin_stats(self, auth_client):
+        r = auth_client.get(f"{BASE_URL}/api/admin/stats")
+        assert r.status_code == 200
+        d = r.json()
+        for k in ["total_exams", "ready_exams", "total_audio_files",
+                  "total_users", "total_attempts", "completed_attempts"]:
+            assert k in d, f"missing key {k}"
+            assert isinstance(d[k], int)
+        assert d["total_exams"] >= 1
+        assert d["ready_exams"] >= 1
+        assert d["total_audio_files"] >= 1
+
+    def test_admin_delete_unauth(self, client):
+        r = client.delete(f"{BASE_URL}/api/admin/exams/some_id")
+        assert r.status_code == 401
+
+    def test_admin_delete_nonexistent(self, auth_client):
+        # Deleting a non-existent exam should still 200 (idempotent)
+        r = auth_client.delete(f"{BASE_URL}/api/admin/exams/TEST_does_not_exist_zzz")
+        assert r.status_code == 200
+        d = r.json()
+        assert d["deleted"] is True
+
+
+# --- Section Instruction Audio (NEW) ---
+class TestInstructionAudio:
+    def test_listening_sections_have_instruction_audio(self, client):
+        r = client.get(f"{BASE_URL}/api/exams/{EXAM_ID}")
+        assert r.status_code == 200
+        sections = r.json().get("listening", {}).get("sections", [])
+        assert len(sections) >= 1
+        sections_with_instr = [s for s in sections if s.get("instruction_audio_id")]
+        assert len(sections_with_instr) >= 1, \
+            f"Expected at least one section with instruction_audio_id, got 0 of {len(sections)}"
+        # Verify the instruction audio is fetchable
+        instr_id = sections_with_instr[0]["instruction_audio_id"]
+        r2 = client.get(f"{BASE_URL}/api/audio/{instr_id}")
+        assert r2.status_code == 200
+        assert r2.headers.get("content-type", "").startswith("audio/mpeg")
+        assert len(r2.content) > 1000
+
+
+# --- Improved Answer Scoring (case-insensitive + variations) ---
+class TestImprovedScoring:
+    def test_case_insensitive_and_variations(self, auth_client):
+        # New attempt
+        r = auth_client.post(f"{BASE_URL}/api/attempts",
+                             json={"exam_id": EXAM_ID, "module": "listening"})
+        assert r.status_code == 200
+        attempt_id = r.json()["attempt_id"]
+        # Mix case + whitespace; correct answers from seed
+        answers = {
+            "1": "STANDARD",        # uppercase
+            "2": " 85 ",             # with whitespace
+            "3": "7",
+            "4": "Ground",           # mixed case
+            "5": "BACK",
+            "6": "2",
+            "7": "15",
+            "8": "thompson",         # lowercase name
+            "9": "893214",
+            "10": "185",
+        }
+        r2 = auth_client.put(f"{BASE_URL}/api/attempts/{attempt_id}/submit",
+                             json={"answers": answers})
+        assert r2.status_code == 200
+        s = r2.json()["scores"]
+        assert s["correct"] == 10, \
+            f"Case-insensitive scoring failed: only {s['correct']}/10 correct. Details: {s.get('details')}"

@@ -172,9 +172,27 @@ async def generate_exam_audio(exam_id: str):
             await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "ready", "audio_progress": 100}})
             return
 
-        # Generate listening audio
+        # Generate listening audio (including section instructions)
         for section in exam.get("listening", {}).get("sections", []):
             section_num = section["section_num"]
+            
+            # Generate instruction audio first if present
+            instruction_text = section.get("instruction")
+            if instruction_text and not section.get("instruction_audio_id"):
+                try:
+                    audio_bytes = await generate_audio_for_text(instruction_text, VOICES["examiner"])
+                    audio_id = f"audio_instr_{uuid.uuid4().hex[:10]}"
+                    await db.audio_files.insert_one({
+                        "audio_id": audio_id, "exam_id": exam_id, "section_num": section_num,
+                        "type": "instruction", "audio_base64": base64.b64encode(audio_bytes).decode(),
+                        "format": "mp3", "created_at": datetime.now(timezone.utc).isoformat()
+                    })
+                    await db.exams.update_one({"exam_id": exam_id},
+                        {"$set": {f"listening.sections.{section_num-1}.instruction_audio_id": audio_id}})
+                    logger.info(f"Generated instruction audio for section {section_num}")
+                except Exception as e:
+                    logger.error(f"Instruction audio error section {section_num}: {e}")
+
             for i, segment in enumerate(section.get("script_segments", [])):
                 if segment.get("audio_id"):
                     generated += 1
@@ -635,6 +653,7 @@ def get_seed_exam():
                         {"name": "Receptionist", "voice_id": VOICES["british_female_1"]},
                         {"name": "Guest", "voice_id": VOICES["british_male_1"]}
                     ],
+                    "instruction": "You will hear a conversation between a hotel receptionist and a guest making a booking. First, you have some time to look at questions 1 to 10. Now listen carefully and answer questions 1 to 10.",
                     "script_segments": [
                         {"speaker": "Receptionist", "text": "[cheerful] Good morning, Parkview Hotel. How may I help you today?"},
                         {"speaker": "Guest", "text": "Hi there. I'd like to book a room for next weekend, please."},
@@ -666,7 +685,7 @@ def get_seed_exam():
                         {"question_num": 5, "question_type": "form_completion", "question_text": "Car park is at the ________ of the building", "correct_answer": "back"},
                         {"question_num": 6, "question_type": "form_completion", "question_text": "Late checkout available until ________ p.m.", "correct_answer": "2"},
                         {"question_num": 7, "question_type": "form_completion", "question_text": "Additional charge for late checkout: $ ________", "correct_answer": "15"},
-                        {"question_num": 8, "question_type": "form_completion", "question_text": "Guest surname:", "correct_answer": "Thompson"},
+                        {"question_num": 8, "question_type": "form_completion", "question_text": "Guest surname:", "correct_answer": "Thompson|thomson"},
                         {"question_num": 9, "question_type": "form_completion", "question_text": "Contact number: 07456 ________", "correct_answer": "893214"},
                         {"question_num": 10, "question_type": "form_completion", "question_text": "Total booking cost: $ ________", "correct_answer": "185"}
                     ]
@@ -676,6 +695,7 @@ def get_seed_exam():
                     "title": "City Transport Guide",
                     "context": "A transport officer giving information about public transport options in a city",
                     "speakers": [{"name": "Officer", "voice_id": VOICES["british_female_2"]}],
+                    "instruction": "You will hear a transport officer giving information about public transport options in a city. First, you have some time to look at questions 11 to 20. Now listen carefully and answer questions 11 to 20.",
                     "script_segments": [
                         {"speaker": "Officer", "text": "[warm] Good afternoon everyone, and welcome to the Riverside City orientation session. I'm going to give you an overview of the public transport options available to you here."},
                         {"speaker": "Officer", "text": "First, let me tell you about the bus network. The city operates twelve main bus routes that cover all major areas. Single tickets cost two pounds fifty, but if you're going to be here for a while, I'd recommend getting a weekly pass for just fourteen pounds."},
@@ -694,7 +714,7 @@ def get_seed_exam():
                         {"question_num": 15, "question_type": "form_completion", "question_text": "Off-peak bus frequency: every ________ minutes", "correct_answer": "25"},
                         {"question_num": 16, "question_type": "form_completion", "question_text": "The tram was introduced in ________", "correct_answer": "2018"},
                         {"question_num": 17, "question_type": "form_completion", "question_text": "Tram journey time end to end: ________ minutes", "correct_answer": "22"},
-                        {"question_num": 18, "question_type": "form_completion", "question_text": "Bike scheme name:", "correct_answer": "PedalGo"},
+                        {"question_num": 18, "question_type": "form_completion", "question_text": "Bike scheme name:", "correct_answer": "PedalGo|Pedal Go|pedalgo"},
                         {"question_num": 19, "question_type": "form_completion", "question_text": "Number of bike docking stations:", "correct_answer": "43"},
                         {"question_num": 20, "question_type": "form_completion", "question_text": "Pedestrian zone closes to vehicles at ________ a.m.", "correct_answer": "10"}
                     ]
@@ -708,6 +728,7 @@ def get_seed_exam():
                         {"name": "Sarah", "voice_id": VOICES["british_female_1"]},
                         {"name": "James", "voice_id": VOICES["british_male_1"]}
                     ],
+                    "instruction": "You will hear a discussion between a tutor and two students about their research project. First, you have some time to look at questions 21 to 30. Now listen carefully and answer questions 21 to 30.",
                     "script_segments": [
                         {"speaker": "Tutor", "text": "Right, Sarah and James, let's discuss how your research project on renewable energy adoption is progressing. Sarah, would you like to start?"},
                         {"speaker": "Sarah", "text": "Sure. Well, we've completed the literature review, which took us about three weeks. We found some really interesting studies on solar panel adoption in suburban areas."},
@@ -740,6 +761,7 @@ def get_seed_exam():
                     "title": "Marine Conservation Lecture",
                     "context": "A university lecture on marine conservation and coral reef restoration",
                     "speakers": [{"name": "Professor", "voice_id": VOICES["british_male_2"]}],
+                    "instruction": "You will hear a university lecture on marine conservation and coral reef restoration. First, you have some time to look at questions 31 to 40. Now listen carefully and answer questions 31 to 40.",
                     "script_segments": [
                         {"speaker": "Professor", "text": "[scholarly] Good morning. Today's lecture focuses on marine conservation, specifically the efforts being made to restore coral reef ecosystems around the world."},
                         {"speaker": "Professor", "text": "Coral reefs are often called the rainforests of the sea, and for good reason. Although they cover less than one percent of the ocean floor, they support approximately twenty-five percent of all known marine species."},
@@ -922,6 +944,68 @@ async def startup():
         seed = get_seed_exam()
         await db.exams.insert_one(seed)
         logger.info("Seeded exam_academic_001")
+
+# ==========================================
+# ADMIN ENDPOINTS
+# ==========================================
+@api_router.get("/admin/exams")
+async def admin_list_exams(request: Request):
+    """Admin view - all exams with full details"""
+    await get_current_user(request)
+    exams = await db.exams.find({}, {"_id": 0, "exam_id": 1, "title": 1, "pathway": 1, "status": 1,
+        "audio_progress": 1, "created_at": 1, "error_message": 1,
+        "listening.total_questions": 1, "reading.total_questions": 1,
+        "writing.tasks": 1, "speaking.parts": 1}).to_list(100)
+    # Add audio count
+    for exam in exams:
+        count = await db.audio_files.count_documents({"exam_id": exam["exam_id"]})
+        exam["audio_files_count"] = count
+    return exams
+
+@api_router.delete("/admin/exams/{exam_id}")
+async def admin_delete_exam(exam_id: str, request: Request):
+    """Delete an exam and its audio"""
+    await get_current_user(request)
+    await db.exams.delete_one({"exam_id": exam_id})
+    result = await db.audio_files.delete_many({"exam_id": exam_id})
+    return {"deleted": True, "audio_files_removed": result.deleted_count}
+
+@api_router.post("/admin/exams/{exam_id}/regenerate-audio")
+async def admin_regenerate_audio(exam_id: str, background_tasks: BackgroundTasks, request: Request):
+    """Force regenerate all audio for an exam"""
+    await get_current_user(request)
+    # Clear existing audio
+    await db.audio_files.delete_many({"exam_id": exam_id})
+    # Reset audio IDs in exam
+    exam = await db.exams.find_one({"exam_id": exam_id}, {"_id": 0})
+    if not exam:
+        raise HTTPException(404, "Exam not found")
+    for si, section in enumerate(exam.get("listening", {}).get("sections", [])):
+        for sgi, seg in enumerate(section.get("script_segments", [])):
+            await db.exams.update_one({"exam_id": exam_id},
+                {"$unset": {f"listening.sections.{si}.script_segments.{sgi}.audio_id": ""}})
+        await db.exams.update_one({"exam_id": exam_id},
+            {"$unset": {f"listening.sections.{si}.instruction_audio_id": ""}})
+    for pi, part in enumerate(exam.get("speaking", {}).get("parts", [])):
+        for qi, q in enumerate(part.get("questions", [])):
+            await db.exams.update_one({"exam_id": exam_id},
+                {"$unset": {f"speaking.parts.{pi}.questions.{qi}.audio_id": ""}})
+    await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "pending_audio", "audio_progress": 0}})
+    background_tasks.add_task(generate_exam_audio, exam_id)
+    return {"status": "regenerating"}
+
+@api_router.get("/admin/stats")
+async def admin_stats(request: Request):
+    """Platform statistics"""
+    await get_current_user(request)
+    return {
+        "total_exams": await db.exams.count_documents({}),
+        "ready_exams": await db.exams.count_documents({"status": "ready"}),
+        "total_audio_files": await db.audio_files.count_documents({}),
+        "total_users": await db.users.count_documents({}),
+        "total_attempts": await db.attempts.count_documents({}),
+        "completed_attempts": await db.attempts.count_documents({"status": "completed"}),
+    }
 
 app.include_router(api_router)
 
