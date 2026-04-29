@@ -225,6 +225,77 @@ class TestInstructionAudio:
         assert len(r2.content) > 1000
 
 
+# --- Iteration 3: Voice IDs distinctness ---
+class TestVoiceAssignments:
+    EXAMINER_VOICE = "nPczCjzI2devNBz1zQrb"  # Brian
+    CONVO_VOICES = {
+        "onwK4e9ZLuTAKqWW03F9",  # Daniel
+        "Xb7hH8MSUJpSbSDYk0k2",  # Alice
+        "eUlIljct4YrEQRcEqrii",  # Ben
+        "NNl6r8mD7vthiJatiJt1",  # Bradford
+    }
+
+    def test_examiner_voice_distinct_from_conversation(self):
+        # Examiner voice must NOT be reused for any conversation speaker
+        assert self.EXAMINER_VOICE not in self.CONVO_VOICES
+
+    def test_seed_uses_distinct_voice_ids(self, client):
+        r = client.get(f"{BASE_URL}/api/exams/{EXAM_ID}")
+        assert r.status_code == 200
+        d = r.json()
+        speaker_voices = set()
+        for s in d.get("listening", {}).get("sections", []):
+            for sp in s.get("speakers", []):
+                if sp.get("voice_id"):
+                    speaker_voices.add(sp["voice_id"])
+        # Conversation speakers should not include the examiner voice
+        assert self.EXAMINER_VOICE not in speaker_voices, \
+            f"Examiner voice {self.EXAMINER_VOICE} was reused for a conversation speaker"
+        # At least 1 conversation voice present
+        assert len(speaker_voices) >= 1
+
+
+# --- Iteration 3: Speaking transcription (ElevenLabs Scribe V1) ---
+class TestSpeakingTranscribe:
+    def test_transcribe_unauth(self):
+        # Use fresh session (no JSON content-type that would block multipart)
+        s = requests.Session()
+        files = {"audio_file": ("a.webm", b"x" * 200, "audio/webm")}
+        r = s.post(f"{BASE_URL}/api/speaking/transcribe", files=files)
+        assert r.status_code == 401, f"Expected 401 unauth, got {r.status_code}: {r.text[:200]}"
+
+    def test_transcribe_too_small(self, auth_client):
+        # Strip JSON content-type header for multipart
+        s = requests.Session()
+        s.headers.update({"Authorization": f"Bearer {SESSION_TOKEN}"})
+        files = {"audio_file": ("tiny.webm", b"x", "audio/webm")}
+        r = s.post(f"{BASE_URL}/api/speaking/transcribe", files=files)
+        assert r.status_code == 400, f"Expected 400 too small, got {r.status_code}: {r.text[:200]}"
+
+    def test_transcribe_real_audio(self, auth_client):
+        # Use a real generated MP3 from the exam as the audio sample
+        r0 = auth_client.get(f"{BASE_URL}/api/exams/{EXAM_ID}")
+        assert r0.status_code == 200
+        audio_id = None
+        for s in r0.json().get("listening", {}).get("sections", []):
+            for seg in s.get("script_segments", []):
+                if seg.get("audio_id"):
+                    audio_id = seg["audio_id"]; break
+            if audio_id: break
+        assert audio_id
+        ar = requests.get(f"{BASE_URL}/api/audio/{audio_id}")
+        assert ar.status_code == 200 and len(ar.content) > 1000
+        s = requests.Session()
+        s.headers.update({"Authorization": f"Bearer {SESSION_TOKEN}"})
+        files = {"audio_file": ("sample.mp3", ar.content, "audio/mpeg")}
+        r = s.post(f"{BASE_URL}/api/speaking/transcribe", files=files, timeout=60)
+        assert r.status_code == 200, f"STT failed: {r.status_code} {r.text[:300]}"
+        d = r.json()
+        assert "text" in d and isinstance(d["text"], str)
+        assert "word_count" in d and isinstance(d["word_count"], int)
+        assert d["word_count"] >= 1, f"Expected non-empty transcription, got {d}"
+
+
 # --- Improved Answer Scoring (case-insensitive + variations) ---
 class TestImprovedScoring:
     def test_case_insensitive_and_variations(self, auth_client):

@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from "react";
-import { Mic, MicOff, Play, Square, Clock, Volume2 } from "lucide-react";
+import { Mic, Square, Play, Clock, Volume2, Loader2, CheckCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { motion, AnimatePresence } from "framer-motion";
+import { API } from "@/App";
 
 export default function SpeakingModule({ exam, audioCache, answers, updateAnswer }) {
   const [currentPart, setCurrentPart] = useState(1);
@@ -10,6 +12,8 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
   const [isPlayingPrompt, setIsPlayingPrompt] = useState(false);
   const [prepTimer, setPrepTimer] = useState(null);
   const [recordings, setRecordings] = useState({});
+  const [transcriptions, setTranscriptions] = useState({});
+  const [transcribing, setTranscribing] = useState({});
   const mediaRecorderRef = useRef(null);
   const audioChunksRef = useRef([]);
   const timerRef = useRef(null);
@@ -20,11 +24,9 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
   const questions = part?.questions || [];
   const question = questions[currentQuestion];
 
-  // Play examiner prompt
   const playPrompt = () => {
     if (!question) return;
     const audioUrl = audioCache[`speaking_${question.question_num}`];
-
     if (audioUrl) {
       const audio = new Audio(audioUrl);
       setIsPlayingPrompt(true);
@@ -34,25 +36,20 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
     }
   };
 
-  // Start preparation timer (Part 2)
   const startPrep = () => {
     setPrepTimer(60);
     prepTimerRef.current = setInterval(() => {
       setPrepTimer(prev => {
-        if (prev <= 1) {
-          clearInterval(prepTimerRef.current);
-          return 0;
-        }
+        if (prev <= 1) { clearInterval(prepTimerRef.current); return 0; }
         return prev - 1;
       });
     }, 1000);
   };
 
-  // Start recording
   const startRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      const mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm;codecs=opus" });
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
@@ -60,28 +57,43 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
         if (e.data.size > 0) audioChunksRef.current.push(e.data);
       };
 
-      mediaRecorder.onstop = () => {
+      mediaRecorder.onstop = async () => {
         const blob = new Blob(audioChunksRef.current, { type: "audio/webm" });
         const url = URL.createObjectURL(blob);
         const qNum = String(question.question_num);
-        setRecordings(prev => ({ ...prev, [qNum]: url }));
-        updateAnswer(qNum, `[Recording saved - ${recordingTime}s]`);
+        setRecordings(prev => ({ ...prev, [qNum]: { url, blob } }));
         stream.getTracks().forEach(t => t.stop());
+
+        // Auto-transcribe via ElevenLabs STT
+        setTranscribing(prev => ({ ...prev, [qNum]: true }));
+        try {
+          const formData = new FormData();
+          formData.append("audio_file", blob, "recording.webm");
+          const res = await fetch(`${API}/speaking/transcribe`, {
+            method: "POST",
+            credentials: "include",
+            body: formData,
+          });
+          if (res.ok) {
+            const data = await res.json();
+            setTranscriptions(prev => ({ ...prev, [qNum]: data.text }));
+            updateAnswer(qNum, data.text);
+          }
+        } catch (e) {
+          console.error("Transcription error:", e);
+        }
+        setTranscribing(prev => ({ ...prev, [qNum]: false }));
       };
 
-      mediaRecorder.start();
+      mediaRecorder.start(250);
       setIsRecording(true);
       setRecordingTime(0);
-
-      timerRef.current = setInterval(() => {
-        setRecordingTime(prev => prev + 1);
-      }, 1000);
+      timerRef.current = setInterval(() => setRecordingTime(prev => prev + 1), 1000);
     } catch (e) {
       console.error("Microphone access denied:", e);
     }
   };
 
-  // Stop recording
   const stopRecording = () => {
     if (mediaRecorderRef.current && isRecording) {
       mediaRecorderRef.current.stop();
@@ -90,7 +102,6 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
     }
   };
 
-  // Next question
   const nextQuestion = () => {
     if (currentQuestion < questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
@@ -116,102 +127,149 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
       {/* Part tabs */}
       <div className="flex gap-3 mb-8" data-testid="part-tabs">
         {parts.map(p => (
-          <button key={p.part_num} onClick={() => { setCurrentPart(p.part_num); setCurrentQuestion(0); }}
-            className={`px-5 py-2 rounded-full text-sm font-medium transition-all ${
-              currentPart === p.part_num ? "bg-[var(--ps-blue)] text-white" : "bg-[var(--ps-ice)] text-[var(--ps-body-gray)] hover:bg-[var(--ps-divider)]"
+          <motion.button key={p.part_num} whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+            onClick={() => { setCurrentPart(p.part_num); setCurrentQuestion(0); }}
+            className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all ${
+              currentPart === p.part_num
+                ? "bg-[var(--ps-blue)] text-white shadow-lg shadow-[var(--ps-blue)]/20"
+                : "bg-white text-[var(--ps-body-gray)] hover:bg-[var(--ps-ice)] border border-[var(--ps-divider)]"
             }`} data-testid={`part-tab-${p.part_num}`}>
             Part {p.part_num}
-          </button>
+          </motion.button>
         ))}
       </div>
 
       {/* Part info */}
-      <div className="card-ps p-6 mb-6" data-testid="part-info">
-        <h3 className="font-medium text-lg mb-2" style={{ color: "var(--ps-charcoal)" }}>
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+        className="card-ps p-6 mb-6" data-testid="part-info">
+        <h3 className="font-semibold text-lg mb-2" style={{ color: "var(--ps-charcoal)" }}>
           Part {currentPart}: {part?.title}
         </h3>
-        <p className="text-sm text-[var(--ps-body-gray)]">{part?.instructions}</p>
+        <p className="text-sm text-[var(--ps-body-gray)] leading-relaxed">{part?.instructions}</p>
 
-        {/* Cue card (Part 2) */}
         {part?.cue_card && (
-          <div className="mt-4 p-4 bg-[var(--ps-ice)] rounded-xl border border-[var(--ps-divider)]" data-testid="cue-card">
-            <p className="text-xs font-medium text-[var(--ps-body-gray)] mb-2">Topic Card</p>
-            <div className="text-sm" style={{ color: "var(--ps-charcoal)" }}>
+          <div className="mt-4 p-5 bg-[var(--ps-ice)] rounded-xl border border-[var(--ps-divider)]" data-testid="cue-card">
+            <p className="text-[10px] font-bold text-[var(--ps-blue)] mb-3 uppercase tracking-wider">Topic Card</p>
+            <div className="text-sm leading-relaxed" style={{ color: "var(--ps-charcoal)" }}>
               {part.cue_card.split("\n").map((line, i) => (
                 <p key={i} className="mb-1">{line}</p>
               ))}
             </div>
             {prepTimer === null && (
-              <button onClick={startPrep} className="btn-ps btn-ps-secondary mt-3" style={{ padding: "6px 16px", fontSize: "0.8rem" }}
+              <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                onClick={startPrep} className="btn-ps btn-ps-secondary mt-4" style={{ padding: "8px 20px", fontSize: "0.8rem" }}
                 data-testid="start-prep-btn">
                 <Clock size={14} /> Start 1-minute preparation
-              </button>
+              </motion.button>
             )}
             {prepTimer !== null && prepTimer > 0 && (
-              <div className="mt-3 flex items-center gap-2">
+              <div className="mt-4 flex items-center gap-2">
                 <Clock size={14} className="text-[var(--ps-blue)]" />
-                <span className="text-sm font-medium text-[var(--ps-blue)]">Preparation time: {formatTime(prepTimer)}</span>
+                <span className="text-sm font-semibold text-[var(--ps-blue)]">{formatTime(prepTimer)}</span>
+                <Progress value={((60 - prepTimer) / 60) * 100} className="flex-1 h-1.5" />
               </div>
             )}
             {prepTimer === 0 && (
-              <p className="mt-3 text-sm font-medium text-[var(--ps-orange)]">Preparation time is over. Please begin speaking.</p>
+              <p className="mt-4 text-sm font-medium text-[var(--ps-orange)]">Preparation time is over. Please begin speaking.</p>
             )}
           </div>
         )}
-      </div>
+      </motion.div>
 
       {/* Current Question */}
-      {question && (
-        <div className="card-ps p-6 mb-6" data-testid={`speaking-question-${question.question_num}`}>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="q-pill">{question.question_num}</span>
-            <p className="text-sm font-medium" style={{ color: "var(--ps-charcoal)" }}>
-              {question.question_text.replace(/\[.*?\]/g, "").trim()}
-            </p>
-          </div>
+      <AnimatePresence mode="wait">
+        {question && (
+          <motion.div key={`q-${question.question_num}`} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
+            className="card-ps p-6 mb-6" data-testid={`speaking-question-${question.question_num}`}>
+            <div className="flex items-center gap-3 mb-5">
+              <span className="q-pill" style={{ width: 36, height: 36, fontSize: "0.85rem" }}>{question.question_num}</span>
+              <p className="text-sm font-medium flex-1" style={{ color: "var(--ps-charcoal)" }}>
+                {question.question_text.replace(/\[.*?\]/g, "").trim()}
+              </p>
+            </div>
 
-          {/* Play examiner audio */}
-          <button onClick={playPrompt} disabled={isPlayingPrompt}
-            className="btn-ps btn-ps-secondary mb-4" style={{ padding: "8px 20px", fontSize: "0.8rem" }}
-            data-testid="play-prompt-btn">
-            {isPlayingPrompt ? (
-              <><div className="audio-playing" style={{ height: 16 }}><span /><span /><span /></div> Playing...</>
-            ) : (
-              <><Volume2 size={14} /> Play Examiner Question</>
-            )}
-          </button>
+            {/* Play examiner audio */}
+            <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+              onClick={playPrompt} disabled={isPlayingPrompt}
+              className="btn-ps btn-ps-secondary mb-5 flex items-center gap-2" style={{ padding: "10px 24px", fontSize: "0.8rem" }}
+              data-testid="play-prompt-btn">
+              {isPlayingPrompt ? (
+                <><div className="audio-playing" style={{ height: 16 }}><span /><span /><span /></div> Playing examiner...</>
+              ) : (
+                <><Volume2 size={14} /> Play Examiner Question</>
+              )}
+            </motion.button>
 
-          {/* Recording controls */}
-          <div className="flex items-center gap-4">
-            {!isRecording ? (
-              <button onClick={startRecording} className="btn-ps btn-ps-primary" style={{ padding: "10px 24px", fontSize: "0.875rem" }}
-                data-testid="start-recording-btn">
-                <Mic size={16} /> Record Response
-              </button>
-            ) : (
-              <button onClick={stopRecording} className="btn-ps btn-ps-orange" style={{ padding: "10px 24px", fontSize: "0.875rem" }}
-                data-testid="stop-recording-btn">
-                <Square size={16} /> Stop ({formatTime(recordingTime)})
-              </button>
-            )}
+            {/* Recording controls */}
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                {!isRecording ? (
+                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    onClick={startRecording}
+                    className="btn-ps btn-ps-primary flex items-center gap-2" style={{ padding: "12px 28px", fontSize: "0.875rem" }}
+                    data-testid="start-recording-btn">
+                    <Mic size={16} /> Record Response
+                  </motion.button>
+                ) : (
+                  <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+                    onClick={stopRecording}
+                    className="btn-ps btn-ps-orange flex items-center gap-2" style={{ padding: "12px 28px", fontSize: "0.875rem" }}
+                    data-testid="stop-recording-btn">
+                    <Square size={16} /> Stop Recording ({formatTime(recordingTime)})
+                  </motion.button>
+                )}
 
-            {recordings[String(question.question_num)] && (
-              <div className="flex items-center gap-2">
-                <audio controls src={recordings[String(question.question_num)]} className="h-8" data-testid="playback-audio" />
-                <span className="text-xs text-green-600 font-medium">Recorded</span>
+                {isRecording && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-3 h-3 rounded-full bg-red-500 animate-pulse" />
+                    <span className="text-sm text-red-500 font-medium">Recording...</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      )}
+
+              {/* Playback + Transcription */}
+              {recordings[String(question.question_num)] && (
+                <div className="bg-[var(--ps-ice)] rounded-xl p-4 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <audio controls src={recordings[String(question.question_num)].url} className="h-8 flex-1" data-testid="playback-audio" />
+                    <CheckCircle size={16} className="text-emerald-500" />
+                  </div>
+
+                  {/* STT Transcription */}
+                  {transcribing[String(question.question_num)] && (
+                    <div className="flex items-center gap-2 text-sm text-[var(--ps-blue)]">
+                      <Loader2 size={14} className="animate-spin" />
+                      <span>Transcribing your response...</span>
+                    </div>
+                  )}
+                  {transcriptions[String(question.question_num)] && (
+                    <div data-testid="transcription-result">
+                      <p className="text-[10px] font-bold text-[var(--ps-body-gray)] uppercase tracking-wider mb-1">Your transcription</p>
+                      <p className="text-sm text-[var(--ps-charcoal)] leading-relaxed bg-white rounded-lg p-3 border border-[var(--ps-divider)]">
+                        {transcriptions[String(question.question_num)]}
+                      </p>
+                      <p className="text-[10px] text-[var(--ps-body-gray)] mt-1">
+                        {answers[String(question.question_num)]?.split(" ").length || 0} words
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Navigation */}
-      <div className="flex justify-between">
-        <div />
-        <button onClick={nextQuestion} className="btn-ps btn-ps-secondary" style={{ padding: "8px 20px", fontSize: "0.875rem" }}
+      <div className="flex justify-between items-center">
+        <div className="text-xs text-[var(--ps-body-gray)]">
+          Question {currentQuestion + 1} of {questions.length}
+        </div>
+        <motion.button whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}
+          onClick={nextQuestion} className="btn-ps btn-ps-secondary flex items-center gap-2" style={{ padding: "10px 24px", fontSize: "0.8rem" }}
           data-testid="next-question-btn">
           {currentQuestion < questions.length - 1 ? "Next Question" : currentPart < parts.length ? "Next Part" : "Finish Speaking"}
-        </button>
+        </motion.button>
       </div>
     </div>
   );

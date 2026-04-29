@@ -57,7 +57,10 @@ export default function ListeningModule({ exam, audioCache, answers, updateAnswe
 
     audio.addEventListener("ended", () => {
       clearInterval(progressIntervalRef.current);
-      setAudioIndex(prev => prev + 1);
+      // Natural pause between speaker turns (750ms breathing room)
+      setTimeout(() => {
+        setAudioIndex(prev => prev + 1);
+      }, 750);
     });
 
     audio.addEventListener("error", (e) => {

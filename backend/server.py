@@ -24,11 +24,13 @@ ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY', '')
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
 
 VOICES = {
-    "british_female_1": "pFZP5JQG7iQjIQuC4Bku",
-    "british_male_1": "onwK4e9ZLuTAKqWW03F9",
-    "british_female_2": "XB0fDUnXU5powFXDhCwa",
-    "british_male_2": "JBFqnCBsd6RMkjVDRZzb",
-    "examiner": "onwK4e9ZLuTAKqWW03F9",
+    "examiner": "nPczCjzI2devNBz1zQrb",        # Brian - Deep narrator (instructions only)
+    "british_female_1": "pFZP5JQG7iQjIQuC4Bku", # Lily - Velvety Actress
+    "british_male_1": "onwK4e9ZLuTAKqWW03F9",   # Daniel - Steady Broadcaster
+    "british_female_2": "Xb7hH8MSUJpSbSDYk0k2", # Alice - Clear Educator
+    "british_male_2": "JBFqnCBsd6RMkjVDRZzb",   # George - Warm Storyteller
+    "british_male_3": "eUlIljct4YrEQRcEqrii",    # Ben - Calm British Male
+    "professor": "NNl6r8mD7vthiJatiJt1",          # Bradford - Expressive Academic
 }
 
 app = FastAPI()
@@ -361,6 +363,39 @@ async def get_audio(audio_id: str):
         headers={"Content-Disposition": f"inline; filename={audio_id}.mp3", "Cache-Control": "public, max-age=86400"})
 
 # ==========================================
+# SPEECH-TO-TEXT (ElevenLabs Scribe)
+# ==========================================
+def _transcribe_audio_sync(audio_bytes: bytes) -> str:
+    """Transcribe audio using ElevenLabs STT (sync, run in executor)"""
+    import io
+    from elevenlabs import ElevenLabs
+    client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
+    result = client.speech_to_text.convert(
+        file=io.BytesIO(audio_bytes),
+        model_id="scribe_v1"
+    )
+    return result.text if hasattr(result, 'text') else str(result)
+
+async def transcribe_audio_async(audio_bytes: bytes) -> str:
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(None, _transcribe_audio_sync, audio_bytes)
+
+@api_router.post("/speaking/transcribe")
+async def transcribe_speaking(audio_file: UploadFile = File(...), request: Request = None):
+    """Transcribe recorded speaking audio via ElevenLabs STT"""
+    if request:
+        await get_current_user(request)
+    audio_content = await audio_file.read()
+    if len(audio_content) < 100:
+        raise HTTPException(400, "Audio file too small")
+    try:
+        text = await transcribe_audio_async(audio_content)
+        return {"text": text, "word_count": len(text.split()) if text else 0}
+    except Exception as e:
+        logger.error(f"STT error: {e}")
+        raise HTTPException(500, f"Transcription failed: {str(e)}")
+
+# ==========================================
 # ATTEMPTS & SCORING
 # ==========================================
 @api_router.post("/attempts")
@@ -680,8 +715,8 @@ def get_seed_exam():
                     "title": "Hotel Reservation",
                     "context": "A conversation between a hotel receptionist and a guest making a booking",
                     "speakers": [
-                        {"name": "Receptionist", "voice_id": VOICES["british_female_1"]},
-                        {"name": "Guest", "voice_id": VOICES["british_male_1"]}
+                        {"name": "Receptionist", "voice_id": "pFZP5JQG7iQjIQuC4Bku"},
+                        {"name": "Guest", "voice_id": "onwK4e9ZLuTAKqWW03F9"}
                     ],
                     "instruction": "You will hear a conversation between a hotel receptionist and a guest making a booking. First, you have some time to look at questions 1 to 10. Now listen carefully and answer questions 1 to 10.",
                     "script_segments": [
@@ -724,7 +759,7 @@ def get_seed_exam():
                     "section_num": 2,
                     "title": "City Transport Guide",
                     "context": "A transport officer giving information about public transport options in a city",
-                    "speakers": [{"name": "Officer", "voice_id": VOICES["british_female_2"]}],
+                    "speakers": [{"name": "Officer", "voice_id": "Xb7hH8MSUJpSbSDYk0k2"}],
                     "instruction": "You will hear a transport officer giving information about public transport options in a city. First, you have some time to look at questions 11 to 20. Now listen carefully and answer questions 11 to 20.",
                     "script_segments": [
                         {"speaker": "Officer", "text": "[warm] Good afternoon everyone, and welcome to the Riverside City orientation session. I'm going to give you an overview of the public transport options available to you here."},
@@ -754,9 +789,9 @@ def get_seed_exam():
                     "title": "Research Project Discussion",
                     "context": "Three university students discussing their group research project",
                     "speakers": [
-                        {"name": "Tutor", "voice_id": VOICES["british_male_2"]},
-                        {"name": "Sarah", "voice_id": VOICES["british_female_1"]},
-                        {"name": "James", "voice_id": VOICES["british_male_1"]}
+                        {"name": "Tutor", "voice_id": "JBFqnCBsd6RMkjVDRZzb"},
+                        {"name": "Sarah", "voice_id": "pFZP5JQG7iQjIQuC4Bku"},
+                        {"name": "James", "voice_id": "eUlIljct4YrEQRcEqrii"}
                     ],
                     "instruction": "You will hear a discussion between a tutor and two students about their research project. First, you have some time to look at questions 21 to 30. Now listen carefully and answer questions 21 to 30.",
                     "script_segments": [
@@ -790,7 +825,7 @@ def get_seed_exam():
                     "section_num": 4,
                     "title": "Marine Conservation Lecture",
                     "context": "A university lecture on marine conservation and coral reef restoration",
-                    "speakers": [{"name": "Professor", "voice_id": VOICES["british_male_2"]}],
+                    "speakers": [{"name": "Professor", "voice_id": "NNl6r8mD7vthiJatiJt1"}],
                     "instruction": "You will hear a university lecture on marine conservation and coral reef restoration. First, you have some time to look at questions 31 to 40. Now listen carefully and answer questions 31 to 40.",
                     "script_segments": [
                         {"speaker": "Professor", "text": "[scholarly] Good morning. Today's lecture focuses on marine conservation, specifically the efforts being made to restore coral reef ecosystems around the world."},
