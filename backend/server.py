@@ -395,24 +395,54 @@ async def submit_answers(attempt_id: str, data: AnswerSubmit, request: Request):
     }})
     return {"attempt_id": attempt_id, "scores": scores}
 
+def normalize_answer(text):
+    """Normalize answer for lenient comparison"""
+    if not text:
+        return ""
+    t = str(text).strip().lower()
+    t = ' '.join(t.split())
+    for c in '.,;:!?$()[]{}':
+        t = t.replace(c, '')
+    return t
+
+def answers_match(user_answer, correct_answer):
+    """Check if answers match with tolerance for spelling/spacing variations"""
+    user = normalize_answer(user_answer)
+    if not user:
+        return False
+    for correct in str(correct_answer).split('|'):
+        c = normalize_answer(correct)
+        if not c:
+            continue
+        if user == c:
+            return True
+        if user.replace(' ', '') == c.replace(' ', ''):
+            return True
+        try:
+            if float(user) == float(c):
+                return True
+        except ValueError:
+            pass
+    return False
+
 def score_objective(exam: dict, module: str, answers: dict) -> dict:
     correct = 0
     total = 0
     details = []
-    sections = exam.get("listening" if module == "listening" else "reading", {}).get("sections" if module == "listening" else "passages", [])
+    key = "sections" if module == "listening" else "passages"
+    sections = exam.get(module, {}).get(key, [])
 
     for section in sections:
         for q in section.get("questions", []):
             q_num = str(q["question_num"])
             total += 1
-            user_answer = str(answers.get(q_num, "")).strip().lower()
-            correct_answer = str(q.get("correct_answer", "")).strip().lower()
-            acceptable = [a.strip().lower() for a in correct_answer.split("|")]
-            is_correct = user_answer in acceptable
+            user_answer = str(answers.get(q_num, ""))
+            correct_answer = str(q.get("correct_answer", ""))
+            is_correct = answers_match(user_answer, correct_answer)
             if is_correct:
                 correct += 1
-            details.append({"question_num": int(q_num), "user_answer": answers.get(q_num, ""),
-                "correct_answer": q.get("correct_answer", ""), "is_correct": is_correct})
+            details.append({"question_num": int(q_num), "user_answer": user_answer,
+                "correct_answer": correct_answer, "is_correct": is_correct})
 
     band = raw_to_band(correct, total, module)
     return {"correct": correct, "total": total, "band_score": band, "details": details}

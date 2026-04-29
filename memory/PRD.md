@@ -27,20 +27,24 @@ Build the most powerful, best Mock exam for IELTS takers - a computer-based IELT
 ## What's Been Implemented (April 29, 2026)
 - [x] Emergent Google OAuth authentication
 - [x] Pre-seeded IELTS Academic Practice Test 1 (40L + 40R + 2W + 10S questions)
-- [x] ElevenLabs V3 audio generation pipeline (61 segments, 4 listening sections + speaking prompts)
+- [x] ElevenLabs V3 audio generation pipeline (65 segments: 4 instruction + 61 content audio)
+- [x] Section instruction audio plays before each listening section
 - [x] Audio preloading system (Blob URLs cached before exam starts)
-- [x] Listening Module - all questions visible, sequential audio playback, section navigation
+- [x] Audio stored in MongoDB `audio_files` collection - generated ONCE, reused for all users (network effects)
+- [x] Listening Module - all questions visible, sequential audio playback, section instructions
 - [x] Reading Module - split panel (passage left, questions right), multiple question types
-- [x] Writing Module - textarea with word count, task tabs
-- [x] Speaking Module - audio prompts + MediaRecorder recording
+- [x] Writing Module - textarea with word count, task tabs, AI scoring via OpenRouter
+- [x] Speaking Module - audio prompts + MediaRecorder recording + AI scoring
+- [x] Improved answer scoring: case-insensitive, space-insensitive, accepts variations
+- [x] Audio scripts include spelling for proper nouns (e.g., "P-E-D-A-L-G-O")
 - [x] IELTS band score conversion for Listening/Reading
-- [x] AI scoring for Writing (via OpenRouter GPT-4o) with 4-criteria breakdown
-- [x] AI scoring for Speaking with 4-criteria breakdown
-- [x] Results page with detailed answer review
+- [x] Results page with detailed answer review and band scores
 - [x] Progress tracking dashboard
-- [x] AI exam generation endpoint (creates new exams via OpenRouter + ElevenLabs)
-- [x] PlayStation-inspired design (light content panels, dark hero/nav)
-- [x] 14/14 backend tests passed
+- [x] Admin panel with exam management, stats, generate/delete/regenerate
+- [x] AI exam generation via OpenRouter + ElevenLabs
+- [x] Framer-motion animations throughout (page transitions, staggered reveals, hover effects)
+- [x] PlayStation-inspired design (light content, dark hero/nav, blue accents)
+- [x] 22/22 backend tests passed
 
 ## Prioritized Backlog
 
