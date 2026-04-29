@@ -198,6 +198,18 @@
 /* Progress ring */
 .progress-ring { transition: stroke-dashoffset 0.3s ease; }
 
+/* IELTS Text Highlighting */
+.ielts-highlight {
+  background: linear-gradient(180deg, transparent 40%, #fef08a 40%, #fef08a 85%, transparent 85%);
+  padding: 0 2px;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: background 180ms ease;
+}
+.ielts-highlight:hover {
+  background: linear-gradient(180deg, transparent 30%, #fde047 30%, #fde047 90%, transparent 90%);
+}
+
 /* Passage text formatting */
 .passage-text {
   font-size: 1rem; line-height: 1.8;

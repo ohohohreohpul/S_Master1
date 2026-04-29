@@ -395,6 +395,68 @@ async def transcribe_speaking(audio_file: UploadFile = File(...), request: Reque
         logger.error(f"STT error: {e}")
         raise HTTPException(500, f"Transcription failed: {str(e)}")
 
+@api_router.post("/speaking/converse")
+async def speaking_converse(request: Request):
+    """Agentic speaking: AI examiner responds based on conversation context"""
+    await get_current_user(request)
+    body = await request.json()
+
+    part_num = body.get("part_num", 1)
+    user_text = body.get("user_transcription", "")
+    history = body.get("conversation_history", [])
+    cue_card = body.get("cue_card", "")
+    action = body.get("action", "respond")  # respond, start, follow_up
+
+    part_instructions = {
+        1: "Part 1 (Introduction & Interview, 4-5 min): Ask about familiar topics like home, work, hobbies. Ask one question at a time. Keep follow-ups natural and brief. Generate variety.",
+        2: f"Part 2 (Long Turn): The candidate was given this cue card:\n{cue_card}\nAfter they finish speaking, ask 1-2 brief follow-up questions about what they said.",
+        3: "Part 3 (Discussion, 4-5 min): Ask abstract/analytical questions building on Part 2 topic. Probe deeper into the candidate's views. One question at a time."
+    }
+
+    system_prompt = f"""You are a professional IELTS Speaking examiner named Daniel. You are conducting Part {part_num} of the IELTS Speaking test.
+
+Rules:
+- Be professional, warm, and encouraging
+- Ask ONE question at a time (never multiple)
+- Keep your responses brief (1-2 sentences max for follow-ups)
+- Sound natural, like a real conversation
+- {part_instructions.get(part_num, '')}
+- If action is "start", give an appropriate opening for this part
+- Do NOT use any text formatting or special characters
+- Respond in plain conversational English"""
+
+    messages = [{"role": "system", "content": system_prompt}]
+    for h in history:
+        if h and h.get("text"):
+            messages.append({"role": h["role"], "content": h["text"]})
+    if user_text:
+        messages.append({"role": "user", "content": user_text})
+    if action == "start" and not user_text:
+        messages.append({"role": "user", "content": f"[System: Begin Part {part_num}. Greet the candidate and ask your first question.]"})
+
+    try:
+        examiner_text = await call_openrouter(messages, model="openai/gpt-4o", json_mode=False)
+        # Clean up any markdown or formatting
+        examiner_text = examiner_text.strip().strip('"').strip("'")
+
+        # Generate audio for examiner response
+        audio_bytes = await generate_audio_for_text(examiner_text, VOICES["examiner"])
+        audio_b64 = base64.b64encode(audio_bytes).decode()
+
+        new_history = list(history)
+        if user_text:
+            new_history.append({"role": "user", "text": user_text})
+        new_history.append({"role": "assistant", "text": examiner_text})
+
+        return {
+            "examiner_text": examiner_text,
+            "audio_base64": audio_b64,
+            "conversation_history": new_history
+        }
+    except Exception as e:
+        logger.error(f"Speaking converse error: {e}")
+        raise HTTPException(500, f"Examiner response failed: {str(e)}")
+
 # ==========================================
 # ATTEMPTS & SCORING
 # ==========================================

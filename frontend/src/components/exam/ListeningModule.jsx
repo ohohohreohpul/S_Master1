@@ -75,9 +75,12 @@ export default function ListeningModule({ exam, audioCache, answers, updateAnswe
       setPlayingInstruction(true);
       const instrAudio = new Audio(instrUrl);
       instrAudio.addEventListener("ended", () => {
-        setPlayingInstruction(false);
-        setAudioIndex(0);
-        setAudioProgress(0);
+        // 3-second pause after instruction before exam audio starts
+        setTimeout(() => {
+          setPlayingInstruction(false);
+          setAudioIndex(0);
+          setAudioProgress(0);
+        }, 3000);
       });
       instrAudio.addEventListener("error", () => {
         setPlayingInstruction(false);
