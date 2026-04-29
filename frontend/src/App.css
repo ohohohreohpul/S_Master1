@@ -239,6 +239,66 @@
   color: var(--ps-mute);
 }
 
+/* IELTS CBT Form Layout */
+.ielts-form {
+  background: var(--ps-white);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid var(--ps-divider);
+}
+.ielts-form-header {
+  background: #e8f4fc;
+  padding: 16px 20px;
+  border-bottom: 3px solid var(--ps-blue);
+}
+.ielts-form-body {
+  padding: 24px 20px;
+}
+.ielts-q-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px; height: 20px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--ps-blue);
+  margin-right: 2px;
+  flex-shrink: 0;
+}
+.ielts-inline-input {
+  display: inline-block;
+  min-width: 100px;
+  max-width: 180px;
+  padding: 4px 8px;
+  border: 1.5px solid #bdd8f0;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-family: inherit;
+  background: #f0f7fc;
+  color: var(--ps-charcoal);
+  transition: border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+  margin: 0 3px;
+  vertical-align: middle;
+}
+.ielts-inline-input:focus {
+  outline: none;
+  border-color: var(--ps-blue);
+  background: var(--ps-white);
+  box-shadow: 0 0 0 2px rgba(0, 112, 204, 0.15);
+}
+.ielts-inline-input.answered {
+  background: #e8f4ec;
+  border-color: #82c99a;
+}
+.ielts-inline-input.flagged {
+  border-color: var(--ps-orange);
+  background: #fef3ee;
+}
+.inline-field-row {
+  display: inline;
+  line-height: 2.2;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .display-xl { font-size: 2.2rem; }

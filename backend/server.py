@@ -598,21 +598,37 @@ async def generate_exam_endpoint(background_tasks: BackgroundTasks, request: Req
 async def ai_generate_exam(exam_id: str):
     """Full AI exam generation pipeline"""
     try:
-        # Generate listening content
+        # Generate listening content with proper IELTS CBT layout
         listening_prompt = """Generate an IELTS Listening test with 4 sections, 10 questions each (40 total).
-Each section needs script_segments (speaker turns with ElevenLabs V3 creative audio tags like [cheerful], [slowly], [pause]).
+Each section needs:
+1. "instruction": A brief instruction text like "You will hear a conversation between..."
+2. "script_segments": Speaker turns with ElevenLabs V3 audio tags like [cheerful], [slowly], [pause]. For proper nouns, include spelling like "That's S-M-I-T-H".
+3. "question_layout": A structured form/note layout matching real IELTS CBT format with inline {N} placeholders for blanks.
+4. "questions": Array with question_num, question_type, correct_answer for scoring.
 
-Section 1: Everyday conversation (2 speakers), form_completion questions
-Section 2: Everyday monologue (1 speaker), multiple_choice questions
-Section 3: Educational discussion (2-3 speakers), matching + short_answer questions
-Section 4: Academic lecture (1 speaker), sentence_completion + multiple_choice questions
+Section 1: Everyday conversation (2 speakers). Format as a FORM/NOTE with grouped headings and inline blanks {1} through {10}.
+Section 2: Everyday monologue (1 speaker). Format as a structured NOTE with headings and inline blanks {11} through {20}.
+Section 3: Educational discussion (2-3 speakers). Mix of matching and short_answer questions {21}-{30}.
+Section 4: Academic lecture (1 speaker). Mix of sentence_completion and multiple_choice {31}-{40}.
 
-Speakers should use names: "Speaker A", "Speaker B", "Speaker C", "Lecturer"
+Speakers use names: "Speaker A", "Speaker B", "Speaker C", "Lecturer"
 
-Return JSON: {"sections": [{"section_num": 1, "title": "...", "context": "...",
+The question_layout format for each section:
+{
+  "title": "Phone call about booking a hotel",
+  "instruction": "Complete the notes below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+  "groups": [
+    {"heading": "Booking Details", "items": ["Room type: {1}", "Price: ${2} per night", "Check-in: {3} October"]}
+  ]
+}
+
+For multiple_choice questions, use regular question format (no layout needed).
+
+Return JSON: {"sections": [{"section_num": 1, "title": "...", "context": "...", "instruction": "You will hear...",
 "speakers": [{"name": "Speaker A", "role": "receptionist"}],
 "script_segments": [{"speaker": "Speaker A", "text": "[cheerful] Hello..."}],
-"questions": [{"question_num": 1, "question_type": "form_completion", "question_text": "Name: ________", "correct_answer": "Smith"}]}]}"""
+"question_layout": {"title": "...", "instruction": "Complete the notes...", "groups": [{"heading": "...", "items": ["... {1} ..."]}]},
+"questions": [{"question_num": 1, "question_type": "form_completion", "correct_answer": "Smith"}]}]}"""
 
         listening_raw = await call_openrouter([
             {"role": "system", "content": "Generate realistic IELTS content. Return valid JSON only."},
@@ -742,6 +758,28 @@ def get_seed_exam():
                         {"speaker": "Guest", "text": "No, that's everything. Thank you very much."},
                         {"speaker": "Receptionist", "text": "You're welcome. We look forward to seeing you on the fifteenth. Have a lovely day."}
                     ],
+                    "question_layout": {
+                        "title": "Hotel Reservation Form",
+                        "instruction": "Complete the form below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+                        "groups": [
+                            {"heading": "Booking Details", "items": [
+                                "Room type: {1}",
+                                "Rate: ${2} per night",
+                                "Breakfast served: {3} to 10 a.m.",
+                                "Restaurant: on the {4} floor"
+                            ]},
+                            {"heading": "Facilities", "items": [
+                                "Car park: at the {5} of building",
+                                "Late checkout: until {6} p.m.",
+                                "Additional charge: ${7}"
+                            ]},
+                            {"heading": "Guest Information", "items": [
+                                "Surname: {8}",
+                                "Contact number: 07456 {9}",
+                                "Total booking cost: ${10}"
+                            ]}
+                        ]
+                    },
                     "questions": [
                         {"question_num": 1, "question_type": "form_completion", "question_text": "Room type booked:", "correct_answer": "standard"},
                         {"question_num": 2, "question_type": "form_completion", "question_text": "Price per night: $ ________", "correct_answer": "85"},
@@ -771,6 +809,30 @@ def get_seed_exam():
                         {"speaker": "Officer", "text": "[helpful] For those of you who prefer cycling, the city has an excellent bike-sharing scheme called PedalGo. There are forty-three docking stations around the city. The first thirty minutes of each ride are free, and after that it's one pound per hour."},
                         {"speaker": "Officer", "text": "Finally, I should mention that the central area of the city, within the old city walls, is a pedestrian zone. No vehicles are allowed there between ten a.m. and four p.m. on weekdays. [slowly] This area includes Market Square, Cathedral Lane, and the Heritage Quarter."}
                     ],
+                    "question_layout": {
+                        "title": "Riverside City Public Transport",
+                        "instruction": "Complete the notes below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer.",
+                        "groups": [
+                            {"heading": "Bus Network", "items": [
+                                "Main bus routes: {11}",
+                                "Weekly pass: ${12}",
+                                "Route 7: train station to the {13}",
+                                "Peak frequency: every {14} minutes",
+                                "Off-peak frequency: every {15} minutes"
+                            ]},
+                            {"heading": "Tram System", "items": [
+                                "Year introduced: {16}",
+                                "Full journey time: {17} minutes"
+                            ]},
+                            {"heading": "Cycling", "items": [
+                                "Bike-sharing scheme name: {18}",
+                                "Number of docking stations: {19}"
+                            ]},
+                            {"heading": "Pedestrian Zone", "items": [
+                                "Vehicles banned from: {20} a.m."
+                            ]}
+                        ]
+                    },
                     "questions": [
                         {"question_num": 11, "question_type": "form_completion", "question_text": "Number of main bus routes:", "correct_answer": "12"},
                         {"question_num": 12, "question_type": "form_completion", "question_text": "Cost of a weekly bus pass: $ ________", "correct_answer": "14"},
@@ -808,6 +870,28 @@ def get_seed_exam():
                         {"speaker": "Sarah", "text": "We're aiming to finish data collection by the end of March, which gives us six weeks for analysis and writing up before the May deadline."},
                         {"speaker": "James", "text": "Sarah is handling the statistical analysis using SPSS software, and I'll be doing the thematic analysis of the interview transcripts."}
                     ],
+                    "question_layout": {
+                        "title": "Research Project on Renewable Energy",
+                        "instruction": "Complete the notes below. Write NO MORE THAN THREE WORDS AND/OR A NUMBER for each answer.",
+                        "groups": [
+                            {"heading": "Project Overview", "items": [
+                                "Topic: {21}",
+                                "Literature review took: {22} weeks",
+                                "Comparison areas: affluent and {23}"
+                            ]},
+                            {"heading": "Survey Design", "items": [
+                                "Target responses: {24}",
+                                "Document revised for ethics: {25}",
+                                "Number of interviews: {26}"
+                            ]},
+                            {"heading": "Key Findings", "items": [
+                                "Biggest barrier to adoption: {27}",
+                                "Data collection deadline: end of {28}",
+                                "Statistical software: {29}",
+                                "James will do {30} analysis"
+                            ]}
+                        ]
+                    },
                     "questions": [
                         {"question_num": 21, "question_type": "short_answer", "question_text": "What topic is the students' research project about?", "correct_answer": "renewable energy adoption"},
                         {"question_num": 22, "question_type": "form_completion", "question_text": "The literature review took ________ weeks", "correct_answer": "3|three"},
@@ -839,6 +923,29 @@ def get_seed_exam():
                         {"speaker": "Professor", "text": "[slowly] The economic argument for conservation is also compelling. Coral reefs generate an estimated three hundred and seventy-five billion dollars annually through tourism, fisheries, and coastal protection. For every dollar invested in reef restoration, studies suggest a return of approximately twenty dollars."},
                         {"speaker": "Professor", "text": "To conclude, while the challenges facing our coral reefs are enormous, the combination of innovative restoration techniques, community engagement, and genetic research gives us genuine cause for optimism. [pause] Any questions?"}
                     ],
+                    "question_layout": {
+                        "title": "Marine Conservation and Coral Reefs",
+                        "instruction": "Complete the notes below. Write NO MORE THAN TWO WORDS AND/OR A NUMBER for each answer. For multiple choice, select the correct letter.",
+                        "groups": [
+                            {"heading": "Coral Reef Facts", "items": [
+                                "Cover less than {31}% of ocean floor",
+                                "Support approximately {32}% of marine species",
+                                "Lost around {33}% since 1950"
+                            ]},
+                            {"heading": "Restoration Techniques", "items": [
+                                "Coral gardening survival rate: up to {35}%",
+                                "Biorock increases growth by {36} to 5 times"
+                            ]},
+                            {"heading": "Monitoring", "items": [
+                                "Great Barrier Reef monitors over {37} sites",
+                                "Reef Check trained over {38} volunteers"
+                            ]},
+                            {"heading": "Future Research", "items": [
+                                "Heat-resistant coral: withstands {39} degrees above threshold",
+                                "Annual reef economic value: ${40} billion"
+                            ]}
+                        ]
+                    },
                     "questions": [
                         {"question_num": 31, "question_type": "sentence_completion", "question_text": "Coral reefs cover less than ________ percent of the ocean floor", "correct_answer": "1|one"},
                         {"question_num": 32, "question_type": "sentence_completion", "question_text": "Reefs support approximately ________% of all known marine species", "correct_answer": "25"},
@@ -1009,6 +1116,24 @@ async def startup():
         seed = get_seed_exam()
         await db.exams.insert_one(seed)
         logger.info("Seeded exam_academic_001")
+    else:
+        # Migration: Add question_layout if missing
+        sections = existing.get("listening", {}).get("sections", [])
+        if sections and not sections[0].get("question_layout"):
+            seed = get_seed_exam()
+            seed_sections = seed.get("listening", {}).get("sections", [])
+            for i, ss in enumerate(seed_sections):
+                if ss.get("question_layout"):
+                    await db.exams.update_one(
+                        {"exam_id": "exam_academic_001"},
+                        {"$set": {f"listening.sections.{i}.question_layout": ss["question_layout"]}}
+                    )
+                if ss.get("instruction") and not sections[i].get("instruction"):
+                    await db.exams.update_one(
+                        {"exam_id": "exam_academic_001"},
+                        {"$set": {f"listening.sections.{i}.instruction": ss["instruction"]}}
+                    )
+            logger.info("Migrated exam_academic_001 with question layouts")
 
 # ==========================================
 # ADMIN ENDPOINTS
