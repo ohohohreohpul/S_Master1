@@ -730,11 +730,29 @@ Return JSON: {"passages": [{"passage_num": 1, "title": "...", "text": "...(full 
         ])
         reading_data = json.loads(reading_raw)
 
-        # Writing tasks (simple prompts)
+        # Writing tasks
         writing = {
             "total_time_minutes": 60,
             "tasks": [
-                {"task_num": 1, "task_type": "describe_visual", "prompt": "The bar chart below shows the number of international students enrolled in three different faculties at a UK university from 2018 to 2023. Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.", "min_words": 150, "time_minutes": 20},
+                {
+                    "task_num": 1, "task_type": "describe_visual", "min_words": 150, "time_minutes": 20,
+                    "prompt": "The bar chart below shows the number of international students enrolled in three different faculties at a UK university from 2018 to 2023. Summarise the information by selecting and reporting the main features, and make comparisons where relevant. Write at least 150 words.",
+                    "chart_type": "bar",
+                    "chart_title": "International Student Enrolment by Faculty (2018–2023)",
+                    "chart_data": {
+                        "x_key": "year",
+                        "y_label": "Number of Students",
+                        "categories": ["Engineering", "Business", "Arts & Humanities"],
+                        "series": [
+                            {"year": "2018", "Engineering": 1200, "Business": 980, "Arts & Humanities": 650},
+                            {"year": "2019", "Engineering": 1350, "Business": 1100, "Arts & Humanities": 700},
+                            {"year": "2020", "Engineering": 1180, "Business": 950, "Arts & Humanities": 620},
+                            {"year": "2021", "Engineering": 1420, "Business": 1200, "Arts & Humanities": 740},
+                            {"year": "2022", "Engineering": 1580, "Business": 1380, "Arts & Humanities": 810},
+                            {"year": "2023", "Engineering": 1750, "Business": 1520, "Arts & Humanities": 890}
+                        ]
+                    }
+                },
                 {"task_num": 2, "task_type": "essay", "prompt": "Some people believe that the best way to improve public health is by increasing the number of sports facilities. Others think this would have little effect and other measures are needed. Discuss both views and give your own opinion. Write at least 250 words.", "min_words": 250, "time_minutes": 40}
             ]
         }
@@ -804,8 +822,8 @@ def get_seed_exam():
                     "title": "Hotel Reservation",
                     "context": "A conversation between a hotel receptionist and a guest making a booking",
                     "speakers": [
-                        {"name": "Receptionist", "voice_id": "pFZP5JQG7iQjIQuC4Bku"},
-                        {"name": "Guest", "voice_id": "onwK4e9ZLuTAKqWW03F9"}
+                        {"name": "Receptionist", "voice_id": "en-GB-Neural2-A"},
+                        {"name": "Guest", "voice_id": "en-GB-Neural2-D"}
                     ],
                     "instruction": "You will hear a conversation between a hotel receptionist and a guest making a booking. First, you have some time to look at questions 1 to 10. Now listen carefully and answer questions 1 to 10.",
                     "script_segments": [
@@ -870,7 +888,7 @@ def get_seed_exam():
                     "section_num": 2,
                     "title": "City Transport Guide",
                     "context": "A transport officer giving information about public transport options in a city",
-                    "speakers": [{"name": "Officer", "voice_id": "Xb7hH8MSUJpSbSDYk0k2"}],
+                    "speakers": [{"name": "Officer", "voice_id": "en-GB-Neural2-C"}],
                     "instruction": "You will hear a transport officer giving information about public transport options in a city. First, you have some time to look at questions 11 to 20. Now listen carefully and answer questions 11 to 20.",
                     "script_segments": [
                         {"speaker": "Officer", "text": "[warm] Good afternoon everyone, and welcome to the Riverside City orientation session. I'm going to give you an overview of the public transport options available to you here."},
@@ -924,9 +942,9 @@ def get_seed_exam():
                     "title": "Research Project Discussion",
                     "context": "Three university students discussing their group research project",
                     "speakers": [
-                        {"name": "Tutor", "voice_id": "JBFqnCBsd6RMkjVDRZzb"},
-                        {"name": "Sarah", "voice_id": "pFZP5JQG7iQjIQuC4Bku"},
-                        {"name": "James", "voice_id": "eUlIljct4YrEQRcEqrii"}
+                        {"name": "Tutor", "voice_id": "en-GB-Wavenet-B"},
+                        {"name": "Sarah", "voice_id": "en-GB-Neural2-A"},
+                        {"name": "James", "voice_id": "en-GB-Wavenet-D"}
                     ],
                     "instruction": "You will hear a discussion between a tutor and two students about their research project. First, you have some time to look at questions 21 to 30. Now listen carefully and answer questions 21 to 30.",
                     "script_segments": [
@@ -982,7 +1000,7 @@ def get_seed_exam():
                     "section_num": 4,
                     "title": "Marine Conservation Lecture",
                     "context": "A university lecture on marine conservation and coral reef restoration",
-                    "speakers": [{"name": "Professor", "voice_id": "NNl6r8mD7vthiJatiJt1"}],
+                    "speakers": [{"name": "Professor", "voice_id": "en-GB-Standard-B"}],
                     "instruction": "You will hear a university lecture on marine conservation and coral reef restoration. First, you have some time to look at questions 31 to 40. Now listen carefully and answer questions 31 to 40.",
                     "script_segments": [
                         {"speaker": "Professor", "text": "[scholarly] Good morning. Today's lecture focuses on marine conservation, specifically the efforts being made to restore coral reef ecosystems around the world."},
@@ -1148,7 +1166,25 @@ Looking forward, blockchain technology and decentralised autonomous organisation
         "writing": {
             "total_time_minutes": 60,
             "tasks": [
-                {"task_num": 1, "task_type": "describe_visual", "prompt": "The bar chart below shows the number of international students enrolled in three different faculties (Engineering, Business, and Arts) at a British university between 2018 and 2023.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.\n\nWrite at least 150 words.\n\n[Data: Engineering grew from 450 to 820 students; Business remained relatively stable at around 600-650; Arts declined from 380 to 290]", "min_words": 150, "time_minutes": 20},
+                {
+                    "task_num": 1, "task_type": "describe_visual", "min_words": 150, "time_minutes": 20,
+                    "prompt": "The bar chart below shows the number of international students enrolled in three different faculties (Engineering, Business, and Arts) at a British university between 2018 and 2023.\n\nSummarise the information by selecting and reporting the main features, and make comparisons where relevant.\n\nWrite at least 150 words.",
+                    "chart_type": "bar",
+                    "chart_title": "International Student Enrolment by Faculty (2018–2023)",
+                    "chart_data": {
+                        "x_key": "year",
+                        "y_label": "Number of Students",
+                        "categories": ["Engineering", "Business", "Arts"],
+                        "series": [
+                            {"year": "2018", "Engineering": 450, "Business": 620, "Arts": 380},
+                            {"year": "2019", "Engineering": 540, "Business": 635, "Arts": 350},
+                            {"year": "2020", "Engineering": 610, "Business": 600, "Arts": 330},
+                            {"year": "2021", "Engineering": 670, "Business": 640, "Arts": 315},
+                            {"year": "2022", "Engineering": 750, "Business": 625, "Arts": 300},
+                            {"year": "2023", "Engineering": 820, "Business": 650, "Arts": 290}
+                        ]
+                    }
+                },
                 {"task_num": 2, "task_type": "essay", "prompt": "In many countries, the gap between the rich and the poor is increasing. What problems does this cause, and what solutions can you suggest?\n\nGive reasons for your answer and include any relevant examples from your own knowledge or experience.\n\nWrite at least 250 words.", "min_words": 250, "time_minutes": 40}
             ]
         },
@@ -1158,23 +1194,23 @@ Looking forward, blockchain technology and decentralised autonomous organisation
                 {"part_num": 1, "title": "Introduction and Interview", "time_minutes": 5,
                  "instructions": "The examiner will ask you questions about familiar topics such as home, work, studies, and interests.",
                  "questions": [
-                     {"question_num": 1, "question_text": "[warm] Good afternoon. My name is Daniel, and I'll be your examiner today. Can you tell me your full name please?", "needs_audio": True},
+                     {"question_num": 1, "question_text": "Good afternoon. My name is Daniel, and I'll be your examiner today. Can you tell me your full name please?", "needs_audio": True},
                      {"question_num": 2, "question_text": "Thank you. Now, let's talk about where you live. Can you describe your neighbourhood for me?", "needs_audio": True},
                      {"question_num": 3, "question_text": "What do you like most about living in that area?", "needs_audio": True},
-                     {"question_num": 4, "question_text": "[curious] Now let's move on to talk about cooking. Do you enjoy cooking? Why or why not?", "needs_audio": True},
+                     {"question_num": 4, "question_text": "Now let's move on to talk about cooking. Do you enjoy cooking? Why or why not?", "needs_audio": True},
                      {"question_num": 5, "question_text": "What is a typical meal that you like to prepare?", "needs_audio": True}
                  ]},
                 {"part_num": 2, "title": "Individual Long Turn", "time_minutes": 4, "preparation_time": 60,
                  "instructions": "You will be given a topic card. You have 1 minute to prepare, then you should speak for 1-2 minutes.",
                  "cue_card": "Describe a time when you helped someone.\nYou should say:\n- who you helped\n- how you helped them\n- why they needed help\n- and explain how you felt about helping them",
                  "questions": [
-                     {"question_num": 6, "question_text": "[professional] Now, I'm going to give you a topic. You'll have one minute to prepare, and then I'd like you to speak for one to two minutes. Here is your topic card.", "needs_audio": True},
+                     {"question_num": 6, "question_text": "Now, I'm going to give you a topic. You'll have one minute to prepare, and then I'd like you to speak for one to two minutes. Here is your topic card.", "needs_audio": True},
                      {"question_num": 7, "question_text": "Thank you. Can you tell me anything else about that experience?", "needs_audio": True}
                  ]},
                 {"part_num": 3, "title": "Two-way Discussion", "time_minutes": 5,
                  "instructions": "The examiner will ask abstract questions related to the Part 2 topic.",
                  "questions": [
-                     {"question_num": 8, "question_text": "[thoughtful] Let's talk more generally about helping others. Do you think people today are less willing to help strangers than in the past?", "needs_audio": True},
+                     {"question_num": 8, "question_text": "Let's talk more generally about helping others. Do you think people today are less willing to help strangers than in the past?", "needs_audio": True},
                      {"question_num": 9, "question_text": "Some people argue that governments should be responsible for helping those in need, rather than individuals. What's your view on this?", "needs_audio": True},
                      {"question_num": 10, "question_text": "How do you think volunteering benefits the person who volunteers, not just the people they help?", "needs_audio": True}
                  ]}
@@ -1190,8 +1226,9 @@ async def startup():
         await db.exams.insert_one(seed)
         logger.info("Seeded exam_academic_001")
     else:
-        # Migration: Add question_layout if missing
         sections = existing.get("listening", {}).get("sections", [])
+
+        # Migration: Add question_layout if missing
         if sections and not sections[0].get("question_layout"):
             seed = get_seed_exam()
             seed_sections = seed.get("listening", {}).get("sections", [])
@@ -1207,6 +1244,47 @@ async def startup():
                         {"$set": {f"listening.sections.{i}.instruction": ss["instruction"]}}
                     )
             logger.info("Migrated exam_academic_001 with question layouts")
+
+        # Migration: Update ElevenLabs voice IDs → Google TTS voice names
+        first_voice = sections[0].get("speakers", [{}])[0].get("voice_id", "") if sections else ""
+        if first_voice and not first_voice.startswith("en-"):
+            el_to_google = {
+                "pFZP5JQG7iQjIQuC4Bku": "en-GB-Neural2-A",
+                "onwK4e9ZLuTAKqWW03F9": "en-GB-Neural2-D",
+                "Xb7hH8MSUJpSbSDYk0k2": "en-GB-Neural2-C",
+                "JBFqnCBsd6RMkjVDRZzb": "en-GB-Wavenet-B",
+                "eUlIljct4YrEQRcEqrii": "en-GB-Wavenet-D",
+                "NNl6r8mD7vthiJatiJt1": "en-GB-Standard-B",
+                "nPczCjzI2devNBz1zQrb": "en-GB-Neural2-B",
+            }
+            for si, sec in enumerate(sections):
+                for spi, sp in enumerate(sec.get("speakers", [])):
+                    new_id = el_to_google.get(sp.get("voice_id", ""), VOICES["british_female_1"])
+                    await db.exams.update_one(
+                        {"exam_id": "exam_academic_001"},
+                        {"$set": {f"listening.sections.{si}.speakers.{spi}.voice_id": new_id}}
+                    )
+            # Wipe ElevenLabs audio — will be regenerated with Google TTS on next request
+            await db.audio_files.delete_many({"exam_id": "exam_academic_001"})
+            await db.exams.update_one({"exam_id": "exam_academic_001"},
+                {"$set": {"status": "pending_audio", "audio_progress": 0},
+                 "$unset": {"error_message": ""}})
+            logger.info("Migrated exam_academic_001 to Google TTS voice IDs; audio reset for regeneration")
+
+        # Migration: Add chart_data to writing task 1 if missing
+        tasks = existing.get("writing", {}).get("tasks", [])
+        if tasks and tasks[0].get("task_type") == "describe_visual" and not tasks[0].get("chart_data"):
+            seed = get_seed_exam()
+            seed_task1 = next((t for t in seed.get("writing", {}).get("tasks", []) if t["task_num"] == 1), None)
+            if seed_task1:
+                await db.exams.update_one({"exam_id": "exam_academic_001"},
+                    {"$set": {
+                        "writing.tasks.0.chart_type": seed_task1["chart_type"],
+                        "writing.tasks.0.chart_title": seed_task1["chart_title"],
+                        "writing.tasks.0.chart_data": seed_task1["chart_data"],
+                        "writing.tasks.0.prompt": seed_task1["prompt"],
+                    }})
+                logger.info("Migrated exam_academic_001 writing task 1 with chart_data")
 
 # ==========================================
 # ADMIN ENDPOINTS

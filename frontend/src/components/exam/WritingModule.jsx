@@ -1,6 +1,41 @@
 import { useState } from "react";
 import { Pen, AlertCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from "recharts";
+
+const CHART_COLORS = ["#2563eb", "#16a34a", "#dc2626", "#d97706", "#7c3aed"];
+
+function TaskChart({ task }) {
+  if (!task.chart_data || task.chart_type !== "bar") return null;
+  const { series, categories, x_key, y_label, chart_title } = {
+    x_key: "year",
+    ...task.chart_data,
+  };
+
+  return (
+    <div className="mt-4 mb-2">
+      {(task.chart_title) && (
+        <p className="text-xs font-medium text-center text-[var(--ps-charcoal)] mb-3">
+          {task.chart_title}
+        </p>
+      )}
+      <ResponsiveContainer width="100%" height={240}>
+        <BarChart data={series} margin={{ top: 4, right: 16, left: 8, bottom: 4 }}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+          <XAxis dataKey={x_key} tick={{ fontSize: 11 }} />
+          <YAxis tick={{ fontSize: 11 }} label={y_label ? { value: y_label, angle: -90, position: "insideLeft", style: { fontSize: 10 } } : undefined} />
+          <Tooltip />
+          <Legend wrapperStyle={{ fontSize: 11 }} />
+          {(categories || []).map((cat, i) => (
+            <Bar key={cat} dataKey={cat} fill={CHART_COLORS[i % CHART_COLORS.length]} radius={[2, 2, 0, 0]} />
+          ))}
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
 
 export default function WritingModule({ exam, answers, updateAnswer }) {
   const [activeTask, setActiveTask] = useState("1");
@@ -31,7 +66,7 @@ export default function WritingModule({ exam, answers, updateAnswer }) {
           return (
             <TabsContent key={task.task_num} value={String(task.task_num)}>
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Prompt */}
+                {/* Prompt + Chart */}
                 <div className="card-ps p-6" data-testid={`writing-prompt-${task.task_num}`}>
                   <div className="flex items-center gap-2 mb-4">
                     <Pen size={18} className="text-[var(--ps-blue)]" />
@@ -43,6 +78,7 @@ export default function WritingModule({ exam, answers, updateAnswer }) {
                       <p key={i} className="mb-2">{line}</p>
                     ))}
                   </div>
+                  <TaskChart task={task} />
                   <div className="mt-4 p-3 bg-[var(--ps-ice)] rounded-lg">
                     <p className="text-xs text-[var(--ps-body-gray)]">Minimum words: {task.min_words}</p>
                   </div>
