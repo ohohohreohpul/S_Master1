@@ -1,13 +1,13 @@
 """
 IELTS Mock Exam Platform - Backend Server
 ==========================================
-ElevenLabs V3 audio pipeline + OpenRouter AI + Emergent Google Auth
+Google Cloud TTS/STT audio pipeline + OpenRouter AI + Emergent Google Auth
 """
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, BackgroundTasks, UploadFile, File
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
-import os, logging, json, base64, uuid, httpx, asyncio
+import os, logging, json, base64, uuid, httpx, asyncio, re
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
@@ -20,17 +20,16 @@ mongo_url = os.environ['MONGO_URL']
 mongo_client = AsyncIOMotorClient(mongo_url)
 db = mongo_client[os.environ['DB_NAME']]
 
-ELEVENLABS_API_KEY = os.environ.get('ELEVENLABS_API_KEY', '')
 OPENROUTER_API_KEY = os.environ.get('OPENROUTER_API_KEY', '')
 
 VOICES = {
-    "examiner": "nPczCjzI2devNBz1zQrb",        # Brian - Deep narrator (instructions only)
-    "british_female_1": "pFZP5JQG7iQjIQuC4Bku", # Lily - Velvety Actress
-    "british_male_1": "onwK4e9ZLuTAKqWW03F9",   # Daniel - Steady Broadcaster
-    "british_female_2": "Xb7hH8MSUJpSbSDYk0k2", # Alice - Clear Educator
-    "british_male_2": "JBFqnCBsd6RMkjVDRZzb",   # George - Warm Storyteller
-    "british_male_3": "eUlIljct4YrEQRcEqrii",    # Ben - Calm British Male
-    "professor": "NNl6r8mD7vthiJatiJt1",          # Bradford - Expressive Academic
+    "examiner":         "en-GB-Neural2-B",  # Male - primary narrator/examiner
+    "british_female_1": "en-GB-Neural2-A",  # Female
+    "british_male_1":   "en-GB-Neural2-D",  # Male
+    "british_female_2": "en-GB-Neural2-C",  # Female
+    "british_male_2":   "en-GB-Wavenet-B",  # Male
+    "british_male_3":   "en-GB-Wavenet-D",  # Male
+    "professor":        "en-GB-Standard-B", # Male - academic register
 }
 
 app = FastAPI()
@@ -137,15 +136,19 @@ async def logout(request: Request, response: Response):
     return {"message": "Logged out"}
 
 # ==========================================
-# ELEVENLABS V3 AUDIO PIPELINE
+# GOOGLE CLOUD TTS PIPELINE
 # ==========================================
+def _strip_audio_tags(text: str) -> str:
+    return re.sub(r'\[[^\]]+\]', '', text).strip()
+
 def _generate_audio_sync(text: str, voice_id: str) -> bytes:
-    from elevenlabs import ElevenLabs
-    client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-    audio = client.text_to_speech.convert(
-        voice_id=voice_id, text=text, model_id="eleven_v3", output_format="mp3_44100_128"
-    )
-    return b"".join(audio)
+    from google.cloud import texttospeech
+    client = texttospeech.TextToSpeechClient()
+    synthesis_input = texttospeech.SynthesisInput(text=_strip_audio_tags(text))
+    voice = texttospeech.VoiceSelectionParams(language_code="en-GB", name=voice_id)
+    audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
+    response = client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
+    return response.audio_content
 
 async def generate_audio_for_text(text: str, voice_id: str) -> bytes:
     loop = asyncio.get_event_loop()
@@ -363,18 +366,26 @@ async def get_audio(audio_id: str):
         headers={"Content-Disposition": f"inline; filename={audio_id}.mp3", "Cache-Control": "public, max-age=86400"})
 
 # ==========================================
-# SPEECH-TO-TEXT (ElevenLabs Scribe)
+# SPEECH-TO-TEXT (Google Cloud STT)
 # ==========================================
 def _transcribe_audio_sync(audio_bytes: bytes) -> str:
-    """Transcribe audio using ElevenLabs STT (sync, run in executor)"""
-    import io
-    from elevenlabs import ElevenLabs
-    client = ElevenLabs(api_key=ELEVENLABS_API_KEY)
-    result = client.speech_to_text.convert(
-        file=io.BytesIO(audio_bytes),
-        model_id="scribe_v1"
+    from google.cloud import speech
+    client = speech.SpeechClient()
+    # Detect MP3 by ID3 header or sync-safe frame byte; fall back to WebM/Opus (browser MediaRecorder)
+    if audio_bytes[:3] == b'ID3' or (len(audio_bytes) > 1 and audio_bytes[0] == 0xff and (audio_bytes[1] & 0xe0) == 0xe0):
+        encoding = speech.RecognitionConfig.AudioEncoding.MP3
+        sample_rate = 44100
+    else:
+        encoding = speech.RecognitionConfig.AudioEncoding.WEBM_OPUS
+        sample_rate = 48000
+    config = speech.RecognitionConfig(
+        encoding=encoding,
+        sample_rate_hertz=sample_rate,
+        language_code="en-GB",
+        enable_automatic_punctuation=True,
     )
-    return result.text if hasattr(result, 'text') else str(result)
+    response = client.recognize(config=config, audio=speech.RecognitionAudio(content=audio_bytes))
+    return " ".join(r.alternatives[0].transcript for r in response.results if r.alternatives)
 
 async def transcribe_audio_async(audio_bytes: bytes) -> str:
     loop = asyncio.get_event_loop()
@@ -382,7 +393,7 @@ async def transcribe_audio_async(audio_bytes: bytes) -> str:
 
 @api_router.post("/speaking/transcribe")
 async def transcribe_speaking(audio_file: UploadFile = File(...), request: Request = None):
-    """Transcribe recorded speaking audio via ElevenLabs STT"""
+    """Transcribe recorded speaking audio via Google Cloud STT"""
     if request:
         await get_current_user(request)
     audio_content = await audio_file.read()
@@ -664,7 +675,7 @@ async def ai_generate_exam(exam_id: str):
         listening_prompt = """Generate an IELTS Listening test with 4 sections, 10 questions each (40 total).
 Each section needs:
 1. "instruction": A brief instruction text like "You will hear a conversation between..."
-2. "script_segments": Speaker turns with ElevenLabs V3 audio tags like [cheerful], [slowly], [pause]. For proper nouns, include spelling like "That's S-M-I-T-H".
+2. "script_segments": Speaker turns written as natural conversational text. For proper nouns, include spelling like "That's S-M-I-T-H".
 3. "question_layout": A structured form/note layout matching real IELTS CBT format with inline {N} placeholders for blanks.
 4. "questions": Array with question_num, question_type, correct_answer for scoring.
 
