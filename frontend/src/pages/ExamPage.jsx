@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { API, useAuth } from "@/App";
-import { Headphones, BookOpen, Pen, Mic, Clock, Flag, ArrowLeft, ArrowRight, Send, AlertCircle } from "lucide-react";
+import { Headphones, BookOpen, Pen, Mic, Clock, Flag, ArrowLeft, ArrowRight, Send, AlertCircle, PencilLine, X, CheckCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import ListeningModule from "@/components/exam/ListeningModule";
@@ -9,17 +9,21 @@ import ReadingModule from "@/components/exam/ReadingModule";
 import WritingModule from "@/components/exam/WritingModule";
 import SpeakingModule from "@/components/exam/SpeakingModule";
 
+const FULL_TEST_STEPS = ["listening", "reading", "writing", "speaking"];
+
 export default function ExamPage() {
   const { examId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const fullTestMode = searchParams.get("mode") === "full_test";
+
   const [exam, setExam] = useState(null);
-  const [phase, setPhase] = useState("loading"); // loading, preparing, ready, in_progress, completed
+  const [phase, setPhase] = useState("loading"); // loading, preparing, ready, in_progress, completed, transitioning
   const [audioProgress, setAudioProgress] = useState(0);
   const [audioCache, setAudioCache] = useState({});
-  const [module, setModule] = useState(searchParams.get("module") || "listening");
+  const [module, setModule] = useState(searchParams.get("module") || (fullTestMode ? "listening" : "listening"));
   const [answers, setAnswers] = useState({});
   const [flagged, setFlagged] = useState(new Set());
   const [attemptId, setAttemptId] = useState(null);
@@ -27,7 +31,27 @@ export default function ExamPage() {
   const timerRef = useRef(null);
   const [error, setError] = useState(null);
 
-  const moduleConfig = {
+  // Full test state
+  const [fullTestAttemptId, setFullTestAttemptId] = useState(null);
+  const [fullTestStepTransition, setFullTestStepTransition] = useState(null); // { completedModule, nextModule, countdown }
+  const [fullTestCurrentStep, setFullTestCurrentStep] = useState(0);
+  const transitionTimerRef = useRef(null);
+
+  // Scratch pad state
+  const [scratchPadOpen, setScratchPadOpen] = useState(false);
+  const [scratchPadText, setScratchPadText] = useState("");
+
+  // Review modal state
+  const [reviewOpen, setReviewOpen] = useState(false);
+
+  const isTelc = exam?.exam_type === "telc";
+
+  const moduleConfig = isTelc ? {
+    listening: { icon: Headphones, label: "Hören", time: 40 * 60, color: "#0070cc" },
+    reading: { icon: BookOpen, label: "Lesen", time: 90 * 60, color: "#1eaedb" },
+    writing: { icon: Pen, label: "Schreiben", time: 30 * 60, color: "#0070cc" },
+    speaking: { icon: Mic, label: "Sprechen", time: 15 * 60, color: "#1eaedb" },
+  } : {
     listening: { icon: Headphones, label: "Listening", time: 30 * 60, color: "#0070cc" },
     reading: { icon: BookOpen, label: "Reading", time: 60 * 60, color: "#1eaedb" },
     writing: { icon: Pen, label: "Writing", time: 60 * 60, color: "#0070cc" },
@@ -72,7 +96,6 @@ export default function ExamPage() {
 
         if (status.status === "ready") {
           clearInterval(interval);
-          // Reload exam with audio IDs
           const examRes = await fetch(`${API}/exams/${examId}`, { credentials: "include" });
           const examData = await examRes.json();
           setExam(examData);
@@ -104,7 +127,6 @@ export default function ExamPage() {
 
         for (const section of sections) {
           const sectionAudios = [];
-          // Load instruction audio first
           if (section.instruction_audio_id) {
             try {
               const res = await fetch(`${API}/audio/${section.instruction_audio_id}`);
@@ -152,17 +174,29 @@ export default function ExamPage() {
 
   const startExam = async () => {
     try {
-      const res = await fetch(`${API}/attempts`, {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ exam_id: examId, module })
-      });
-      const data = await res.json();
-      setAttemptId(data.attempt_id);
+      if (fullTestMode) {
+        // Create full test attempt
+        const res = await fetch(`${API}/attempts/full-test`, {
+          method: "POST", credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ exam_id: examId })
+        });
+        const data = await res.json();
+        setFullTestAttemptId(data.attempt_id);
+        setAttemptId(data.attempt_id);
+      } else {
+        const res = await fetch(`${API}/attempts`, {
+          method: "POST", credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ exam_id: examId, module })
+        });
+        const data = await res.json();
+        setAttemptId(data.attempt_id);
+      }
+
       setTimeLeft(moduleConfig[module].time);
       setPhase("in_progress");
 
-      // Start timer
       timerRef.current = setInterval(() => {
         setTimeLeft(prev => {
           if (prev <= 1) {
@@ -183,34 +217,134 @@ export default function ExamPage() {
     setPhase("submitting");
 
     try {
-      if (module === "writing") {
-        const res = await fetch(`${API}/attempts/${attemptId}/score-writing`, {
-          method: "POST", credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ task_1: answers.task_1 || "", task_2: answers.task_2 || "" })
-        });
-        const data = await res.json();
-        navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
-      } else if (module === "speaking") {
-        const res = await fetch(`${API}/attempts/${attemptId}/score-speaking`, {
-          method: "POST", credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ transcriptions: answers })
-        });
-        const data = await res.json();
-        navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
+      if (fullTestMode) {
+        await submitFullTestModule();
       } else {
-        const res = await fetch(`${API}/attempts/${attemptId}/submit`, {
-          method: "PUT", credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ answers })
-        });
-        const data = await res.json();
-        navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
+        await submitSingleModule();
       }
     } catch (e) {
       setError("Failed to submit answers");
       setPhase("in_progress");
+    }
+  };
+
+  const submitSingleModule = async () => {
+    if (module === "writing") {
+      const endpoint = isTelc
+        ? `${API}/attempts/${attemptId}/score-telc-writing`
+        : `${API}/attempts/${attemptId}/score-writing`;
+      const body = isTelc
+        ? { aufgabe_1: answers.task_1 || "" }
+        : { task_1: answers.task_1 || "", task_2: answers.task_2 || "" };
+      const res = await fetch(endpoint, {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      const data = await res.json();
+      navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
+    } else if (module === "speaking") {
+      const res = await fetch(`${API}/attempts/${attemptId}/score-speaking`, {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcriptions: answers })
+      });
+      const data = await res.json();
+      navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
+    } else {
+      const res = await fetch(`${API}/attempts/${attemptId}/submit`, {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ answers })
+      });
+      const data = await res.json();
+      navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
+    }
+  };
+
+  const submitFullTestModule = async () => {
+    const currentAttemptId = fullTestAttemptId || attemptId;
+
+    let nextModule = null;
+    let scores = null;
+
+    if (module === "writing") {
+      const res = await fetch(`${API}/attempts/${currentAttemptId}/full-test/score-writing`, {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task_1: answers.task_1 || "", task_2: answers.task_2 || "" })
+      });
+      const data = await res.json();
+      scores = data.scores;
+      // After writing, next is speaking
+      const moduleRes = await fetch(`${API}/attempts/${currentAttemptId}/full-test/module`, {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ module, answers })
+      });
+      const moduleData = await moduleRes.json();
+      nextModule = moduleData.next_module;
+    } else if (module === "speaking") {
+      const res = await fetch(`${API}/attempts/${currentAttemptId}/full-test/score-speaking`, {
+        method: "POST", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transcriptions: answers })
+      });
+      const data = await res.json();
+      scores = data.scores;
+      nextModule = null; // Speaking is last
+    } else {
+      const res = await fetch(`${API}/attempts/${currentAttemptId}/full-test/module`, {
+        method: "PUT", credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ module, answers })
+      });
+      const data = await res.json();
+      nextModule = data.next_module;
+      scores = data.scores;
+    }
+
+    if (!nextModule || module === "speaking") {
+      // Full test complete
+      navigate(`/results/${currentAttemptId}`, { state: { mode: "full_test", exam } });
+      return;
+    }
+
+    // Show transition screen
+    const completedLabel = moduleConfig[module]?.label || module;
+    const nextLabel = moduleConfig[nextModule]?.label || nextModule;
+    setFullTestStepTransition({ completedModule: module, completedLabel, nextModule, nextLabel, countdown: 3 });
+    setPhase("transitioning");
+
+    let count = 3;
+    transitionTimerRef.current = setInterval(() => {
+      count--;
+      setFullTestStepTransition(prev => prev ? { ...prev, countdown: count } : null);
+      if (count <= 0) {
+        clearInterval(transitionTimerRef.current);
+        proceedToNextModule(nextModule);
+      }
+    }, 1000);
+  };
+
+  const proceedToNextModule = async (nextMod) => {
+    setFullTestStepTransition(null);
+    setAnswers({});
+    setFlagged(new Set());
+    const stepIdx = FULL_TEST_STEPS.indexOf(nextMod);
+    setFullTestCurrentStep(stepIdx);
+    setModule(nextMod);
+
+    // Reload audio if needed
+    if (nextMod === "listening" || nextMod === "speaking") {
+      if (exam?.status === "ready") {
+        setPhase("preloading");
+        await preloadAudio(exam);
+      } else {
+        setPhase("ready");
+      }
+    } else {
+      setPhase("ready");
     }
   };
 
@@ -231,6 +365,69 @@ export default function ExamPage() {
       return next;
     });
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) clearInterval(timerRef.current);
+      if (transitionTimerRef.current) clearInterval(transitionTimerRef.current);
+    };
+  }, []);
+
+  // Full test step stepper
+  const FullTestStepper = () => (
+    <div className="flex items-center justify-center gap-0 px-4 py-2 bg-[var(--ps-black)]" data-testid="full-test-stepper">
+      {FULL_TEST_STEPS.map((step, idx) => {
+        const cfg = moduleConfig[step];
+        const Icon = cfg?.icon;
+        const isActive = step === module;
+        const isDone = FULL_TEST_STEPS.indexOf(module) > idx;
+        return (
+          <div key={step} className="flex items-center">
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${
+              isActive
+                ? "bg-[var(--ps-blue)] text-white"
+                : isDone
+                  ? "bg-emerald-500/20 text-emerald-400"
+                  : "text-gray-500"
+            }`}>
+              {isDone ? <CheckCircle size={12} /> : Icon ? <Icon size={12} /> : null}
+              {cfg?.label}
+            </div>
+            {idx < FULL_TEST_STEPS.length - 1 && (
+              <div className={`w-8 h-px mx-1 ${isDone ? "bg-emerald-500/40" : "bg-gray-600"}`} />
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
+  // Transition screen
+  if (phase === "transitioning" && fullTestStepTransition) {
+    const { completedLabel, nextLabel, countdown } = fullTestStepTransition;
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-[var(--ps-dark)]" data-testid="exam-transition">
+        <FullTestStepper />
+        <motion.div
+          key="transition"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="card-ps p-12 max-w-md w-full text-center mx-4 absolute">
+          <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-6">
+            <CheckCircle size={32} className="text-emerald-500" />
+          </div>
+          <h2 className="display-compact mb-2" style={{ color: "var(--ps-black)" }}>
+            {completedLabel} Complete!
+          </h2>
+          <p className="text-[var(--ps-body-gray)] mb-6">
+            Next: <span className="font-semibold text-[var(--ps-blue)]">{nextLabel}</span>
+          </p>
+          <div className="text-5xl font-extralight text-[var(--ps-blue)] mb-4">{countdown}</div>
+          <p className="text-xs text-[var(--ps-body-gray)]">Starting next module automatically...</p>
+        </motion.div>
+      </div>
+    );
+  }
 
   // Loading phase
   if (phase === "loading") {
@@ -285,19 +482,29 @@ export default function ExamPage() {
 
   // Ready phase
   if (phase === "ready") {
-    const ModuleIcon = moduleConfig[module].icon;
+    const ModuleIcon = moduleConfig[module]?.icon || BookOpen;
     return (
       <div className="flex items-center justify-center min-h-screen bg-[var(--ps-ice)]" data-testid="exam-ready">
-        <div className="card-ps p-10 max-w-lg w-full text-center">
-          <div className="w-20 h-20 rounded-2xl mx-auto mb-6 flex items-center justify-center" style={{ background: `${moduleConfig[module].color}15` }}>
-            <ModuleIcon size={40} style={{ color: moduleConfig[module].color }} />
+        {fullTestMode && (
+          <div className="fixed top-0 left-0 right-0 z-10">
+            <FullTestStepper />
+          </div>
+        )}
+        <div className={`card-ps p-10 max-w-lg w-full text-center ${fullTestMode ? "mt-14" : ""}`}>
+          <div className="w-20 h-20 rounded-2xl mx-auto mb-6 flex items-center justify-center" style={{ background: `${moduleConfig[module]?.color || "#0070cc"}15` }}>
+            <ModuleIcon size={40} style={{ color: moduleConfig[module]?.color || "#0070cc" }} />
           </div>
           <h2 className="display-sm mb-2" style={{ color: "var(--ps-black)" }}>
-            {moduleConfig[module].label} Module
+            {moduleConfig[module]?.label} {isTelc ? "Prüfung" : "Module"}
           </h2>
           <p className="text-[var(--ps-body-gray)] mb-2">{exam?.title}</p>
+          {fullTestMode && (
+            <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--ps-blue)]/10 text-[var(--ps-blue)] mb-4">
+              Full Test Mode — Step {FULL_TEST_STEPS.indexOf(module) + 1} of 4
+            </span>
+          )}
           <div className="flex items-center justify-center gap-4 text-sm text-[var(--ps-body-gray)] mb-8">
-            <span className="flex items-center gap-1"><Clock size={14} /> {moduleConfig[module].time / 60} minutes</span>
+            <span className="flex items-center gap-1"><Clock size={14} /> {(moduleConfig[module]?.time || 1800) / 60} minutes</span>
           </div>
 
           {module === "listening" && (
@@ -314,7 +521,7 @@ export default function ExamPage() {
           )}
 
           <button data-testid="begin-exam-btn" onClick={startExam} className="btn-ps btn-ps-orange" style={{ fontSize: "1rem", padding: "14px 40px" }}>
-            Begin {moduleConfig[module].label} Test
+            Begin {moduleConfig[module]?.label} {isTelc ? "Prüfung" : "Test"}
           </button>
         </div>
       </div>
@@ -334,17 +541,31 @@ export default function ExamPage() {
   }
 
   // In Progress phase
-  const ModuleIcon = moduleConfig[module].icon;
+  const ModuleIcon = moduleConfig[module]?.icon || BookOpen;
   const timeWarning = timeLeft < 300;
   const timeCritical = timeLeft < 60;
 
+  // Flagged questions for review
+  const flaggedList = Array.from(flagged);
+
   return (
     <div className="min-h-screen flex flex-col" data-testid="exam-in-progress">
+      {/* Full test stepper */}
+      {fullTestMode && <FullTestStepper />}
+
       {/* Top bar */}
       <div className="exam-topbar" data-testid="exam-topbar">
         <div className="flex items-center gap-4">
-          <ModuleIcon size={20} style={{ color: moduleConfig[module].color }} />
-          <span className="font-medium">{moduleConfig[module].label}</span>
+          <ModuleIcon size={20} style={{ color: moduleConfig[module]?.color || "#0070cc" }} />
+          <span className="font-medium">{moduleConfig[module]?.label}</span>
+          {flagged.size > 0 && (
+            <button
+              onClick={() => setReviewOpen(true)}
+              className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-[var(--ps-orange)]/15 text-[var(--ps-orange)] border border-[var(--ps-orange)]/30 hover:bg-[var(--ps-orange)]/25 transition-colors"
+              data-testid="review-flagged-btn">
+              <Flag size={11} /> Review ({flagged.size})
+            </button>
+          )}
         </div>
         <div className={`timer-display ${timeCritical ? "timer-critical" : timeWarning ? "timer-warning" : ""}`} data-testid="exam-timer">
           {formatTime(timeLeft)}
@@ -371,6 +592,106 @@ export default function ExamPage() {
           <SpeakingModule exam={exam} audioCache={audioCache} answers={answers} updateAnswer={updateAnswer} />
         )}
       </div>
+
+      {/* Scratch Pad floating button */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3">
+        <AnimatePresence>
+          {scratchPadOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+              transition={{ duration: 0.2 }}
+              className="bg-white rounded-2xl shadow-2xl border border-[var(--ps-divider)] overflow-hidden"
+              style={{ width: 320 }}
+              data-testid="scratch-pad-panel">
+              <div className="flex items-center justify-between px-4 py-3 bg-[var(--ps-black)]">
+                <div className="flex items-center gap-2">
+                  <PencilLine size={14} className="text-[var(--ps-cyan)]" />
+                  <span className="text-xs font-semibold text-white">Scratch Pad</span>
+                </div>
+                <button onClick={() => setScratchPadOpen(false)} className="text-gray-400 hover:text-white transition-colors">
+                  <X size={14} />
+                </button>
+              </div>
+              <textarea
+                className="w-full h-48 p-4 text-sm resize-none focus:outline-none text-[var(--ps-charcoal)] placeholder-gray-300"
+                placeholder="Write notes here..."
+                value={scratchPadText}
+                onChange={e => setScratchPadText(e.target.value)}
+                data-testid="scratch-pad-textarea"
+              />
+              <div className="px-4 py-2 border-t border-[var(--ps-divider)] flex justify-end">
+                <span className="text-[10px] text-[var(--ps-mute)]">Notes are not submitted</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        <motion.button
+          whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
+          onClick={() => setScratchPadOpen(v => !v)}
+          className={`w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-colors ${
+            scratchPadOpen
+              ? "bg-[var(--ps-blue)] text-white"
+              : "bg-white border border-[var(--ps-divider)] text-[var(--ps-body-gray)] hover:text-[var(--ps-blue)]"
+          }`}
+          data-testid="scratch-pad-btn"
+          title="Scratch Pad">
+          <PencilLine size={18} />
+        </motion.button>
+      </div>
+
+      {/* Review Flagged Modal */}
+      <AnimatePresence>
+        {reviewOpen && (
+          <motion.div
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm"
+            onClick={() => setReviewOpen(false)}
+            data-testid="review-modal-overlay">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }}
+              className="card-ps p-6 max-w-sm w-full mx-4"
+              onClick={e => e.stopPropagation()}
+              data-testid="review-modal">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="font-semibold text-base" style={{ color: "var(--ps-charcoal)" }}>
+                  Flagged Questions
+                </h3>
+                <button onClick={() => setReviewOpen(false)} className="text-[var(--ps-mute)] hover:text-[var(--ps-charcoal)]">
+                  <X size={16} />
+                </button>
+              </div>
+              {flaggedList.length === 0 ? (
+                <p className="text-sm text-[var(--ps-body-gray)]">No flagged questions.</p>
+              ) : (
+                <div className="space-y-2">
+                  {flaggedList.map(qNum => (
+                    <div key={qNum} className="flex items-center justify-between p-3 rounded-xl bg-[var(--ps-ice)] border border-[var(--ps-orange)]/20">
+                      <span className="text-sm font-medium" style={{ color: "var(--ps-charcoal)" }}>Question {qNum}</span>
+                      <div className="flex items-center gap-2">
+                        <span className={`text-xs ${answers[qNum] ? "text-emerald-600" : "text-[var(--ps-mute)]"}`}>
+                          {answers[qNum] ? "Answered" : "Unanswered"}
+                        </span>
+                        <button onClick={() => toggleFlag(qNum)} className="text-[var(--ps-orange)] hover:text-red-500 transition-colors">
+                          <Flag size={14} className="fill-[var(--ps-orange)]" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <button
+                onClick={() => setReviewOpen(false)}
+                className="btn-ps btn-ps-primary w-full mt-5"
+                style={{ padding: "10px", fontSize: "0.875rem" }}>
+                Back to Exam
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
