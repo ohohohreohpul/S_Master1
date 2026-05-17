@@ -16,6 +16,11 @@ from datetime import datetime, timezone, timedelta
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
+import stripe
+stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', '')
+STRIPE_WEBHOOK_SECRET = os.environ.get('STRIPE_WEBHOOK_SECRET', '')
+FRONTEND_URL = os.environ.get('FRONTEND_URL', 'http://localhost:3000')
+
 mongo_url = os.environ['MONGO_URL']
 mongo_client = AsyncIOMotorClient(mongo_url)
 db = mongo_client[os.environ['DB_NAME']]
@@ -31,6 +36,14 @@ VOICES = {
     "british_male_2": "JBFqnCBsd6RMkjVDRZzb",   # George - Warm Storyteller
     "british_male_3": "eUlIljct4YrEQRcEqrii",    # Ben - Calm British Male
     "professor": "NNl6r8mD7vthiJatiJt1",          # Bradford - Expressive Academic
+}
+
+VOICES_DE = {
+    "examiner_de": "nPczCjzI2devNBz1zQrb",
+    "german_female_1": "pFZP5JQG7iQjIQuC4Bku",
+    "german_male_1": "onwK4e9ZLuTAKqWW03F9",
+    "german_female_2": "Xb7hH8MSUJpSbSDYk0k2",
+    "german_male_2": "JBFqnCBsd6RMkjVDRZzb",
 }
 
 app = FastAPI()
@@ -58,6 +71,16 @@ class WritingSubmit(BaseModel):
 
 class SpeakingScoreRequest(BaseModel):
     transcriptions: Dict[str, str]
+
+class FullTestModuleSubmit(BaseModel):
+    module: str
+    answers: Dict[str, Any]
+
+class TelcWritingSubmit(BaseModel):
+    aufgabe_1: str
+
+class StripeCheckoutRequest(BaseModel):
+    plan: str  # "monthly" or "annual"
 
 # ==========================================
 # AUTH
@@ -152,12 +175,23 @@ async def generate_audio_for_text(text: str, voice_id: str) -> bytes:
     return await loop.run_in_executor(None, _generate_audio_sync, text, voice_id)
 
 async def generate_exam_audio(exam_id: str):
-    """Generate all audio for an exam"""
+    """Generate all audio for an exam (IELTS or TELC)"""
     try:
         exam = await db.exams.find_one({"exam_id": exam_id}, {"_id": 0})
         if not exam:
             return
+        exam_type = exam.get("exam_type", "ielts")
+        if exam_type == "telc":
+            await _generate_telc_audio(exam_id, exam)
+        else:
+            await _generate_ielts_audio(exam_id, exam)
+    except Exception as e:
+        logger.error(f"Audio pipeline error: {e}")
+        await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "audio_error", "error_message": str(e)}})
 
+async def _generate_ielts_audio(exam_id: str, exam: dict):
+    """Generate all audio for an IELTS exam"""
+    try:
         await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "generating_audio", "audio_progress": 0}})
 
         total_segments = 0
@@ -177,7 +211,7 @@ async def generate_exam_audio(exam_id: str):
         # Generate listening audio (including section instructions)
         for section in exam.get("listening", {}).get("sections", []):
             section_num = section["section_num"]
-            
+
             # Generate instruction audio first if present
             instruction_text = section.get("instruction")
             if instruction_text and not section.get("instruction_audio_id"):
@@ -251,6 +285,133 @@ async def generate_exam_audio(exam_id: str):
         logger.error(f"Audio pipeline error: {e}")
         await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "audio_error", "error_message": str(e)}})
 
+async def _generate_telc_audio(exam_id: str, exam: dict):
+    """Generate audio for TELC exam hoeren + sprechen"""
+    try:
+        await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "generating_audio", "audio_progress": 0}})
+        total = 0
+        generated = 0
+
+        # Count segments in hoeren aufgaben
+        for aufgabe in exam.get("hoeren", {}).get("aufgaben", []):
+            total += len(aufgabe.get("script_segments", []))
+            for conv in aufgabe.get("conversations", []):
+                total += len(conv.get("script_segments", []))
+            for ansage in aufgabe.get("ansagen", []):
+                total += 1
+        # Count sprechen teile
+        for teil in exam.get("sprechen", {}).get("teile", []):
+            for q in teil.get("fragen", []):
+                if q.get("needs_audio"):
+                    total += 1
+
+        if total == 0:
+            await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "ready", "audio_progress": 100}})
+            return
+
+        # Generate hoeren audio
+        for a_idx, aufgabe in enumerate(exam.get("hoeren", {}).get("aufgaben", [])):
+            # Handle direct script_segments (Aufgabe 2 style)
+            for s_idx, seg in enumerate(aufgabe.get("script_segments", [])):
+                if seg.get("audio_id"):
+                    generated += 1
+                    continue
+                try:
+                    voice_id = VOICES_DE.get("german_female_1")
+                    for sp in aufgabe.get("sprecher", []):
+                        if sp["name"] == seg["sprecher"]:
+                            voice_id = sp.get("voice_id", voice_id)
+                            break
+                    audio_bytes = await generate_audio_for_text(seg["text"], voice_id)
+                    audio_id = f"audio_{uuid.uuid4().hex[:12]}"
+                    await db.audio_files.insert_one({
+                        "audio_id": audio_id, "exam_id": exam_id, "type": "telc_hoeren",
+                        "audio_base64": base64.b64encode(audio_bytes).decode(),
+                        "format": "mp3", "created_at": datetime.now(timezone.utc).isoformat()
+                    })
+                    await db.exams.update_one({"exam_id": exam_id},
+                        {"$set": {f"hoeren.aufgaben.{a_idx}.script_segments.{s_idx}.audio_id": audio_id}})
+                    generated += 1
+                    await db.exams.update_one({"exam_id": exam_id},
+                        {"$set": {"audio_progress": int(generated / total * 100)}})
+                except Exception as e:
+                    logger.error(f"TELC audio gen error: {e}")
+
+            # Handle conversations (Aufgabe 1 style)
+            for c_idx, conv in enumerate(aufgabe.get("conversations", [])):
+                for s_idx, seg in enumerate(conv.get("script_segments", [])):
+                    if seg.get("audio_id"):
+                        generated += 1
+                        continue
+                    try:
+                        voice_id = VOICES_DE.get("german_female_1")
+                        sprecher_list = conv.get("sprecher", aufgabe.get("sprecher", []))
+                        for sp in sprecher_list:
+                            if sp["name"] == seg["sprecher"]:
+                                voice_id = sp.get("voice_id", voice_id)
+                                break
+                        audio_bytes = await generate_audio_for_text(seg["text"], voice_id)
+                        audio_id = f"audio_{uuid.uuid4().hex[:12]}"
+                        await db.audio_files.insert_one({
+                            "audio_id": audio_id, "exam_id": exam_id, "type": "telc_hoeren",
+                            "audio_base64": base64.b64encode(audio_bytes).decode(),
+                            "format": "mp3", "created_at": datetime.now(timezone.utc).isoformat()
+                        })
+                        await db.exams.update_one({"exam_id": exam_id},
+                            {"$set": {f"hoeren.aufgaben.{a_idx}.conversations.{c_idx}.script_segments.{s_idx}.audio_id": audio_id}})
+                        generated += 1
+                        await db.exams.update_one({"exam_id": exam_id},
+                            {"$set": {"audio_progress": int(generated / total * 100)}})
+                    except Exception as e:
+                        logger.error(f"TELC audio gen error: {e}")
+
+            # Handle ansagen (Aufgabe 3 style)
+            for ans_idx, ansage in enumerate(aufgabe.get("ansagen", [])):
+                if ansage.get("audio_id"):
+                    generated += 1
+                    continue
+                try:
+                    voice_id = ansage.get("voice_id", VOICES_DE.get("examiner_de"))
+                    audio_bytes = await generate_audio_for_text(ansage["text"], voice_id)
+                    audio_id = f"audio_{uuid.uuid4().hex[:12]}"
+                    await db.audio_files.insert_one({
+                        "audio_id": audio_id, "exam_id": exam_id, "type": "telc_hoeren",
+                        "audio_base64": base64.b64encode(audio_bytes).decode(),
+                        "format": "mp3", "created_at": datetime.now(timezone.utc).isoformat()
+                    })
+                    await db.exams.update_one({"exam_id": exam_id},
+                        {"$set": {f"hoeren.aufgaben.{a_idx}.ansagen.{ans_idx}.audio_id": audio_id}})
+                    generated += 1
+                    await db.exams.update_one({"exam_id": exam_id},
+                        {"$set": {"audio_progress": int(generated / total * 100)}})
+                except Exception as e:
+                    logger.error(f"TELC ansage audio error: {e}")
+
+        # Generate sprechen audio
+        for t_idx, teil in enumerate(exam.get("sprechen", {}).get("teile", [])):
+            for q_idx, q in enumerate(teil.get("fragen", [])):
+                if q.get("needs_audio") and not q.get("audio_id"):
+                    try:
+                        audio_bytes = await generate_audio_for_text(q["frage_text"], VOICES_DE["examiner_de"])
+                        audio_id = f"audio_{uuid.uuid4().hex[:12]}"
+                        await db.audio_files.insert_one({
+                            "audio_id": audio_id, "exam_id": exam_id, "type": "telc_sprechen",
+                            "audio_base64": base64.b64encode(audio_bytes).decode(),
+                            "format": "mp3", "created_at": datetime.now(timezone.utc).isoformat()
+                        })
+                        await db.exams.update_one({"exam_id": exam_id},
+                            {"$set": {f"sprechen.teile.{t_idx}.fragen.{q_idx}.audio_id": audio_id}})
+                        generated += 1
+                        await db.exams.update_one({"exam_id": exam_id},
+                            {"$set": {"audio_progress": int(generated / total * 100)}})
+                    except Exception as e:
+                        logger.error(f"TELC sprechen audio error: {e}")
+
+        await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "ready", "audio_progress": 100}})
+    except Exception as e:
+        logger.error(f"TELC audio error: {e}")
+        await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "audio_error", "error_message": str(e)}})
+
 # ==========================================
 # OPENROUTER AI
 # ==========================================
@@ -300,12 +461,43 @@ Return JSON: {{"fluency_coherence":{{"band":6.0,"feedback":"..."}},"lexical_reso
         logger.error(f"Failed to parse speaking score JSON: {result[:200]}")
         raise HTTPException(500, "AI scoring returned invalid format")
 
+async def score_telc_writing_ai(aufgabe_text: str, aufgabe_prompt: str, level: str) -> dict:
+    prompt = f"""You are a certified TELC Deutsch {level} examiner. Score this writing response.
+
+TASK: {aufgabe_prompt}
+RESPONSE ({len(aufgabe_text.split())} words): {aufgabe_text}
+
+TELC {level} writing criteria: Communicative achievement, Organization, Language range & accuracy.
+Max 30 points total (10 per criterion).
+
+Return JSON: {{"kommunikative_aufgabe":{{"punkte":8,"feedback":"..."}},"textaufbau":{{"punkte":8,"feedback":"..."}},"sprachliche_mittel":{{"punkte":8,"feedback":"..."}},"gesamt_punkte":24,"bestanden":true,"allgemeines_feedback":"..."}}"""
+    result = await call_openrouter([
+        {"role": "system", "content": "You are a TELC examiner. Return only valid JSON."},
+        {"role": "user", "content": prompt}
+    ], model="openai/gpt-4o")
+    return json.loads(result)
+
+async def score_telc_speaking_ai(transcriptions: dict, level: str) -> dict:
+    prompt = f"""You are a certified TELC Deutsch {level} speaking examiner. Score these transcribed responses.
+Responses: {json.dumps(transcriptions)}
+
+Criteria: Communicative achievement, Fluency, Language accuracy & range. Max 30 points.
+Return JSON: {{"kommunikative_kompetenz":{{"punkte":8,"feedback":"..."}},"fluessigkeit":{{"punkte":8,"feedback":"..."}},"sprachliche_korrektheit":{{"punkte":8,"feedback":"..."}},"gesamt_punkte":24,"bestanden":true,"allgemeines_feedback":"..."}}"""
+    result = await call_openrouter([
+        {"role": "system", "content": "You are a TELC examiner. Return only valid JSON."},
+        {"role": "user", "content": prompt}
+    ], model="openai/gpt-4o")
+    return json.loads(result)
+
 # ==========================================
 # EXAM ENDPOINTS
 # ==========================================
 @api_router.get("/exams")
-async def list_exams():
-    exams = await db.exams.find({}, {"_id": 0, "exam_id": 1, "title": 1, "pathway": 1, "status": 1, "created_at": 1}).to_list(100)
+async def list_exams(exam_type: str = None):
+    query = {}
+    if exam_type:
+        query["exam_type"] = exam_type
+    exams = await db.exams.find(query, {"_id": 0, "exam_id": 1, "title": 1, "pathway": 1, "exam_type": 1, "telc_level": 1, "status": 1, "created_at": 1}).to_list(100)
     return exams
 
 @api_router.get("/exams/{exam_id}")
@@ -481,9 +673,16 @@ async def submit_answers(attempt_id: str, data: AnswerSubmit, request: Request):
     exam = await db.exams.find_one({"exam_id": attempt["exam_id"]}, {"_id": 0})
     scores = None
     module = attempt["module"]
+    exam_type = exam.get("exam_type", "ielts")
 
-    if module in ["listening", "reading"]:
-        scores = score_objective(exam, module, data.answers)
+    if exam_type == "telc":
+        telc_module_map = {"listening": "hoeren", "reading": "lesen"}
+        telc_module = telc_module_map.get(module, module)
+        if module in ["listening", "reading"]:
+            scores = score_telc_objective(exam, telc_module, data.answers)
+    else:
+        if module in ["listening", "reading"]:
+            scores = score_objective(exam, module, data.answers)
 
     await db.attempts.update_one({"attempt_id": attempt_id}, {"$set": {
         "answers": data.answers, "scores": scores,
@@ -555,6 +754,27 @@ def raw_to_band(correct: int, total: int, module: str) -> float:
             return band
     return 2.0
 
+def score_telc_objective(exam: dict, module: str, answers: dict) -> dict:
+    """Score TELC objective modules (lesen, hoeren) - percentage based"""
+    correct = 0
+    total = 0
+    details = []
+    sections = exam.get(module, {}).get("aufgaben", [])
+    for section in sections:
+        for q in section.get("questions", []):
+            q_num = str(q["question_num"])
+            total += 1
+            user_answer = str(answers.get(q_num, ""))
+            correct_answer = str(q.get("correct_answer", ""))
+            is_correct = answers_match(user_answer, correct_answer)
+            if is_correct:
+                correct += 1
+            details.append({"question_num": int(q_num), "user_answer": user_answer,
+                "correct_answer": correct_answer, "is_correct": is_correct})
+    percentage = round(correct / total * 100, 1) if total > 0 else 0.0
+    return {"correct": correct, "total": total, "percentage": percentage,
+            "passed": percentage >= 60.0, "details": details}
+
 @api_router.post("/attempts/{attempt_id}/score-writing")
 async def score_writing_attempt(attempt_id: str, data: WritingSubmit, request: Request):
     user = await get_current_user(request)
@@ -590,6 +810,23 @@ async def score_speaking_attempt(attempt_id: str, data: SpeakingScoreRequest, re
     }})
     return {"attempt_id": attempt_id, "scores": scores}
 
+@api_router.post("/attempts/{attempt_id}/score-telc-writing")
+async def score_telc_writing_attempt(attempt_id: str, data: TelcWritingSubmit, request: Request):
+    user = await get_current_user(request)
+    attempt = await db.attempts.find_one({"attempt_id": attempt_id, "user_id": user["user_id"]}, {"_id": 0})
+    if not attempt:
+        raise HTTPException(404, "Attempt not found")
+    exam = await db.exams.find_one({"exam_id": attempt["exam_id"]}, {"_id": 0})
+    level = exam.get("telc_level", "B1")
+    aufgaben = exam.get("schreiben", {}).get("aufgaben", [])
+    prompt = aufgaben[0]["aufgabe"] if aufgaben else ""
+    scores = await score_telc_writing_ai(data.aufgabe_1, prompt, level)
+    await db.attempts.update_one({"attempt_id": attempt_id}, {"$set": {
+        "answers": {"aufgabe_1": data.aufgabe_1}, "scores": scores,
+        "completed_at": datetime.now(timezone.utc).isoformat(), "status": "completed"
+    }})
+    return {"attempt_id": attempt_id, "scores": scores}
+
 @api_router.get("/attempts/{attempt_id}")
 async def get_attempt(attempt_id: str, request: Request):
     user = await get_current_user(request)
@@ -602,6 +839,114 @@ async def get_attempt(attempt_id: str, request: Request):
 async def list_attempts(request: Request):
     user = await get_current_user(request)
     return await db.attempts.find({"user_id": user["user_id"]}, {"_id": 0}).sort("started_at", -1).to_list(100)
+
+@api_router.post("/attempts/full-test")
+async def create_full_test_attempt(request: Request):
+    body = await request.json()
+    exam_id = body.get("exam_id")
+    user = await get_current_user(request)
+    attempt_id = f"attempt_{uuid.uuid4().hex[:12]}"
+    await db.attempts.insert_one({
+        "attempt_id": attempt_id, "user_id": user["user_id"], "exam_id": exam_id,
+        "module": "full_test", "mode": "full_test",
+        "current_module": "listening",
+        "modules_completed": [],
+        "module_answers": {}, "module_scores": {},
+        "started_at": datetime.now(timezone.utc).isoformat(),
+        "completed_at": None, "status": "in_progress"
+    })
+    return {"attempt_id": attempt_id}
+
+@api_router.put("/attempts/{attempt_id}/full-test/module")
+async def submit_full_test_module(attempt_id: str, data: FullTestModuleSubmit, request: Request):
+    user = await get_current_user(request)
+    attempt = await db.attempts.find_one({"attempt_id": attempt_id, "user_id": user["user_id"]}, {"_id": 0})
+    if not attempt:
+        raise HTTPException(404, "Attempt not found")
+    exam = await db.exams.find_one({"exam_id": attempt["exam_id"]}, {"_id": 0})
+    module = data.module
+    scores = None
+    if module in ["listening", "reading"]:
+        scores = score_objective(exam, module, data.answers)
+
+    modules_completed = attempt.get("modules_completed", [])
+    if module not in modules_completed:
+        modules_completed.append(module)
+
+    module_order = ["listening", "reading", "writing", "speaking"]
+    current_idx = module_order.index(module)
+    next_module = module_order[current_idx + 1] if current_idx + 1 < len(module_order) else None
+
+    update = {
+        f"module_answers.{module}": data.answers,
+        "modules_completed": modules_completed,
+        "current_module": next_module or "completed"
+    }
+    if scores:
+        update[f"module_scores.{module}"] = scores
+
+    all_done = set(modules_completed) >= {"listening", "reading", "writing", "speaking"}
+    if all_done and next_module is None:
+        update["status"] = "submitted"
+        update["completed_at"] = datetime.now(timezone.utc).isoformat()
+
+    await db.attempts.update_one({"attempt_id": attempt_id}, {"$set": update})
+    return {"attempt_id": attempt_id, "next_module": next_module, "scores": scores}
+
+@api_router.post("/attempts/{attempt_id}/full-test/score-writing")
+async def score_full_test_writing(attempt_id: str, data: WritingSubmit, request: Request):
+    user = await get_current_user(request)
+    attempt = await db.attempts.find_one({"attempt_id": attempt_id, "user_id": user["user_id"]}, {"_id": 0})
+    if not attempt:
+        raise HTTPException(404, "Attempt not found")
+    exam = await db.exams.find_one({"exam_id": attempt["exam_id"]}, {"_id": 0})
+    tasks = exam.get("writing", {}).get("tasks", [])
+    t1p = tasks[0]["prompt"] if tasks else ""
+    t2p = tasks[1]["prompt"] if len(tasks) > 1 else ""
+    scores = await score_writing_ai(data.task_1, data.task_2, t1p, t2p)
+    await db.attempts.update_one({"attempt_id": attempt_id}, {"$set": {
+        "module_answers.writing": {"task_1": data.task_1, "task_2": data.task_2},
+        "module_scores.writing": scores
+    }})
+    return {"scores": scores}
+
+@api_router.post("/attempts/{attempt_id}/full-test/score-speaking")
+async def score_full_test_speaking(attempt_id: str, data: SpeakingScoreRequest, request: Request):
+    user = await get_current_user(request)
+    attempt = await db.attempts.find_one({"attempt_id": attempt_id, "user_id": user["user_id"]}, {"_id": 0})
+    if not attempt:
+        raise HTTPException(404, "Attempt not found")
+    exam = await db.exams.find_one({"exam_id": attempt["exam_id"]}, {"_id": 0})
+    questions = {}
+    for part in exam.get("speaking", {}).get("parts", []):
+        for q in part.get("questions", []):
+            questions[str(q.get("question_num", ""))] = q.get("question_text", "")
+    scores = await score_speaking_ai(data.transcriptions, questions)
+
+    all_module_scores = attempt.get("module_scores", {})
+    all_module_scores["speaking"] = scores
+
+    bands = []
+    for mod in ["listening", "reading"]:
+        s = all_module_scores.get(mod, {})
+        if s.get("band_score"):
+            bands.append(s["band_score"])
+    w = all_module_scores.get("writing", {})
+    if w.get("overall_writing_band"):
+        bands.append(w["overall_writing_band"])
+    sp = all_module_scores.get("speaking", {})
+    if sp.get("overall_band"):
+        bands.append(sp["overall_band"])
+    overall = round(sum(bands) / len(bands) * 2) / 2 if bands else 0.0
+
+    await db.attempts.update_one({"attempt_id": attempt_id}, {"$set": {
+        "module_scores.speaking": scores,
+        "module_answers.speaking": {"transcriptions": data.transcriptions},
+        "overall_band": overall,
+        "status": "completed",
+        "completed_at": datetime.now(timezone.utc).isoformat()
+    }})
+    return {"scores": scores, "overall_band": overall}
 
 # ==========================================
 # PROGRESS
@@ -771,6 +1116,127 @@ Return JSON: {"passages": [{"passage_num": 1, "title": "...", "text": "...(full 
         await generate_exam_audio(exam_id)
     except Exception as e:
         logger.error(f"AI exam generation error: {e}")
+        await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "error", "error_message": str(e)}})
+
+@api_router.post("/exams/generate-telc")
+async def generate_telc_endpoint(background_tasks: BackgroundTasks, request: Request):
+    body = await request.json()
+    level = body.get("level", "B1")
+    user = await get_current_user(request)
+    exam_id = f"exam_telc_{uuid.uuid4().hex[:8]}"
+    await db.exams.insert_one({
+        "exam_id": exam_id,
+        "title": f"TELC Deutsch {level} - KI-generiert",
+        "exam_type": "telc",
+        "telc_level": level,
+        "pathway": f"telc_{level.lower()}",
+        "status": "generating_content",
+        "audio_progress": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "created_by": user["user_id"],
+        "lesen": {"aufgaben": [], "total_questions": 15, "duration_minutes": 90},
+        "hoeren": {"aufgaben": [], "total_questions": 15, "duration_minutes": 40},
+        "schreiben": {"aufgaben": [], "total_time_minutes": 30},
+        "sprechen": {"teile": [], "total_time_minutes": 15}
+    })
+    background_tasks.add_task(ai_generate_telc_exam, exam_id, level)
+    return {"exam_id": exam_id, "status": "generating_content"}
+
+async def ai_generate_telc_exam(exam_id: str, level: str):
+    try:
+        lesen_prompt = f"""Generate a TELC Deutsch {level} Lesen (Reading) test with exactly 3 Aufgaben (tasks), 5 questions each (15 total).
+
+Aufgabe 1 (q1-5): Matching - 5 short texts (A-E, 40-60 words each) about everyday German topics (ads, notices, short articles). 5 descriptions that each match one text. Format: short_texts: [{{id: "A", text: "..."}}], descriptions: [{{question_num: 1, text: "...", correct_answer: "A"}}]
+
+Aufgabe 2 (q6-10): One text (150-200 words) about a German everyday topic. 5 Richtig/Falsch/Nicht im Text questions. correct_answer: "Richtig", "Falsch", or "Nicht im Text"
+
+Aufgabe 3 (q11-15): One text (150-200 words) different topic. 5 multiple choice questions with options A/B/C. correct_answer: "A", "B", or "C"
+
+All texts and questions must be in German at {level} level.
+
+Return JSON: {{"aufgaben": [{{"aufgabe_num": 1, "typ": "zuordnung", "short_texts": [{{"id": "A", "text": "..."}}], "questions": [{{"question_num": 1, "question_text": "...", "correct_answer": "A"}}]}}, {{"aufgabe_num": 2, "typ": "richtig_falsch", "text": "...", "questions": [{{"question_num": 6, "question_text": "...", "correct_answer": "Richtig"}}]}}, {{"aufgabe_num": 3, "typ": "multiple_choice", "text": "...", "questions": [{{"question_num": 11, "question_text": "...", "options": ["A) ...", "B) ...", "C) ..."], "correct_answer": "A"}}]}}]}}"""
+
+        lesen_raw = await call_openrouter([
+            {"role": "system", "content": f"Generate authentic TELC Deutsch {level} exam content in German. Return valid JSON only."},
+            {"role": "user", "content": lesen_prompt}
+        ])
+        lesen_data = json.loads(lesen_raw)
+
+        hoeren_prompt = f"""Generate a TELC Deutsch {level} Hören (Listening) test with 3 Aufgaben.
+
+Aufgabe 1 (q1-5): 5 short conversations (2-3 exchanges each) in everyday German situations. Each conversation has 1 True/False question. Format: conversations with script_segments (sprecher + text), one question per conversation with correct_answer "Richtig" or "Falsch"
+
+Aufgabe 2 (q6-10): One longer conversation (8-10 exchanges) about planning/organising something. 5 multiple choice questions (A/B/C). correct_answer: "A", "B", or "C"
+
+Aufgabe 3 (q11-15): 5 short radio announcements/messages (1-2 sentences each). Each has 1 question with correct_answer "Richtig" or "Falsch"
+
+All content must be in German at {level} level. Use German names. Include natural German speech patterns.
+
+Sprecher names: "Frau Müller", "Herr Schmidt", "Moderator", "Ansager", etc.
+
+Return JSON: {{"aufgaben": [{{"aufgabe_num": 1, "typ": "kurzgespraeche", "sprecher": [{{"name": "...", "voice_id": "..."}}], "conversations": [{{"conv_num": 1, "script_segments": [{{"sprecher": "...", "text": "..."}}], "questions": [{{"question_num": 1, "question_text": "...", "correct_answer": "Richtig"}}]}}]}}, {{"aufgabe_num": 2, "typ": "gespraech", "sprecher": [...], "script_segments": [...], "questions": [...]}} , {{"aufgabe_num": 3, "typ": "ansagen", "ansagen": [{{"num": 1, "text": "...", "question_num": 11, "question_text": "...", "correct_answer": "Richtig"}}]}}]}}"""
+
+        hoeren_raw = await call_openrouter([
+            {"role": "system", "content": f"Generate TELC Deutsch {level} listening content in German. Return valid JSON only."},
+            {"role": "user", "content": hoeren_prompt}
+        ])
+        hoeren_data = json.loads(hoeren_raw)
+
+        # Assign German voices to sprecher
+        voice_list = list(VOICES_DE.values())
+        for aufgabe in hoeren_data.get("aufgaben", []):
+            for i, sp in enumerate(aufgabe.get("sprecher", [])):
+                sp["voice_id"] = voice_list[i % len(voice_list)]
+            for conv in aufgabe.get("conversations", []):
+                for i, sp in enumerate(conv.get("sprecher", aufgabe.get("sprecher", []))):
+                    sp["voice_id"] = voice_list[i % len(voice_list)]
+
+        schreiben = {
+            "total_time_minutes": 30,
+            "aufgaben": [{
+                "aufgabe_num": 1,
+                "aufgabe_typ": "brief_email",
+                "aufgabe": f"Sie haben eine E-Mail von Ihrer Freundin / Ihrem Freund bekommen. Sie/Er schreibt, dass sie/er nächsten Monat umzieht und Hilfe beim Umzug braucht. Schreiben Sie eine Antwort-E-Mail auf Deutsch. Schreiben Sie: ob Sie helfen können, wann Sie Zeit haben, was Sie beim Umzug helfen können. Schreiben Sie ca. 100-120 Wörter.",
+                "min_words": 80,
+                "max_words": 150
+            }]
+        }
+
+        sprechen = {
+            "total_time_minutes": 15,
+            "teile": [
+                {"teil_num": 1, "titel": "Kontaktaufnahme", "instructions": "Stellen Sie sich vor und beantworten Sie Fragen zu Ihrer Person.",
+                 "fragen": [
+                     {"frage_num": 1, "frage_text": "Guten Tag! Ich bin Ihr Prüfer. Wie heißen Sie und woher kommen Sie?", "needs_audio": True},
+                     {"frage_num": 2, "frage_text": "Was machen Sie beruflich oder was studieren Sie?", "needs_audio": True},
+                     {"frage_num": 3, "frage_text": "Was sind Ihre Hobbys?", "needs_audio": True}
+                 ]},
+                {"teil_num": 2, "titel": "Informationen austauschen", "instructions": "Sie sehen ein Bild. Beschreiben Sie das Bild und beantworten Sie Fragen dazu.",
+                 "bild_beschreibung": "Ein Stadtpark mit Menschen: Familien beim Picknicken, Kinder spielen, ältere Menschen auf Bänken sitzen.",
+                 "fragen": [
+                     {"frage_num": 4, "frage_text": "Beschreiben Sie das Bild. Was sehen Sie?", "needs_audio": True},
+                     {"frage_num": 5, "frage_text": "Gehen Sie gern in Parks? Warum oder warum nicht?", "needs_audio": True}
+                 ]},
+                {"teil_num": 3, "titel": "Gemeinsam planen", "instructions": "Planen Sie gemeinsam mit dem Prüfer eine Aktivität.",
+                 "aufgabe": "Sie und ein Freund möchten am Wochenende etwas gemeinsam unternehmen. Diskutieren Sie Möglichkeiten und einigen Sie sich auf eine Aktivität.",
+                 "fragen": [
+                     {"frage_num": 6, "frage_text": "Was würden Sie am Wochenende gerne machen? Haben Sie Ideen?", "needs_audio": True},
+                     {"frage_num": 7, "frage_text": "Wie wäre es mit einem Ausflug? Was denken Sie?", "needs_audio": True}
+                 ]}
+            ]
+        }
+
+        await db.exams.update_one({"exam_id": exam_id}, {"$set": {
+            "title": f"TELC Deutsch {level} - KI-generiert ({datetime.now(timezone.utc).strftime('%d.%m.%Y')})",
+            "lesen": {**lesen_data, "total_questions": 15, "duration_minutes": 90},
+            "hoeren": {**hoeren_data, "total_questions": 15, "duration_minutes": 40},
+            "schreiben": schreiben,
+            "sprechen": sprechen,
+            "status": "pending_audio"
+        }})
+        await generate_exam_audio(exam_id)
+    except Exception as e:
+        logger.error(f"TELC generation error: {e}")
         await db.exams.update_one({"exam_id": exam_id}, {"$set": {"status": "error", "error_message": str(e)}})
 
 # ==========================================
@@ -1196,6 +1662,99 @@ async def startup():
                         {"$set": {f"listening.sections.{i}.instruction": ss["instruction"]}}
                     )
             logger.info("Migrated exam_academic_001 with question layouts")
+
+# ==========================================
+# STRIPE SUBSCRIPTIONS
+# ==========================================
+STRIPE_PRICE_MONTHLY = os.environ.get('STRIPE_PRICE_MONTHLY', '')
+STRIPE_PRICE_ANNUAL = os.environ.get('STRIPE_PRICE_ANNUAL', '')
+
+@api_router.post("/stripe/checkout")
+async def create_checkout_session(data: StripeCheckoutRequest, request: Request):
+    user = await get_current_user(request)
+    price_id = STRIPE_PRICE_MONTHLY if data.plan == "monthly" else STRIPE_PRICE_ANNUAL
+    if not price_id:
+        raise HTTPException(400, "Stripe not configured")
+    try:
+        customer_id = user.get("stripe_customer_id")
+        if not customer_id:
+            customer = stripe.Customer.create(email=user["email"], name=user["name"])
+            customer_id = customer.id
+            await db.users.update_one({"user_id": user["user_id"]}, {"$set": {"stripe_customer_id": customer_id}})
+
+        session = stripe.checkout.Session.create(
+            customer=customer_id,
+            payment_method_types=["card"],
+            line_items=[{"price": price_id, "quantity": 1}],
+            mode="subscription",
+            success_url=f"{FRONTEND_URL}/subscription/success?session_id={{CHECKOUT_SESSION_ID}}",
+            cancel_url=f"{FRONTEND_URL}/pricing",
+        )
+        return {"url": session.url}
+    except stripe.error.StripeError as e:
+        raise HTTPException(400, str(e))
+
+@api_router.post("/stripe/webhook", include_in_schema=False)
+async def stripe_webhook(request: Request):
+    payload = await request.body()
+    sig_header = request.headers.get("stripe-signature", "")
+    try:
+        event = stripe.Webhook.construct_event(payload, sig_header, STRIPE_WEBHOOK_SECRET)
+    except (ValueError, stripe.error.SignatureVerificationError):
+        raise HTTPException(400, "Invalid signature")
+
+    if event["type"] == "customer.subscription.created" or event["type"] == "customer.subscription.updated":
+        sub = event["data"]["object"]
+        customer_id = sub["customer"]
+        status = sub["status"]
+        tier = "pro" if status == "active" else "free"
+        expires_at = datetime.fromtimestamp(sub["current_period_end"], tz=timezone.utc).isoformat()
+        await db.users.update_one({"stripe_customer_id": customer_id}, {"$set": {
+            "subscription": {"tier": tier, "stripe_subscription_id": sub["id"],
+                             "stripe_customer_id": customer_id, "expires_at": expires_at, "status": status}
+        }})
+    elif event["type"] == "customer.subscription.deleted":
+        sub = event["data"]["object"]
+        customer_id = sub["customer"]
+        await db.users.update_one({"stripe_customer_id": customer_id}, {"$set": {
+            "subscription": {"tier": "free", "status": "canceled"}
+        }})
+    return {"received": True}
+
+@api_router.get("/stripe/portal")
+async def customer_portal(request: Request):
+    user = await get_current_user(request)
+    customer_id = user.get("stripe_customer_id")
+    if not customer_id:
+        raise HTTPException(400, "No subscription found")
+    try:
+        session = stripe.billing_portal.Session.create(
+            customer=customer_id,
+            return_url=f"{FRONTEND_URL}/dashboard"
+        )
+        return {"url": session.url}
+    except stripe.error.StripeError as e:
+        raise HTTPException(400, str(e))
+
+@api_router.get("/subscription/status")
+async def get_subscription_status(request: Request):
+    user = await get_current_user(request)
+    sub = user.get("subscription", {})
+    tier = "free"
+    if sub:
+        tier = sub.get("tier", "free")
+        if tier != "free":
+            expires_at = sub.get("expires_at")
+            if expires_at:
+                try:
+                    exp = datetime.fromisoformat(expires_at)
+                    if exp.tzinfo is None:
+                        exp = exp.replace(tzinfo=timezone.utc)
+                    if exp < datetime.now(timezone.utc):
+                        tier = "free"
+                except:
+                    tier = "free"
+    return {"tier": tier, "subscription": sub}
 
 # ==========================================
 # ADMIN ENDPOINTS

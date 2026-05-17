@@ -7,6 +7,8 @@ import ExamPage from "@/pages/ExamPage";
 import ResultsPage from "@/pages/ResultsPage";
 import AuthCallback from "@/pages/AuthCallback";
 import AdminPage from "@/pages/AdminPage";
+import PricingPage from "@/pages/PricingPage";
+import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import ProtectedRoute from "@/components/ProtectedRoute";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
@@ -75,6 +77,8 @@ function AppRouter() {
       <Route path="/admin" element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
       <Route path="/exam/:examId" element={<ProtectedRoute><ExamPage /></ProtectedRoute>} />
       <Route path="/results/:attemptId" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
+      <Route path="/pricing" element={<PricingPage />} />
+      <Route path="/subscription/success" element={<ProtectedRoute><SubscriptionSuccess /></ProtectedRoute>} />
     </Routes>
   );
 }
