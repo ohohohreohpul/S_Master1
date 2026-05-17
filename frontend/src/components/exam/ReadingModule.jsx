@@ -7,7 +7,14 @@ export default function ReadingModule({ exam, answers, updateAnswer, flagged, to
   const [highlights, setHighlights] = useState({}); // { passageNum: [{text, id}] }
   const [showHighlightBtn, setShowHighlightBtn] = useState(null); // { x, y, text }
   const [highlightMode, setHighlightMode] = useState(false);
+  const [eliminated, setEliminated] = useState({}); // { qNum_optIdx: true }
   const passageRef = useRef(null);
+
+  const toggleEliminate = (qNum, optIdx, e) => {
+    e.preventDefault();
+    const key = `${qNum}_${optIdx}`;
+    setEliminated(prev => ({ ...prev, [key]: !prev[key] }));
+  };
 
   const passages = exam?.reading?.passages || [];
   const passage = passages.find(p => p.passage_num === currentPassage);
@@ -124,17 +131,26 @@ export default function ReadingModule({ exam, answers, updateAnswer, flagged, to
 
         {q.question_type === "multiple_choice" && q.options ? (
           <div className="space-y-1.5">
-            {q.options.map((opt, i) => (
-              <label key={i} className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all text-sm ${
-                answers[qNum] === opt.charAt(0)
-                  ? "bg-[var(--ps-blue)]/5 border border-[var(--ps-blue)]/20"
-                  : "hover:bg-[var(--ps-ice)] border border-transparent"
-              }`} data-testid={`option-${qNum}-${i}`}>
-                <input type="radio" name={`q_${qNum}`} value={opt.charAt(0)} checked={answers[qNum] === opt.charAt(0)}
-                  onChange={(e) => updateAnswer(qNum, e.target.value)} className="w-4 h-4 accent-[var(--ps-blue)]" />
-                <span>{opt}</span>
-              </label>
-            ))}
+            <p className="text-[10px] text-[var(--ps-mute)] mb-2">Right-click an option to eliminate it</p>
+            {q.options.map((opt, i) => {
+              const elimKey = `${qNum}_${i}`;
+              const isElim = eliminated[elimKey];
+              return (
+                <label key={i} onContextMenu={(e) => toggleEliminate(qNum, i, e)}
+                  className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all text-sm select-none ${
+                    answers[qNum] === opt.charAt(0)
+                      ? "bg-[var(--ps-blue)]/5 border border-[var(--ps-blue)]/20"
+                      : isElim
+                        ? "bg-gray-50 border border-transparent opacity-50"
+                        : "hover:bg-[var(--ps-ice)] border border-transparent"
+                  }`} data-testid={`option-${qNum}-${i}`}>
+                  <input type="radio" name={`q_${qNum}`} value={opt.charAt(0)} checked={answers[qNum] === opt.charAt(0)}
+                    onChange={(e) => updateAnswer(qNum, e.target.value)} className="w-4 h-4 accent-[var(--ps-blue)]" />
+                  <span className={isElim ? "line-through text-gray-400" : ""}>{opt}</span>
+                  {isElim && <span className="ml-auto text-[9px] text-gray-400">eliminated</span>}
+                </label>
+              );
+            })}
           </div>
         ) : q.question_type === "true_false_not_given" ? (
           <div className="flex gap-2">
@@ -151,18 +167,33 @@ export default function ReadingModule({ exam, answers, updateAnswer, flagged, to
             ))}
           </div>
         ) : q.question_type === "matching_headings" && q.options ? (
-          <div className="space-y-1.5">
-            {q.options.map((opt, i) => (
-              <label key={i} className={`flex items-center gap-3 p-2.5 rounded-lg cursor-pointer transition-all text-sm ${
-                answers[qNum] === opt.charAt(0)
-                  ? "bg-[var(--ps-blue)]/5 border border-[var(--ps-blue)]/20"
-                  : "hover:bg-[var(--ps-ice)] border border-transparent"
-              }`} data-testid={`option-${qNum}-${i}`}>
-                <input type="radio" name={`q_${qNum}`} value={opt.charAt(0)} checked={answers[qNum] === opt.charAt(0)}
-                  onChange={(e) => updateAnswer(qNum, e.target.value)} className="w-4 h-4 accent-[var(--ps-blue)]" />
-                <span>{opt}</span>
-              </label>
-            ))}
+          <div className="flex gap-4" data-testid={`matching-headings-${qNum}`}>
+            {/* Left: Statement/Question */}
+            <div className="flex-1 p-3 bg-[var(--ps-ice)] rounded-xl border border-[var(--ps-divider)]">
+              <p className="text-xs font-medium text-[var(--ps-mute)] mb-1 uppercase tracking-wider">Paragraph</p>
+              <p className="text-sm" style={{ color: "var(--ps-charcoal)" }}>{q.question_text}</p>
+            </div>
+            {/* Right: Lettered option pills */}
+            <div className="flex flex-wrap gap-2 items-start content-start max-w-[200px]">
+              {q.options.map((opt, i) => {
+                const letter = opt.charAt(0);
+                const isSelected = answers[qNum] === letter;
+                return (
+                  <motion.button key={i}
+                    whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
+                    onClick={() => updateAnswer(qNum, letter)}
+                    title={opt}
+                    className={`w-9 h-9 rounded-full text-xs font-bold transition-all border flex items-center justify-center ${
+                      isSelected
+                        ? "bg-[var(--ps-blue)] text-white border-[var(--ps-blue)] shadow-md"
+                        : "bg-white text-[var(--ps-charcoal)] border-[var(--ps-divider)] hover:border-[var(--ps-blue)]/40 hover:text-[var(--ps-blue)]"
+                    }`}
+                    data-testid={`option-${qNum}-${i}`}>
+                    {letter}
+                  </motion.button>
+                );
+              })}
+            </div>
           </div>
         ) : (
           <input type="text" className="exam-input" placeholder="Type your answer..." value={answers[qNum] || ""}

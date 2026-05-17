@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/App";
-import { BookOpen, Headphones, Pen, Mic, ArrowRight, Shield, Zap, BarChart3, Users, Globe, Award } from "lucide-react";
+import { BookOpen, Headphones, Pen, Mic, ArrowRight, Shield, Zap, BarChart3, Users, Globe, Award, Languages } from "lucide-react";
 import { motion } from "framer-motion";
 
 const fadeUp = { hidden: { opacity: 0, y: 30 }, show: { opacity: 1, y: 0 } };
@@ -59,18 +59,30 @@ export default function LandingPage() {
         <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: "radial-gradient(circle at 1px 1px, white 1px, transparent 0)", backgroundSize: "40px 40px" }} />
         <motion.div className="max-w-5xl mx-auto text-center relative" initial="hidden" animate="show" variants={stagger}>
           <motion.p variants={fadeUp} className="text-[var(--ps-cyan)] font-medium text-xs tracking-[0.25em] mb-8 uppercase">
-            Computer-based IELTS simulation
+            AI-powered exam preparation platform
           </motion.p>
           <motion.h1 variants={fadeUp} className="display-xl mb-6 text-white">
-            The most authentic<br />IELTS mock exam
+            Master IELTS and TELC<br />Deutsch with AI
           </motion.h1>
-          <motion.p variants={fadeUp} className="text-lg font-light text-gray-400 max-w-2xl mx-auto mb-12 leading-relaxed">
-            Full practice tests with AI-generated audio, real-time scoring, and detailed band feedback. Audio pre-loads before every exam for perfect timing.
+          <motion.p variants={fadeUp} className="text-lg font-light text-gray-400 max-w-2xl mx-auto mb-8 leading-relaxed">
+            AI-powered mock exams with real scoring, natural audio, and detailed feedback. Prepare for IELTS Academic or TELC Deutsch at B1 and B2.
           </motion.p>
+          {/* Exam type chips */}
+          <motion.div variants={fadeUp} className="flex items-center justify-center gap-3 mb-10 flex-wrap">
+            <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--ps-blue)]/20 border border-[var(--ps-blue)]/30 text-sm font-medium text-white">
+              <BookOpen size={14} className="text-[var(--ps-cyan)]" /> IELTS Academic
+            </span>
+            <span className="flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/20 border border-amber-500/30 text-sm font-medium text-white">
+              <Languages size={14} className="text-amber-400" /> TELC Deutsch B1 / B2
+            </span>
+          </motion.div>
           <motion.div variants={fadeUp} className="flex items-center justify-center gap-4 flex-wrap">
             <button data-testid="hero-start-btn" onClick={user ? () => navigate("/dashboard") : handleLogin}
               className="btn-ps btn-ps-orange" style={{ fontSize: "1rem", padding: "16px 40px" }}>
               Start Practice Test <ArrowRight size={18} />
+            </button>
+            <button onClick={() => navigate("/pricing")} className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition-colors">
+              See pricing <ArrowRight size={14} />
             </button>
           </motion.div>
 
@@ -90,8 +102,8 @@ export default function LandingPage() {
       <section className="panel-light py-24 px-8 md:px-16 lg:px-24" data-testid="modules-section">
         <div className="max-w-6xl mx-auto">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }}>
-            <h2 className="display-sm text-center mb-2" style={{ color: "var(--ps-black)" }}>All four IELTS modules</h2>
-            <p className="text-center text-[var(--ps-body-gray)] mb-14 text-base">Exactly as you'll experience on test day</p>
+            <h2 className="display-sm text-center mb-2" style={{ color: "var(--ps-black)" }}>All modules, both exams</h2>
+            <p className="text-center text-[var(--ps-body-gray)] mb-14 text-base">Exactly as you'll experience on test day — IELTS and TELC Deutsch</p>
           </motion.div>
           <motion.div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5"
             initial="hidden" whileInView="show" viewport={{ once: true }} variants={stagger}>
@@ -151,8 +163,8 @@ export default function LandingPage() {
 
       {/* Footer - Blue */}
       <footer className="panel-blue py-12 px-8 text-center" data-testid="footer">
-        <p className="text-sm text-white/80 font-light">IELTS Pro Mock Exam Platform</p>
-        <p className="text-xs text-white/40 mt-2">Not affiliated with IDP or British Council. All content is AI-generated.</p>
+        <p className="text-sm text-white/80 font-light">IELTS &amp; TELC Deutsch Mock Exam Platform</p>
+        <p className="text-xs text-white/40 mt-2">Not affiliated with IDP, British Council, or TELC GmbH. All content is AI-generated.</p>
       </footer>
     </div>
   );
