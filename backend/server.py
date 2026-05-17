@@ -1637,6 +1637,536 @@ Looking forward, blockchain technology and decentralised autonomous organisation
         }
     }
 
+def get_telc_b1_seed():
+    return {
+        "exam_id": "exam_telc_b1_001",
+        "title": "TELC Deutsch B1 - Übungstest 1",
+        "exam_type": "telc",
+        "telc_level": "B1",
+        "pathway": "telc_b1",
+        "status": "pending_audio",
+        "audio_progress": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "lesen": {
+            "total_questions": 15,
+            "duration_minutes": 90,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "zuordnung",
+                    "title": "Aufgabe 1 - Texte zuordnen",
+                    "instruction": "Welche Überschrift passt zu welchem Text? Ordnen Sie zu. Eine Überschrift passt nicht.",
+                    "short_texts": [
+                        {"id": "A", "text": "Das Stadtbad Mitte ist täglich von 7 bis 22 Uhr geöffnet. Wir bieten Schwimmkurse für Kinder ab 5 Jahren und Aquafitness für Erwachsene an. Familienkarte erhältlich. Sauna im Obergeschoss (nur für Erwachsene)."},
+                        {"id": "B", "text": "Stadtbücherei am Marktplatz: Bücher, Zeitschriften und DVDs kostenlos ausleihen. Montag bis Freitag 10–19 Uhr, Samstag 10–14 Uhr. Für die Anmeldung bringen Sie bitte Ihren Personalausweis mit."},
+                        {"id": "C", "text": "Frischer Obst- und Gemüsemarkt jeden Dienstag und Freitag von 8 bis 13 Uhr auf dem Rathausplatz. Regionale Produkte direkt vom Bauernhof. Auch Käse, Eier und Honig aus der Umgebung."},
+                        {"id": "D", "text": "Volkshochschule – Anmeldung Herbstkurse ab sofort möglich. Deutsch als Fremdsprache (alle Niveaus), Englisch, Spanisch, Kochen, Fotografie und vieles mehr. Infos und Anmeldung online oder persönlich."},
+                        {"id": "E", "text": "Fahrradverleih am Bahnhof: Cityräder, E-Bikes und Kindersitze verfügbar. Stundenpreise ab 3 Euro, Tageskarte 15 Euro. Personalausweis als Pfand erforderlich. Geöffnet täglich 8–20 Uhr."}
+                    ],
+                    "questions": [
+                        {"question_num": 1, "question_text": "Hier kann man Bücher kostenlos mitnehmen.", "correct_answer": "B"},
+                        {"question_num": 2, "question_text": "Hier kann man Fahrräder mieten.", "correct_answer": "E"},
+                        {"question_num": 3, "question_text": "Hier kann man frische Lebensmittel kaufen.", "correct_answer": "C"},
+                        {"question_num": 4, "question_text": "Hier kann man eine neue Sprache lernen.", "correct_answer": "D"},
+                        {"question_num": 5, "question_text": "Hier kann man schwimmen gehen.", "correct_answer": "A"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "richtig_falsch",
+                    "title": "Aufgabe 2 - Richtig, Falsch oder Nicht im Text?",
+                    "instruction": "Lesen Sie den Text und entscheiden Sie: Ist die Aussage richtig, falsch oder steht das nicht im Text?",
+                    "text": """Homeoffice in Deutschland – Fluch oder Segen?
+
+Seit der Corona-Pandemie arbeiten immer mehr Deutsche von zu Hause aus. Laut einer aktuellen Studie des Instituts für Arbeitsmarkt- und Berufsforschung arbeiten heute etwa 24 Prozent aller Beschäftigten regelmäßig im Homeoffice – vor der Pandemie waren es nur 12 Prozent.
+
+Die Meinungen über das Homeoffice sind geteilt. Viele Arbeitnehmer schätzen die Flexibilität: Sie können sich ihre Arbeitszeit besser einteilen und sparen täglich Zeit und Geld für den Weg zur Arbeit. Für Eltern ist es oft leichter, Familie und Beruf zu vereinbaren.
+
+Allerdings gibt es auch Nachteile. Viele Menschen vermissen den Kontakt zu den Kollegen. Die Grenze zwischen Arbeit und Freizeit verschwimmt oft, und manche Mitarbeiter arbeiten im Homeoffice sogar länger als im Büro. Außerdem haben nicht alle zu Hause einen ruhigen Arbeitsplatz.
+
+Experten empfehlen deshalb ein hybrides Modell: ein bis zwei Tage Homeoffice pro Woche und den Rest der Zeit im Büro. So profitiert man von den Vorteilen beider Welten.""",
+                    "questions": [
+                        {"question_num": 6, "question_text": "Vor der Pandemie arbeiteten 24 Prozent der Deutschen im Homeoffice.", "correct_answer": "Falsch"},
+                        {"question_num": 7, "question_text": "Im Homeoffice sparen viele Arbeitnehmer Zeit und Geld für den Weg zur Arbeit.", "correct_answer": "Richtig"},
+                        {"question_num": 8, "question_text": "Alle Mitarbeiter im Homeoffice haben einen ruhigen Arbeitsplatz.", "correct_answer": "Falsch"},
+                        {"question_num": 9, "question_text": "Manche Mitarbeiter im Homeoffice verdienen mehr Geld als im Büro.", "correct_answer": "Nicht im Text"},
+                        {"question_num": 10, "question_text": "Experten empfehlen, manchmal im Büro und manchmal zu Hause zu arbeiten.", "correct_answer": "Richtig"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "multiple_choice",
+                    "title": "Aufgabe 3 - Multiple Choice",
+                    "instruction": "Lesen Sie den Text. Welche Antwort (A, B oder C) passt?",
+                    "text": """Stadtführungen mal anders
+
+Die Tourismusbehörde der Stadt Freiburg bietet ab diesem Sommer ein neues Programm an: Stadtführungen mit dem Fahrrad. Jeden Samstag um 10 Uhr starten geführte Radtouren vom Hauptbahnhof. Die Tour dauert etwa zwei Stunden und führt zu den wichtigsten Sehenswürdigkeiten der Altstadt, zum Münster und entlang der Dreisam.
+
+Die Führung kostet 15 Euro pro Person, Fahrräder können für 8 Euro gemietet werden. Für Gruppen ab 10 Personen gibt es einen Rabatt von 20 Prozent. Kinder unter 12 Jahren nehmen kostenlos teil, wenn sie von einem Erwachsenen begleitet werden.
+
+Die Stadtführerin Claudia Berger, die die Tour leitet, ist begeistert: "Mit dem Fahrrad kann man die Stadt viel intensiver erleben als zu Fuß. Wir machen auch Stopps an weniger bekannten Orten, die normale Touristengruppen nicht besuchen."
+
+Anmeldung ist nicht erforderlich – man kann einfach am Startpunkt erscheinen. Bei schlechtem Wetter findet die Tour trotzdem statt, außer bei starkem Regen oder Sturm.""",
+                    "questions": [
+                        {"question_num": 11, "question_text": "Wo beginnt die Radtour?", "options": ["A) Am Münster", "B) Am Hauptbahnhof", "C) Am Rathaus"], "correct_answer": "B"},
+                        {"question_num": 12, "question_text": "Was kostet die Führung für ein Kind von 10 Jahren mit einem Erwachsenen?", "options": ["A) 15 Euro", "B) 8 Euro", "C) Nichts"], "correct_answer": "C"},
+                        {"question_num": 13, "question_text": "Was ist ein Vorteil der Radtour laut Claudia Berger?", "options": ["A) Sie ist billiger als eine Fußtour.", "B) Man sieht auch weniger bekannte Orte.", "C) Man kann die Tour online buchen."], "correct_answer": "B"},
+                        {"question_num": 14, "question_text": "Wann findet die Tour nicht statt?", "options": ["A) Bei leichtem Regen", "B) Bei starkem Regen oder Sturm", "C) Im Winter"], "correct_answer": "B"},
+                        {"question_num": 15, "question_text": "Wie viel zahlt eine Gruppe von 10 Personen für die Führung insgesamt?", "options": ["A) 150 Euro", "B) 120 Euro", "C) 130 Euro"], "correct_answer": "B"}
+                    ]
+                }
+            ]
+        },
+        "hoeren": {
+            "total_questions": 15,
+            "duration_minutes": 40,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "kurzgespraeche",
+                    "title": "Aufgabe 1 - Kurze Gespräche",
+                    "instruction": "Sie hören fünf kurze Gespräche. Sind die Aussagen richtig oder falsch?",
+                    "conversations": [
+                        {
+                            "conv_num": 1,
+                            "sprecher": [
+                                {"name": "Frau Koch", "voice_id": "pFZP5JQG7iQjIQuC4Bku"},
+                                {"name": "Herr Braun", "voice_id": "onwK4e9ZLuTAKqWW03F9"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Frau Koch", "text": "[freundlich] Guten Morgen! Haben Sie schon gehört? Das neue Restaurant am Marktplatz macht heute Abend auf."},
+                                {"sprecher": "Herr Braun", "text": "Ja, ich habe eine Einladung zur Eröffnung bekommen. Es soll italienisches Essen anbieten."},
+                                {"sprecher": "Frau Koch", "text": "Wirklich? Ich dachte, es wird ein asiatisches Restaurant."},
+                                {"sprecher": "Herr Braun", "text": "Nein, nein – Pizza und Pasta, alles frisch gemacht."}
+                            ],
+                            "questions": [{"question_num": 1, "question_text": "Das neue Restaurant bietet asiatisches Essen an.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 2,
+                            "sprecher": [
+                                {"name": "Studentin", "voice_id": "Xb7hH8MSUJpSbSDYk0k2"},
+                                {"name": "Bibliothekarin", "voice_id": "pFZP5JQG7iQjIQuC4Bku"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Studentin", "text": "Entschuldigung, ich suche ein Buch über deutsche Geschichte. Haben Sie etwas über die Weimarer Republik?"},
+                                {"sprecher": "Bibliothekarin", "text": "Ja, wir haben mehrere Bücher dazu. Aber die meisten sind gerade ausgeliehen. Eines ist noch da – im Regal Nummer sieben."},
+                                {"sprecher": "Studentin", "text": "Kann ich es für drei Wochen ausleihen?"},
+                                {"sprecher": "Bibliothekarin", "text": "Normalerweise sind es vier Wochen, aber dieses Buch ist sehr gefragt, daher nur zwei Wochen."}
+                            ],
+                            "questions": [{"question_num": 2, "question_text": "Die Studentin kann das Buch für vier Wochen ausleihen.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 3,
+                            "sprecher": [
+                                {"name": "Kunde", "voice_id": "onwK4e9ZLuTAKqWW03F9"},
+                                {"name": "Verkäuferin", "voice_id": "Xb7hH8MSUJpSbSDYk0k2"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Kunde", "text": "[pausiert] Ich hätte gerne diese Jacke in Größe L, aber in Blau, wenn möglich."},
+                                {"sprecher": "Verkäuferin", "text": "In Blau haben wir nur noch Größe M und XL. L ist leider ausverkauft."},
+                                {"sprecher": "Kunde", "text": "Schade. Und in Grün?"},
+                                {"sprecher": "Verkäuferin", "text": "In Grün haben wir alle Größen vorrätig, auch L."}
+                            ],
+                            "questions": [{"question_num": 3, "question_text": "Der Kunde kann die Jacke in Blau und Größe L kaufen.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 4,
+                            "sprecher": [
+                                {"name": "Lars", "voice_id": "JBFqnCBsd6RMkjVDRZzb"},
+                                {"name": "Mia", "voice_id": "pFZP5JQG7iQjIQuC4Bku"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Lars", "text": "Mia, ich wollte dich fragen – machst du morgen Abend mit beim Stadtlauf?"},
+                                {"sprecher": "Mia", "text": "Stadtlauf? Wann fängt der an?"},
+                                {"sprecher": "Lars", "text": "Um halb sieben am Stadtpark. Es sind fünf Kilometer – nicht zu schwer."},
+                                {"sprecher": "Mia", "text": "[überlegt] Das klingt gut. Ich bin dabei!"}
+                            ],
+                            "questions": [{"question_num": 4, "question_text": "Der Stadtlauf findet am Stadtpark statt.", "correct_answer": "Richtig"}]
+                        },
+                        {
+                            "conv_num": 5,
+                            "sprecher": [
+                                {"name": "Frau Weber", "voice_id": "pFZP5JQG7iQjIQuC4Bku"},
+                                {"name": "Herr Fischer", "voice_id": "eUlIljct4YrEQRcEqrii"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Frau Weber", "text": "Herr Fischer, ich habe gehört, Sie ziehen nächsten Monat um?"},
+                                {"sprecher": "Herr Fischer", "text": "Ja, genau. Ich habe eine neue Wohnung im Norden der Stadt gefunden – größer und mit Balkon."},
+                                {"sprecher": "Frau Weber", "text": "Das klingt wunderbar! Brauchen Sie Hilfe beim Umzug?"},
+                                {"sprecher": "Herr Fischer", "text": "Das ist sehr nett, danke! Ich habe schon einen Umzugswagen gemietet."}
+                            ],
+                            "questions": [{"question_num": 5, "question_text": "Herr Fischer zieht in eine Wohnung ohne Balkon.", "correct_answer": "Falsch"}]
+                        }
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "gespraech",
+                    "title": "Aufgabe 2 - Ein Gespräch",
+                    "instruction": "Sie hören ein Gespräch zwischen zwei Personen. Wählen Sie die richtige Antwort.",
+                    "sprecher": [
+                        {"name": "Sandra", "voice_id": "pFZP5JQG7iQjIQuC4Bku"},
+                        {"name": "Thomas", "voice_id": "onwK4e9ZLuTAKqWW03F9"}
+                    ],
+                    "script_segments": [
+                        {"sprecher": "Sandra", "text": "[entspannt] Thomas, hast du schon Pläne für den Urlaub nächsten Sommer?"},
+                        {"sprecher": "Thomas", "text": "Ja! Ich möchte gerne nach Spanien fahren – an die Costa Brava. Ich war noch nie dort."},
+                        {"sprecher": "Sandra", "text": "Oh, das klingt toll! Ich war letztes Jahr da. Das Wasser ist wirklich wunderschön. Wie lange möchtest du fahren?"},
+                        {"sprecher": "Thomas", "text": "Zwei Wochen wären ideal. Aber ich weiß noch nicht genau wann – entweder Juli oder August."},
+                        {"sprecher": "Sandra", "text": "[nachdenklich] Im August ist es sehr heiß und es gibt viele Touristen. Ich würde Juli empfehlen – angenehmer und nicht so überfüllt."},
+                        {"sprecher": "Thomas", "text": "Guter Tipp, danke! Fliegst du mit dem Flugzeug oder fährst du lieber mit dem Zug?"},
+                        {"sprecher": "Sandra", "text": "Ich bin letztes Mal geflogen – nur zwei Stunden. Mit dem Zug wäre es viel länger, aber vielleicht interessanter."},
+                        {"sprecher": "Thomas", "text": "Ich denke, ich nehme das Flugzeug. Es ist schneller und oft auch günstiger, wenn man früh bucht."},
+                        {"sprecher": "Sandra", "text": "Hast du schon ein Hotel gesucht? In Juli sollte man früh buchen, sonst sind die guten Hotels ausgebucht."},
+                        {"sprecher": "Thomas", "text": "[enthusiastisch] Nein, noch nicht. Ich schaue heute Abend online nach. Hast du eine Empfehlung?"},
+                        {"sprecher": "Sandra", "text": "Ja, ich war im Hotel Mediterrán – direkt am Strand, frühstück inklusive, und das Personal war sehr freundlich."}
+                    ],
+                    "questions": [
+                        {"question_num": 6, "question_text": "Wohin möchte Thomas im Urlaub fahren?", "options": ["A) Nach Italien", "B) Nach Spanien", "C) Nach Portugal"], "correct_answer": "B"},
+                        {"question_num": 7, "question_text": "Wann empfiehlt Sandra den Urlaub zu machen?", "options": ["A) Im Juni", "B) Im August", "C) Im Juli"], "correct_answer": "C"},
+                        {"question_num": 8, "question_text": "Wie ist Sandra letztes Jahr gereist?", "options": ["A) Mit dem Zug", "B) Mit dem Flugzeug", "C) Mit dem Auto"], "correct_answer": "B"},
+                        {"question_num": 9, "question_text": "Was war gut an Sandras Hotel?", "options": ["A) Es war sehr günstig.", "B) Es hatte einen Pool.", "C) Das Personal war freundlich."], "correct_answer": "C"},
+                        {"question_num": 10, "question_text": "Was will Thomas heute Abend machen?", "options": ["A) Flüge buchen", "B) Online ein Hotel suchen", "C) Sandra besuchen"], "correct_answer": "B"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "ansagen",
+                    "title": "Aufgabe 3 - Ansagen und Mitteilungen",
+                    "instruction": "Sie hören fünf kurze Ansagen. Sind die Aussagen richtig oder falsch?",
+                    "ansagen": [
+                        {"ansage_num": 1, "sprecher": "Ansager", "voice_id": "nPczCjzI2devNBz1zQrb",
+                         "text": "[klar] Achtung, eine Durchsage für Reisende nach München: Der ICE 1234 ab Gleis 7 hat heute eine Verspätung von etwa 20 Minuten. Wir bitten um Ihr Verständnis.",
+                         "question_num": 11, "question_text": "Der Zug nach München fährt pünktlich ab.", "correct_answer": "Falsch"},
+                        {"ansage_num": 2, "sprecher": "Moderatorin", "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+                         "text": "[professionell] Das Stadtmuseum ist ab nächster Woche jeden Mittwoch bis 21 Uhr geöffnet. Der Eintritt am Mittwochabend ist für alle Besucher kostenlos.",
+                         "question_num": 12, "question_text": "Das Stadtmuseum bietet mittwochabends kostenlosen Eintritt an.", "correct_answer": "Richtig"},
+                        {"ansage_num": 3, "sprecher": "Ansager", "voice_id": "nPczCjzI2devNBz1zQrb",
+                         "text": "Liebe Kunden, unser Supermarkt ist am kommenden Sonntag wegen Inventur geschlossen. Wir sind am Montag wieder ab 8 Uhr für Sie da.",
+                         "question_num": 13, "question_text": "Der Supermarkt ist am Sonntag geöffnet.", "correct_answer": "Falsch"},
+                        {"ansage_num": 4, "sprecher": "Moderatorin", "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+                         "text": "[warm] Das Wetter morgen: In der Nordhälfte gibt es Regen und Temperaturen um 12 Grad. Im Süden bleibt es trocken und sonnig, bis zu 18 Grad.",
+                         "question_num": 14, "question_text": "Im Süden wird es morgen regnen.", "correct_answer": "Falsch"},
+                        {"ansage_num": 5, "sprecher": "Ansager", "voice_id": "nPczCjzI2devNBz1zQrb",
+                         "text": "Die Volkshochschule lädt ein: Deutschkurse für Anfänger starten am ersten September. Anmeldung bis zum 20. August online oder persönlich im Sekretariat.",
+                         "question_num": 15, "question_text": "Die Anmeldung für den Deutschkurs ist ab dem ersten September möglich.", "correct_answer": "Falsch"}
+                    ]
+                }
+            ]
+        },
+        "schreiben": {
+            "total_time_minutes": 30,
+            "aufgaben": [{
+                "aufgabe_num": 1,
+                "aufgabe_typ": "brief_email",
+                "aufgabe": "Sie haben diese E-Mail von Ihrem Freund Jonas bekommen:\n\n'Hallo! Ich ziehe nächsten Monat in eine neue Wohnung um und brauche Hilfe. Hast du am Samstag, den 15., Zeit? Wir könnten danach zusammen essen gehen. Liebe Grüße, Jonas'\n\nSchreiben Sie eine Antwort-E-Mail. Schreiben Sie:\n• ob Sie helfen können und warum (nicht)\n• wann Sie Zeit haben\n• einen Vorschlag für das Abendessen\n\nSchreiben Sie ca. 100 Wörter.",
+                "min_words": 80,
+                "max_words": 130
+            }]
+        },
+        "sprechen": {
+            "total_time_minutes": 15,
+            "teile": [
+                {
+                    "teil_num": 1,
+                    "titel": "Kontaktaufnahme",
+                    "instructions": "Der Prüfer stellt Ihnen einige Fragen zu Ihrer Person. Antworten Sie auf Deutsch.",
+                    "fragen": [
+                        {"frage_num": 1, "frage_text": "[warm] Guten Tag! Willkommen zur Prüfung. Wie heißen Sie und woher kommen Sie ursprünglich?", "needs_audio": True},
+                        {"frage_num": 2, "frage_text": "Was machen Sie zurzeit – arbeiten Sie oder studieren Sie?", "needs_audio": True},
+                        {"frage_num": 3, "frage_text": "Was sind Ihre Hobbys? Was machen Sie in Ihrer Freizeit gerne?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "teil_num": 2,
+                    "titel": "Über ein Thema sprechen",
+                    "instructions": "Sie sehen ein Bild. Beschreiben Sie das Bild und beantworten Sie die Fragen.",
+                    "bild_beschreibung": "Ein belebter Wochenmarkt in einer deutschen Stadt: Stände mit frischem Gemüse, Obst und Blumen. Verkäufer und Kunden im Gespräch. Menschen schlendern zwischen den Ständen.",
+                    "fragen": [
+                        {"frage_num": 4, "frage_text": "Beschreiben Sie dieses Bild. Was sehen Sie?", "needs_audio": True},
+                        {"frage_num": 5, "frage_text": "Gehen Sie manchmal auf den Markt? Was kaufen Sie dort gerne?", "needs_audio": True},
+                        {"frage_num": 6, "frage_text": "Was finden Sie besser – im Supermarkt einkaufen oder auf dem Wochenmarkt? Warum?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "teil_num": 3,
+                    "titel": "Gemeinsam etwas planen",
+                    "instructions": "Planen Sie gemeinsam mit dem Prüfer eine Veranstaltung.",
+                    "aufgabe": "Sie und ein Freund oder eine Freundin möchten den Geburtstag eines gemeinsamen Freundes feiern. Diskutieren Sie, wie Sie die Party organisieren möchten.",
+                    "fragen": [
+                        {"frage_num": 7, "frage_text": "Also, für Peters Geburtstag – haben Sie schon Ideen? Machen wir eine Party bei jemandem zu Hause oder gehen wir lieber aus?", "needs_audio": True},
+                        {"frage_num": 8, "frage_text": "Wie viele Personen sollen eingeladen werden? Und was essen wir – kochen wir selbst oder bestellen wir?", "needs_audio": True}
+                    ]
+                }
+            ]
+        }
+    }
+
+def get_telc_b2_seed():
+    return {
+        "exam_id": "exam_telc_b2_001",
+        "title": "TELC Deutsch B2 - Übungstest 1",
+        "exam_type": "telc",
+        "telc_level": "B2",
+        "pathway": "telc_b2",
+        "status": "pending_audio",
+        "audio_progress": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "lesen": {
+            "total_questions": 15,
+            "duration_minutes": 90,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "zuordnung",
+                    "title": "Aufgabe 1 - Texte zuordnen",
+                    "instruction": "Lesen Sie die Texte A–E und die Beschreibungen 1–5. Welcher Text passt zu welcher Beschreibung? Eine Beschreibung passt nicht.",
+                    "short_texts": [
+                        {"id": "A", "text": "Die Digitalisierung verändert den Arbeitsmarkt grundlegend. Laut einer Studie des Instituts für Arbeitsmarktforschung werden bis 2030 rund 35 Prozent aller Berufe durch Automatisierung und künstliche Intelligenz stark verändert oder ersetzt. Besonders betroffen sind Routinetätigkeiten in der Produktion und Verwaltung, während kreative und soziale Berufe weniger gefährdet sind."},
+                        {"id": "B", "text": "Nachhaltiger Tourismus gewinnt an Bedeutung: Immer mehr Reisende achten auf den ökologischen Fußabdruck ihrer Urlaubsreisen. Flüge werden zunehmend kritisch bewertet, und Alternativen wie Bahnreisen oder Fahrradtouren erfreuen sich wachsender Beliebtheit. Reiseveranstalter reagieren mit umweltfreundlichen Angeboten und CO₂-Kompensationsprogrammen."},
+                        {"id": "C", "text": "Ehrenamtliches Engagement in Deutschland: Über 28 Millionen Menschen engagieren sich freiwillig in Vereinen, sozialen Einrichtungen oder politischen Organisationen. Die häufigsten Bereiche sind Sport, Kultur und soziale Dienste. Studien zeigen, dass Ehrenamtliche nicht nur der Gesellschaft, sondern auch ihrer eigenen Gesundheit und Lebenszufriedenheit nutzen."},
+                        {"id": "D", "text": "Urbane Gärten – Grün in der Stadt: In vielen deutschen Großstädten entstehen Gemeinschaftsgärten, in denen Stadtbewohner gemeinsam Obst, Gemüse und Kräuter anbauen. Diese sogenannten Urban-Farming-Projekte fördern nicht nur die Artenvielfalt, sondern stärken auch den sozialen Zusammenhalt in den Quartieren und bieten Erholung vom Stadtleben."},
+                        {"id": "E", "text": "Medienkompetenz wird zur Schlüsselqualifikation des 21. Jahrhunderts erklärt. Der kritische Umgang mit Informationen, das Erkennen von Falschmeldungen und das Verstehen algorithmischer Empfehlungssysteme gelten als unverzichtbare Fähigkeiten. Schulen und Hochschulen integrieren zunehmend Medienkompetenz-Module in ihre Lehrpläne."}
+                    ],
+                    "questions": [
+                        {"question_num": 1, "question_text": "Dieser Text beschreibt, wie sich Technologie auf Beschäftigung auswirkt.", "correct_answer": "A"},
+                        {"question_num": 2, "question_text": "Dieser Text befasst sich mit umweltbewusstem Reisen.", "correct_answer": "B"},
+                        {"question_num": 3, "question_text": "Dieser Text handelt vom freiwilligen Engagement der Bevölkerung.", "correct_answer": "C"},
+                        {"question_num": 4, "question_text": "Dieser Text thematisiert den Anbau von Pflanzen in städtischen Gebieten.", "correct_answer": "D"},
+                        {"question_num": 5, "question_text": "Dieser Text erläutert die Bedeutung kompetenter Informationsverarbeitung.", "correct_answer": "E"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "richtig_falsch",
+                    "title": "Aufgabe 2 - Richtig, Falsch oder Nicht im Text?",
+                    "instruction": "Lesen Sie den Text und entscheiden Sie: Ist die Aussage richtig, falsch oder steht das nicht im Text?",
+                    "text": """Künstliche Intelligenz in der Medizin: Chancen und Risiken
+
+Die Integration künstlicher Intelligenz in die medizinische Diagnostik schreitet mit beachtlicher Geschwindigkeit voran. KI-Systeme sind heute in der Lage, Röntgenbilder und MRT-Aufnahmen mit einer Präzision zu analysieren, die in bestimmten Bereichen mit der erfahrener Radiologen vergleichbar oder sogar überlegen ist. Eine Studie der Stanford University zeigte, dass ein KI-Algorithmus bestimmte Hautkrebs-Arten mit einer Genauigkeit von 91 Prozent diagnostizieren konnte, während erfahrene Dermatologen auf 86 Prozent kamen.
+
+Dennoch stehen dem breiten Einsatz von KI im Gesundheitswesen erhebliche Hindernisse entgegen. Datenschutzrechtliche Bedenken sind besonders relevant, da medizinische KI-Systeme auf enormen Mengen sensibler Patientendaten trainiert werden müssen. Die Europäische Datenschutz-Grundverordnung setzt hier enge Grenzen, die eine internationale Zusammenarbeit erschweren.
+
+Ein weiteres Problem ist die sogenannte algorithmische Verzerrung: KI-Systeme, die überwiegend auf Daten westlicher, wohlhabender Patientengruppen trainiert wurden, erzielen bei anderen demographischen Gruppen deutlich schlechtere Ergebnisse. Forscher der Universität Harvard wiesen nach, dass ein weit verbreiteter KI-Algorithmus zur Risikoeinschätzung von Patienten systematisch afroamerikanische Patienten benachteiligte.
+
+Trotz dieser Herausforderungen investieren Gesundheitssysteme weltweit massiv in KI-gestützte Lösungen. Deutschland hat im Rahmen seiner KI-Strategie zwei Milliarden Euro für medizinische KI-Forschung bereitgestellt. Experten sind sich einig, dass KI die Medizin nicht ersetzen, aber als mächtiges Werkzeug ergänzen wird – vorausgesetzt, ethische und rechtliche Rahmenbedingungen werden sorgfältig entwickelt.""",
+                    "questions": [
+                        {"question_num": 6, "question_text": "KI-Systeme übertreffen Radiologen in allen Bereichen der Diagnostik.", "correct_answer": "Falsch"},
+                        {"question_num": 7, "question_text": "Der KI-Algorithmus zur Hautkrebsdiagnose erzielte eine höhere Genauigkeit als erfahrene Dermatologen.", "correct_answer": "Richtig"},
+                        {"question_num": 8, "question_text": "Die DSGVO erleichtert die internationale Zusammenarbeit bei medizinischen KI-Projekten.", "correct_answer": "Falsch"},
+                        {"question_num": 9, "question_text": "Der beschriebene Harvard-Algorithmus bevorzugte systematisch bestimmte Patientengruppen.", "correct_answer": "Richtig"},
+                        {"question_num": 10, "question_text": "Deutschland plant, KI vollständig in alle Krankenhäuser einzuführen.", "correct_answer": "Nicht im Text"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "multiple_choice",
+                    "title": "Aufgabe 3 - Multiple Choice",
+                    "instruction": "Lesen Sie den Text. Welche Antwort (A, B oder C) passt am besten?",
+                    "text": """Homeoffice und Produktivität: Was sagt die Forschung?
+
+Die Covid-19-Pandemie hat das weltweit größte Experiment zur Telearbeit erzwungen und dabei wertvolle Erkenntnisse geliefert, die Arbeitspsychologen und Ökonomen seither intensiv auswerten. Die Ergebnisse sind differenzierter, als viele erwartet hatten.
+
+Eine groß angelegte Studie der Universität Stanford, die 16.000 Mitarbeiter über neun Monate begleitete, zeigte eine Produktivitätssteigerung von 13 Prozent bei Homeoffice-Beschäftigten. Als Ursachen wurden weniger Ablenkungen durch Kollegen, kürzere Pausen und eine reduzierte Krankenquote identifiziert. Gleichzeitig berichteten die Mitarbeiter von einer höheren Arbeitszufriedenheit und einem geringeren Stressniveau.
+
+Allerdings zeichnen neuere Studien ein komplexeres Bild. Für kreative und kollaborative Aufgaben, die intensive Zusammenarbeit erfordern, scheint die Präsenz im Büro weiterhin einen Vorteil zu bieten. Eine Untersuchung von Microsoft Research ergab, dass Teams im Homeoffice zwar effizienter innerhalb ihres engeren Netzwerks kommunizierten, aber deutlich weniger Verbindungen zu anderen Abteilungen und Kollegen aufbauten – ein Phänomen, das als „Silobildung" bezeichnet wird.
+
+Führungskräfte stehen vor der Herausforderung, ein Gleichgewicht zu finden. Hybride Modelle, bei denen Mitarbeiter zwei bis drei Tage im Büro und den Rest von zu Hause arbeiten, gelten derzeit als vielversprechendster Ansatz. Sie kombinieren die Produktivitätsvorteile des Homeoffice mit den sozialen und kreativen Impulsen der Büropräsenz.
+
+Die langfristigen gesellschaftlichen Auswirkungen sind noch nicht absehbar. Stadtplaner beobachten eine Verlagerung von Arbeitskräften aus teuren Großstädten in kleinere Städte und ländliche Regionen, was sowohl Immobilienmärkte als auch kommunale Infrastrukturen grundlegend verändern könnte.""",
+                    "questions": [
+                        {"question_num": 11, "question_text": "Was ergab die Stanford-Studie über Homeoffice-Mitarbeiter?", "options": ["A) Sie arbeiteten weniger Stunden.", "B) Ihre Produktivität stieg um 13 Prozent.", "C) Sie hatten mehr Kontakt zu Kollegen."], "correct_answer": "B"},
+                        {"question_num": 12, "question_text": "Was versteht man laut Text unter 'Silobildung'?", "options": ["A) Mitarbeiter arbeiten effizienter.", "B) Teams kommunizieren weniger mit anderen Abteilungen.", "C) Führungskräfte verlieren den Überblick."], "correct_answer": "B"},
+                        {"question_num": 13, "question_text": "Welches Arbeitsmodell wird derzeit als am vielversprechendsten angesehen?", "options": ["A) Vollständiges Homeoffice", "B) Vollständige Büropräsenz", "C) Ein hybrides Modell"], "correct_answer": "C"},
+                        {"question_num": 14, "question_text": "Was beobachten Stadtplaner als Folge des Homeoffice-Trends?", "options": ["A) Mehr Menschen ziehen in Großstädte.", "B) Arbeitnehmer verlassen teure Großstädte.", "C) Immobilienpreise sinken überall."], "correct_answer": "B"},
+                        {"question_num": 15, "question_text": "Welchen Vorteil bietet laut Text die Büropräsenz gegenüber dem Homeoffice?", "options": ["A) Höhere Produktivität bei Routineaufgaben", "B) Förderung kreativer und kollaborativer Prozesse", "C) Niedrigere Betriebskosten"], "correct_answer": "B"}
+                    ]
+                }
+            ]
+        },
+        "hoeren": {
+            "total_questions": 15,
+            "duration_minutes": 40,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "kurzgespraeche",
+                    "title": "Aufgabe 1 - Kurze Gespräche",
+                    "instruction": "Sie hören fünf kurze Gespräche. Sind die Aussagen richtig oder falsch?",
+                    "conversations": [
+                        {
+                            "conv_num": 1,
+                            "sprecher": [
+                                {"name": "Dr. Hoffmann", "voice_id": "JBFqnCBsd6RMkjVDRZzb"},
+                                {"name": "Kollegin", "voice_id": "pFZP5JQG7iQjIQuC4Bku"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Dr. Hoffmann", "text": "[nachdenklich] Ich habe gerade den neuen Forschungsbericht gelesen. Die Ergebnisse sind interessant, aber die Methodik erscheint mir fragwürdig."},
+                                {"sprecher": "Kollegin", "text": "Inwiefern? Die Stichprobengröße war doch mit über 500 Teilnehmern recht solide."},
+                                {"sprecher": "Dr. Hoffmann", "text": "Das stimmt, aber die Kontrollgruppe wurde nicht ordentlich isoliert. Das beeinträchtigt die Validität der Schlussfolgerungen erheblich."},
+                                {"sprecher": "Kollegin", "text": "Da haben Sie recht. Das sollten wir in unserem Review ansprechen."}
+                            ],
+                            "questions": [{"question_num": 1, "question_text": "Dr. Hoffmann ist mit der Stichprobengröße der Studie nicht zufrieden.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 2,
+                            "sprecher": [
+                                {"name": "Moderator", "voice_id": "nPczCjzI2devNBz1zQrb"},
+                                {"name": "Expertin", "voice_id": "Xb7hH8MSUJpSbSDYk0k2"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Moderator", "text": "Frau Professor, wie bewerten Sie die aktuellen Maßnahmen zur Reduzierung von Plastikmüll in deutschen Städten?"},
+                                {"sprecher": "Expertin", "text": "[bestimmt] Die bisherigen Schritte sind ein Anfang, reichen aber bei weitem nicht aus. Wir brauchen verbindliche Reduktionsziele und konsequente Herstellerverantwortung, nicht nur freiwillige Initiativen."},
+                                {"sprecher": "Moderator", "text": "Glauben Sie, dass die EU-Plastikrichtlinie einen Unterschied macht?"},
+                                {"sprecher": "Expertin", "text": "Sie ist ein Fortschritt, aber die Umsetzung variiert stark zwischen den Mitgliedsstaaten. Deutschland könnte hier eine Vorreiterrolle übernehmen."}
+                            ],
+                            "questions": [{"question_num": 2, "question_text": "Die Expertin hält die bisherigen Plastikmaßnahmen für ausreichend.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 3,
+                            "sprecher": [
+                                {"name": "Lena", "voice_id": "pFZP5JQG7iQjIQuC4Bku"},
+                                {"name": "Felix", "voice_id": "onwK4e9ZLuTAKqWW03F9"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Lena", "text": "Felix, ich habe überlegt, ob wir unser Startup nicht lieber in Berlin gründen sollten statt in München."},
+                                {"sprecher": "Felix", "text": "[überlegend] Berlin hat zweifellos ein lebhafteres Start-up-Ökosystem und günstigere Mieten. Aber München bietet bessere Vernetzung zu etablierten Unternehmen und Investoren."},
+                                {"sprecher": "Lena", "text": "Stimmt. Und die Lebenshaltungskosten in München sind enorm."},
+                                {"sprecher": "Felix", "text": "Lass uns beide Optionen gründlich analysieren, bevor wir entscheiden."}
+                            ],
+                            "questions": [{"question_num": 3, "question_text": "Felix empfiehlt, das Startup definitiv in Berlin zu gründen.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 4,
+                            "sprecher": [
+                                {"name": "Studentin", "voice_id": "Xb7hH8MSUJpSbSDYk0k2"},
+                                {"name": "Professor", "voice_id": "JBFqnCBsd6RMkjVDRZzb"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Studentin", "text": "Professor Weber, ich wollte fragen, ob ich meine Bachelorarbeit auch auf Englisch verfassen darf."},
+                                {"sprecher": "Professor", "text": "Grundsätzlich ist das möglich, sofern Sie einen formellen Antrag beim Prüfungsamt stellen. Beachten Sie aber, dass die Beurteilung dann auch sprachliche Korrektheit im Englischen einschließt."},
+                                {"sprecher": "Studentin", "text": "Verstanden. Gibt es eine Frist für den Antrag?"},
+                                {"sprecher": "Professor", "text": "Der Antrag muss spätestens vier Wochen vor Beginn der Bearbeitungszeit eingereicht werden."}
+                            ],
+                            "questions": [{"question_num": 4, "question_text": "Eine Bachelorarbeit auf Englisch ist ohne besonderen Antrag möglich.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 5,
+                            "sprecher": [
+                                {"name": "Journalist", "voice_id": "onwK4e9ZLuTAKqWW03F9"},
+                                {"name": "Bürgermeisterin", "voice_id": "pFZP5JQG7iQjIQuC4Bku"}
+                            ],
+                            "script_segments": [
+                                {"sprecher": "Journalist", "text": "Frau Bürgermeisterin, wie planen Sie, das Wohnungsproblem in unserer Stadt anzugehen?"},
+                                {"sprecher": "Bürgermeisterin", "text": "[entschlossen] Wir haben ein dreistufiges Programm entwickelt: kurzfristig mehr Sozialwohnungen, mittelfristig Anreize für private Investoren und langfristig eine neue Stadtentwicklungsplanung mit dichterem, aber lebenswertserem Wohnen."},
+                                {"sprecher": "Journalist", "text": "Und wie wird das finanziert?"},
+                                {"sprecher": "Bürgermeisterin", "text": "Durch eine Kombination aus kommunalen Mitteln, Landesförderung und EU-Strukturfonds."}
+                            ],
+                            "questions": [{"question_num": 5, "question_text": "Die Bürgermeisterin hat einen dreistufigen Plan zur Lösung des Wohnungsproblems.", "correct_answer": "Richtig"}]
+                        }
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "gespraech",
+                    "title": "Aufgabe 2 - Ein Gespräch",
+                    "instruction": "Sie hören ein Gespräch. Wählen Sie die richtige Antwort (A, B oder C).",
+                    "sprecher": [
+                        {"name": "Moderatorin", "voice_id": "Xb7hH8MSUJpSbSDYk0k2"},
+                        {"name": "Experte", "voice_id": "JBFqnCBsd6RMkjVDRZzb"}
+                    ],
+                    "script_segments": [
+                        {"sprecher": "Moderatorin", "text": "[professionell] Herzlich willkommen zu unserem Podcast über Zukunftstechnologien. Heute sprechen wir über Quantencomputing. Herr Dr. Maier, können Sie erklären, was Quantencomputer von klassischen Computern unterscheidet?"},
+                        {"sprecher": "Experte", "text": "Gerne. Klassische Computer arbeiten mit Bits, die entweder 0 oder 1 sein können. Quantencomputer verwenden sogenannte Qubits, die dank eines Phänomens namens Superposition gleichzeitig 0 und 1 sein können – das ermöglicht eine exponentiell höhere Rechenkapazität."},
+                        {"sprecher": "Moderatorin", "text": "Und wann werden wir Quantencomputer im Alltag sehen?"},
+                        {"sprecher": "Experte", "text": "[nachdenklich] Für hochspezialisierte Anwendungen in Pharmakologie und Kryptographie werden sie in fünf bis zehn Jahren relevant sein. Für den Massenmarkt rechne ich mit mindestens zwanzig Jahren, da die Technologie noch sehr fragil ist und bei extrem niedrigen Temperaturen betrieben werden muss."},
+                        {"sprecher": "Moderatorin", "text": "Welche konkreten Anwendungen versprechen die größten Durchbrüche?"},
+                        {"sprecher": "Experte", "text": "Die Simulation molekularer Strukturen für die Medikamentenentwicklung ist besonders vielversprechend. Was heute Milliarden kostet und Jahre dauert, könnte mit Quantencomputern in Wochen und zu einem Bruchteil der Kosten möglich werden."},
+                        {"sprecher": "Moderatorin", "text": "Gibt es auch Risiken dieser Technologie?"},
+                        {"sprecher": "Experte", "text": "[ernst] Absolut. Das größte Risiko ist die Bedrohung aktueller Verschlüsselungsstandards. Quantencomputer könnten die gängigen RSA-Verschlüsselungen innerhalb von Minuten brechen – was bedeutet, dass wir jetzt schon an quantensicherer Kryptographie arbeiten müssen."},
+                        {"sprecher": "Moderatorin", "text": "Wie ist Deutschland im internationalen Vergleich aufgestellt?"},
+                        {"sprecher": "Experte", "text": "Deutschland hat zwei Milliarden Euro in Quantentechnologien investiert und ist europäischer Vorreiter. Im globalen Vergleich liegen aber die USA und China deutlich vorne, insbesondere bei der Anzahl der einsatzfähigen Qubits."}
+                    ],
+                    "questions": [
+                        {"question_num": 6, "question_text": "Was ist der Hauptunterschied zwischen klassischen Computern und Quantencomputern?", "options": ["A) Quantencomputer sind kleiner.", "B) Quantencomputer verwenden Qubits statt Bits.", "C) Quantencomputer brauchen keinen Strom."], "correct_answer": "B"},
+                        {"question_num": 7, "question_text": "Wann erwartet der Experte Quantencomputer im Massenmarkt?", "options": ["A) In fünf Jahren", "B) In zehn Jahren", "C) In mindestens zwanzig Jahren"], "correct_answer": "C"},
+                        {"question_num": 8, "question_text": "Welchen Bereich nennt der Experte als vielversprechendste Anwendung?", "options": ["A) Unterhaltungselektronik", "B) Medikamentenentwicklung", "C) Soziale Netzwerke"], "correct_answer": "B"},
+                        {"question_num": 9, "question_text": "Welches Risiko nennt der Experte im Zusammenhang mit Quantencomputern?", "options": ["A) Überhitzung von Rechenzentren", "B) Gefährdung aktueller Verschlüsselungsstandards", "C) Hoher Energieverbrauch"], "correct_answer": "B"},
+                        {"question_num": 10, "question_text": "Wie ist Deutschlands Position im globalen Quantencomputing?", "options": ["A) Deutschland ist weltweit führend.", "B) Deutschland ist europäischer Vorreiter, aber hinter USA und China.", "C) Deutschland hat noch nicht in Quantencomputing investiert."], "correct_answer": "B"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "ansagen",
+                    "title": "Aufgabe 3 - Kurze Texte aus dem Radio",
+                    "instruction": "Sie hören fünf kurze Radiotexte. Sind die Aussagen richtig oder falsch?",
+                    "ansagen": [
+                        {"ansage_num": 1, "sprecher": "Moderator", "voice_id": "nPczCjzI2devNBz1zQrb",
+                         "text": "[professionell] Meldung aus der Wissenschaft: Forscher der Technischen Universität München haben einen neuen Batterietyp entwickelt, der sich innerhalb von fünf Minuten vollständig aufladen lässt und eine dreifach höhere Energiedichte als herkömmliche Lithium-Ionen-Akkus aufweist. Die Serienreife wird für 2028 erwartet.",
+                         "question_num": 11, "question_text": "Die neue Batterie hat eine niedrigere Energiedichte als herkömmliche Akkus.", "correct_answer": "Falsch"},
+                        {"ansage_num": 2, "sprecher": "Moderatorin", "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+                         "text": "[sachlich] Wirtschaftsnachrichten: Der Deutsche Aktienindex DAX hat heute seinen höchsten Stand seit drei Jahren erreicht. Analysten führen dies auf positive Quartalszahlen aus dem Technologiesektor und sinkende Inflationserwartungen zurück.",
+                         "question_num": 12, "question_text": "Der DAX hat heute einen Rekordstand erreicht.", "correct_answer": "Falsch"},
+                        {"ansage_num": 3, "sprecher": "Moderator", "voice_id": "nPczCjzI2devNBz1zQrb",
+                         "text": "Kulturmeldung: Die Staatsgalerie Stuttgart präsentiert ab dem 1. März eine umfangreiche Retrospektive der Künstlerin Käthe Kollwitz. Die Ausstellung umfasst über 200 Werke aus allen Schaffensphasen und ist bis Ende Juni geöffnet.",
+                         "question_num": 13, "question_text": "Die Ausstellung der Staatsgalerie Stuttgart zeigt weniger als 200 Werke.", "correct_answer": "Falsch"},
+                        {"ansage_num": 4, "sprecher": "Moderatorin", "voice_id": "Xb7hH8MSUJpSbSDYk0k2",
+                         "text": "[informativ] Verkehrsmeldung: Auf der Autobahn A9 zwischen München und Nürnberg kommt es wegen Bauarbeiten noch bis Ende des Monats zu erheblichen Verzögerungen. Reisende werden gebeten, Alternativrouten zu nutzen oder die Reise auf die Abendstunden zu verlegen.",
+                         "question_num": 14, "question_text": "Die Bauarbeiten auf der A9 sind bereits abgeschlossen.", "correct_answer": "Falsch"},
+                        {"ansage_num": 5, "sprecher": "Moderator", "voice_id": "nPczCjzI2devNBz1zQrb",
+                         "text": "Gesundheitsnachricht: Das Bundesgesundheitsministerium empfiehlt angesichts steigender Grippezahlen die Impfung für alle Personen über 60 Jahre sowie chronisch Kranke. Die Impfung ist in allen Arztpraxen und Apotheken mit Impfservice erhältlich.",
+                         "question_num": 15, "question_text": "Die Grippeimpfung wird für alle Personen über 60 empfohlen.", "correct_answer": "Richtig"}
+                    ]
+                }
+            ]
+        },
+        "schreiben": {
+            "total_time_minutes": 45,
+            "aufgaben": [{
+                "aufgabe_num": 1,
+                "aufgabe_typ": "erörterung",
+                "aufgabe": "In vielen Ländern wird diskutiert, ob soziale Medien für Jugendliche unter 16 Jahren verboten werden sollten.\n\nSchreiben Sie einen argumentativen Aufsatz zu diesem Thema. Gehen Sie dabei auf folgende Punkte ein:\n• Vorteile sozialer Medien für Jugendliche\n• Nachteile und Risiken sozialer Medien\n• Ihre eigene Meinung mit Begründung\n\nSchreiben Sie ca. 200 Wörter.",
+                "min_words": 180,
+                "max_words": 250
+            }]
+        },
+        "sprechen": {
+            "total_time_minutes": 15,
+            "teile": [
+                {
+                    "teil_num": 1,
+                    "titel": "Präsentation eines Themas",
+                    "instructions": "Sie stellen ein Thema vor und diskutieren es mit dem Prüfer.",
+                    "fragen": [
+                        {"frage_num": 1, "frage_text": "[professionell] Guten Tag und willkommen zur Prüfung. Stellen Sie sich bitte kurz vor: Wer sind Sie, was machen Sie beruflich oder akademisch, und was interessiert Sie besonders?", "needs_audio": True},
+                        {"frage_num": 2, "frage_text": "Sie haben das Thema 'Digitalisierung im Bildungswesen' vorbereitet. Bitte präsentieren Sie Ihre Überlegungen dazu. Sie haben etwa zwei Minuten Zeit.", "needs_audio": True},
+                        {"frage_num": 3, "frage_text": "Sie haben einige interessante Punkte angesprochen. Wie stehen Sie persönlich dazu: Verbessert Technologie das Lernen, oder birgt sie mehr Risiken als Chancen?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "teil_num": 2,
+                    "titel": "Diskussion eines gesellschaftlichen Themas",
+                    "instructions": "Sie diskutieren ein aktuelles gesellschaftliches Thema mit dem Prüfer.",
+                    "fragen": [
+                        {"frage_num": 4, "frage_text": "Lassen Sie uns über das Thema Klimawandel sprechen. Viele Menschen sind der Meinung, dass individuelle Maßnahmen keinen Unterschied machen. Was denken Sie darüber?", "needs_audio": True},
+                        {"frage_num": 5, "frage_text": "Welche Verantwortung tragen Ihrer Meinung nach Regierungen, Unternehmen und Einzelpersonen beim Klimaschutz jeweils?", "needs_audio": True},
+                        {"frage_num": 6, "frage_text": "Wie würden Sie reagieren, wenn die Regierung einschneidende Maßnahmen wie ein Verbot von Inlandsflügen oder stark erhöhte Benzinsteuern einführen würde?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "teil_num": 3,
+                    "titel": "Problemlösung und Argumentation",
+                    "instructions": "Sie lösen gemeinsam mit dem Prüfer ein Problem und vertreten Ihren Standpunkt.",
+                    "aufgabe": "Eine Stadt überlegt, ob sie die Innenstadt vollständig autofrei machen soll. Diskutieren Sie die Vor- und Nachteile und entwickeln Sie gemeinsam einen Lösungsvorschlag.",
+                    "fragen": [
+                        {"frage_num": 7, "frage_text": "Stellen Sie sich vor, Sie sind Stadtrat. Die Stadt möchte die Innenstadt autofrei machen. Welche Argumente würden Sie für und gegen diesen Vorschlag vorbringen?", "needs_audio": True},
+                        {"frage_num": 8, "frage_text": "Wie könnte man die Interessen von Geschäftsleuten, Pendlern und Umweltschützern ausgewogen berücksichtigen? Haben Sie einen konkreten Kompromissvorschlag?", "needs_audio": True}
+                    ]
+                }
+            ]
+        }
+    }
+
 @app.on_event("startup")
 async def startup():
     existing = await db.exams.find_one({"exam_id": "exam_academic_001"}, {"_id": 0})
@@ -1662,6 +2192,16 @@ async def startup():
                         {"$set": {f"listening.sections.{i}.instruction": ss["instruction"]}}
                     )
             logger.info("Migrated exam_academic_001 with question layouts")
+
+    # Seed TELC B1
+    if not await db.exams.find_one({"exam_id": "exam_telc_b1_001"}):
+        await db.exams.insert_one(get_telc_b1_seed())
+        logger.info("Seeded exam_telc_b1_001")
+
+    # Seed TELC B2
+    if not await db.exams.find_one({"exam_id": "exam_telc_b2_001"}):
+        await db.exams.insert_one(get_telc_b2_seed())
+        logger.info("Seeded exam_telc_b2_001")
 
 # ==========================================
 # STRIPE SUBSCRIPTIONS
@@ -1763,7 +2303,7 @@ async def get_subscription_status(request: Request):
 async def admin_list_exams(request: Request):
     """Admin view - all exams with full details"""
     await get_current_user(request)
-    exams = await db.exams.find({}, {"_id": 0, "exam_id": 1, "title": 1, "pathway": 1, "status": 1,
+    exams = await db.exams.find({}, {"_id": 0, "exam_id": 1, "title": 1, "pathway": 1, "exam_type": 1, "telc_level": 1, "status": 1,
         "audio_progress": 1, "created_at": 1, "error_message": 1,
         "listening.total_questions": 1, "reading.total_questions": 1,
         "writing.tasks": 1, "speaking.parts": 1}).to_list(100)
@@ -1816,6 +2356,9 @@ async def admin_stats(request: Request):
         "total_users": await db.users.count_documents({}),
         "total_attempts": await db.attempts.count_documents({}),
         "completed_attempts": await db.attempts.count_documents({"status": "completed"}),
+        "ielts_exams": await db.exams.count_documents({"exam_type": {"$in": ["ielts", None]}}),
+        "telc_exams": await db.exams.count_documents({"exam_type": "telc"}),
+        "pro_users": await db.users.count_documents({"subscription.tier": "pro"}),
     }
 
 app.include_router(api_router)
