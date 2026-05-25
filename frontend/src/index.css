@@ -1,0 +1,76 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ps-blue: #0070cc;
+  --ps-cyan: #1eaedb;
+  --ps-black: #000000;
+  --ps-white: #ffffff;
+  --ps-ice: #f5f7fa;
+  --ps-orange: #d53b00;
+  --ps-charcoal: #1f1f1f;
+  --ps-body-gray: #6b6b6b;
+  --ps-mute: #cccccc;
+  --ps-divider: #f3f3f3;
+  --ps-error: #c81b3a;
+}
+
+body {
+  margin: 0;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--ps-white);
+  color: var(--ps-charcoal);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 0 0% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
+    --primary: 207 100% 40%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 210 20% 97%;
+    --secondary-foreground: 0 0% 12%;
+    --muted: 210 20% 97%;
+    --muted-foreground: 0 0% 42%;
+    --accent: 210 20% 97%;
+    --accent-foreground: 0 0% 12%;
+    --destructive: 349 78% 44%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 207 100% 40%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+}
+
+@layer base {
+  [data-debug-wrapper="true"] {
+    display: contents !important;
+  }
+  [data-debug-wrapper="true"] > * {
+    margin-left: inherit; margin-right: inherit; margin-top: inherit; margin-bottom: inherit;
+    padding-left: inherit; padding-right: inherit; padding-top: inherit; padding-bottom: inherit;
+    column-gap: inherit; row-gap: inherit; gap: inherit;
+    border-left-width: inherit; border-right-width: inherit; border-top-width: inherit; border-bottom-width: inherit;
+    border-left-style: inherit; border-right-style: inherit; border-top-style: inherit; border-bottom-style: inherit;
+    border-left-color: inherit; border-right-color: inherit; border-top-color: inherit; border-bottom-color: inherit;
+  }
+}

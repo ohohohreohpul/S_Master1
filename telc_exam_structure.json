@@ -1,0 +1,286 @@
+{
+  "$comment": "TELC Deutsch B1/B2 — Exam structure reference for generator development",
+  "$schema": "https://json-schema.org/draft/2020-12",
+
+  "exam": {
+    "exam_id": "string — unique id, e.g. 'exam_telc_b1_001'",
+    "title": "string — e.g. 'TELC Deutsch B1 - Übungstest 1'",
+    "exam_type": "telc",
+    "telc_level": "B1 | B2",
+    "pathway": "telc_b1 | telc_b2",
+    "status": "pending_audio | generating_audio | ready | error",
+    "audio_progress": "0–100 integer",
+    "created_at": "ISO8601 timestamp",
+
+    "hoeren": {
+      "$comment": "Hörverstehen — ~30 min, 20 questions total, all Richtig/Falsch",
+      "total_questions": 20,
+      "duration_minutes": 30,
+      "aufgaben": [
+        {
+          "aufgabe_num": 1,
+          "typ": "kurzgespraeche",
+          "$comment": "5 short conversations heard ONCE. 1 R/F question each.",
+          "title": "string",
+          "instruction": "string",
+          "conversations": [
+            {
+              "conv_num": "1–5",
+              "sprecher": [
+                { "name": "Frau Müller", "voice_id": "Aoede (female) | Charon (male) | etc." }
+              ],
+              "script_segments": [
+                { "sprecher": "Frau Müller", "text": "spoken text", "audio_id": "set after audio generation" }
+              ],
+              "questions": [
+                {
+                  "question_num": "1–5",
+                  "question_text": "statement to evaluate",
+                  "correct_answer": "Richtig | Falsch"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "aufgabe_num": 2,
+          "typ": "gespraech",
+          "$comment": "One longer conversation heard TWICE. 10 R/F questions.",
+          "title": "string",
+          "instruction": "string",
+          "sprecher": [
+            { "name": "Moderatorin", "voice_id": "Aoede" },
+            { "name": "Herr Bauer", "voice_id": "Charon" }
+          ],
+          "script_segments": [
+            { "sprecher": "Moderatorin", "text": "...", "audio_id": "..." }
+          ],
+          "questions": [
+            {
+              "question_num": "6–15",
+              "question_text": "statement to evaluate",
+              "correct_answer": "Richtig | Falsch"
+            }
+          ]
+        },
+        {
+          "aufgabe_num": 3,
+          "typ": "ansagen",
+          "$comment": "5 short announcements heard TWICE. 1 R/F question each.",
+          "title": "string",
+          "instruction": "string",
+          "ansagen": [
+            {
+              "ansage_num": "1–5",
+              "text": "announcement text",
+              "audio_id": "set after generation",
+              "question_num": "16–20",
+              "question_text": "statement to evaluate",
+              "correct_answer": "Richtig | Falsch"
+            }
+          ]
+        }
+      ]
+    },
+
+    "lesen": {
+      "$comment": "Leseverstehen — 60 min within the 90-min written session, 20 questions",
+      "total_questions": 20,
+      "duration_minutes": 90,
+      "aufgaben": [
+        {
+          "aufgabe_num": 1,
+          "typ": "zuordnung",
+          "$comment": "Match 5 texts to headings. 10 headings (a–j), only 5 correct.",
+          "title": "string",
+          "instruction": "string",
+          "short_texts": [
+            { "id": "A", "text": "80–120 word text" }
+          ],
+          "ueberschriften": [
+            { "id": "a", "text": "heading text" }
+          ],
+          "questions": [
+            {
+              "question_num": "1–5",
+              "question_text": "Text A — Welche Überschrift passt?",
+              "correct_answer": "d"
+            }
+          ]
+        },
+        {
+          "aufgabe_num": 2,
+          "typ": "multiple_choice",
+          "$comment": "One text with 5 MC questions (a/b/c). B1: 280–350 words. B2: 400–550 words.",
+          "title": "string",
+          "instruction": "string",
+          "text": "full passage text",
+          "questions": [
+            {
+              "question_num": "6–10",
+              "question_text": "question text",
+              "options": ["a) ...", "b) ...", "c) ..."],
+              "correct_answer": "a | b | c"
+            }
+          ]
+        },
+        {
+          "aufgabe_num": 3,
+          "typ": "anzeigen",
+          "$comment": "10 situations matched to 12 ads. 2 ads unmatched (answer x).",
+          "title": "string",
+          "instruction": "string",
+          "anzeigen": [
+            { "id": "a", "text": "advertisement / notice text" }
+          ],
+          "questions": [
+            {
+              "question_num": "11–20",
+              "situation": "one-sentence description of what someone needs",
+              "question_text": "Welche Anzeige passt?",
+              "correct_answer": "a–l | x"
+            }
+          ]
+        }
+      ]
+    },
+
+    "sprachbausteine": {
+      "$comment": "Language structures — 30 min within the 90-min session, 20 questions",
+      "total_questions": 20,
+      "duration_minutes": 90,
+      "aufgaben": [
+        {
+          "aufgabe_num": 1,
+          "typ": "lueckentext_mc",
+          "$comment": "Gap-fill with MC. Gaps written as {21}–{30} in text.",
+          "title": "string",
+          "instruction": "string",
+          "text_with_gaps": "text with {21}, {22} ... {30} markers",
+          "options": [
+            {
+              "question_num": "21–30",
+              "a": "option a text",
+              "b": "option b text",
+              "c": "option c text",
+              "correct_answer": "a | b | c"
+            }
+          ]
+        },
+        {
+          "aufgabe_num": 2,
+          "typ": "lueckentext_wortbank",
+          "$comment": "Word-bank gap-fill. Gaps written as {31}–{40}. 15 words (a–o), 5 distractors.",
+          "title": "string",
+          "instruction": "string",
+          "text_with_gaps": "text with {31}, {32} ... {40} markers",
+          "wortbank": [
+            { "id": "a", "word": "BESONDERS" }
+          ],
+          "options": [
+            {
+              "question_num": "31–40",
+              "correct_answer": "a–o"
+            }
+          ]
+        }
+      ]
+    },
+
+    "schreiben": {
+      "$comment": "Schriftlicher Ausdruck — 30 min, 1 task",
+      "total_time_minutes": 30,
+      "aufgaben": [
+        {
+          "aufgabe_num": 1,
+          "aufgabe_typ": "brief_email",
+          "aufgabe": "Full task description including what to write and 3–4 bullet points to address",
+          "min_words": 80,
+          "max_words": 130
+        }
+      ]
+    },
+
+    "sprechen": {
+      "$comment": "Mündlicher Ausdruck — ~15 min + 20 min prep, 3 Teile",
+      "total_time_minutes": 15,
+      "vorbereitungszeit_minutes": 20,
+      "teile": [
+        {
+          "teil_num": 1,
+          "titel": "Einander kennenlernen",
+          "instructions": "string",
+          "themen": ["Name", "Herkunft", "Beruf"],
+          "fragen": [
+            {
+              "frage_num": "1–4",
+              "frage_text": "examiner question text",
+              "needs_audio": true,
+              "audio_id": "set after generation"
+            }
+          ]
+        },
+        {
+          "teil_num": 2,
+          "titel": "Über ein Thema sprechen",
+          "instructions": "string",
+          "thema": "topic title",
+          "meinungen": [
+            { "person": "A", "zitat": "quoted opinion text" },
+            { "person": "B", "zitat": "opposing opinion text" }
+          ],
+          "fragen": [
+            {
+              "frage_num": "5–7",
+              "frage_text": "examiner question",
+              "needs_audio": true,
+              "audio_id": "set after generation"
+            }
+          ]
+        },
+        {
+          "teil_num": 3,
+          "titel": "Gemeinsam etwas planen",
+          "instructions": "string",
+          "szenario": "planning scenario description",
+          "planungspunkte": ["bullet point 1", "bullet point 2"],
+          "fragen": [
+            {
+              "frage_num": "8–10",
+              "frage_text": "examiner question",
+              "needs_audio": true,
+              "audio_id": "set after generation"
+            }
+          ]
+        }
+      ]
+    }
+  },
+
+  "scoring": {
+    "$comment": "Pass threshold: 60% per objective section. Written + oral assessed separately.",
+    "lesen": { "max_questions": 20, "pass_threshold_pct": 60 },
+    "sprachbausteine": { "max_questions": 20, "pass_threshold_pct": 60 },
+    "hoeren": { "max_questions": 20, "pass_threshold_pct": 60 },
+    "schreiben": { "max_points": 30, "rubric": "kommunikative_aufgabe + textaufbau + sprachliche_mittel", "pass_threshold_pct": 60 },
+    "sprechen": { "max_points": 30, "rubric": "kommunikative_kompetenz + fluessigkeit + sprachliche_korrektheit", "pass_threshold_pct": 60 }
+  },
+
+  "audio_voices": {
+    "$comment": "Gemini 3.1 Flash TTS voices via Replicate. Gender assigned by speaker name prefix (Frau=female, Herr=male).",
+    "female": ["Aoede", "Kore"],
+    "male": ["Charon", "Orus", "Fenrir"],
+    "examiner": "Fenrir"
+  },
+
+  "question_numbering": {
+    "hoeren_teil1": "1–5",
+    "hoeren_teil2": "6–15",
+    "hoeren_teil3": "16–20",
+    "lesen_aufgabe1": "1–5",
+    "lesen_aufgabe2": "6–10",
+    "lesen_aufgabe3": "11–20",
+    "sprachbausteine_aufgabe1": "21–30",
+    "sprachbausteine_aufgabe2": "31–40"
+  }
+}

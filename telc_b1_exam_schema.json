@@ -1,0 +1,597 @@
+{
+  "exam_id": "exam_telc_b1_001",
+  "title": "TELC Deutsch B1 - Übungstest 1",
+  "pathway": "telc_b1",
+  "exam_type": "telc",
+  "telc_level": "B1",
+  "status": "ready",
+  "hoeren": {
+    "aufgaben": [
+      {
+        "typ": "kurzgespraeche",
+        "title": "Aufgabe 1 - Kurze Gespräche",
+        "aufgabe_num": 1,
+        "instruction": "Sie hören fünf kurze Gespräche. Sind die Aussagen richtig oder falsch?",
+        "conversations": [
+          {
+            "conv_num": 1,
+            "sprecher": [
+              {
+                "name": "Frau Koch"
+              },
+              {
+                "name": "Herr Braun"
+              }
+            ],
+            "questions": [
+              {
+                "question_num": 1,
+                "question_text": "Das neue Restaurant bietet asiatisches Essen an.",
+                "correct_answer": "Falsch"
+              }
+            ],
+            "script_segments": [
+              {
+                "text": "[freundlich] Guten Morgen! Haben Sie schon gehört? Das neue Restaurant am Marktplatz macht heute Abend auf.",
+                "sprecher": "Frau Koch"
+              },
+              {
+                "text": "Ja, ich habe eine Einladung zur Eröffnung bekommen. Es soll italienisches Essen anbieten.",
+                "sprecher": "Herr Braun"
+              },
+              {
+                "text": "Wirklich? Ich dachte, es wird ein asiatisches Restaurant.",
+                "sprecher": "Frau Koch"
+              },
+              {
+                "text": "Nein, nein – Pizza und Pasta, alles frisch gemacht.",
+                "sprecher": "Herr Braun"
+              }
+            ]
+          },
+          {
+            "conv_num": 2,
+            "sprecher": [
+              {
+                "name": "Studentin"
+              },
+              {
+                "name": "Bibliothekarin"
+              }
+            ],
+            "questions": [
+              {
+                "question_num": 2,
+                "question_text": "Die Studentin kann das Buch für vier Wochen ausleihen.",
+                "correct_answer": "Falsch"
+              }
+            ],
+            "script_segments": [
+              {
+                "text": "Entschuldigung, ich suche ein Buch über deutsche Geschichte. Haben Sie etwas über die Weimarer Republik?",
+                "sprecher": "Studentin"
+              },
+              {
+                "text": "Ja, wir haben mehrere Bücher dazu. Aber die meisten sind gerade ausgeliehen. Eines ist noch da – im Regal Nummer sieben.",
+                "sprecher": "Bibliothekarin"
+              },
+              {
+                "text": "Kann ich es für drei Wochen ausleihen?",
+                "sprecher": "Studentin"
+              },
+              {
+                "text": "Normalerweise sind es vier Wochen, aber dieses Buch ist sehr gefragt, daher nur zwei Wochen.",
+                "sprecher": "Bibliothekarin"
+              }
+            ]
+          },
+          {
+            "conv_num": 3,
+            "sprecher": [
+              {
+                "name": "Kunde"
+              },
+              {
+                "name": "Verkäuferin"
+              }
+            ],
+            "questions": [
+              {
+                "question_num": 3,
+                "question_text": "Der Kunde kann die Jacke in Blau und Größe L kaufen.",
+                "correct_answer": "Falsch"
+              }
+            ],
+            "script_segments": [
+              {
+                "text": "[pausiert] Ich hätte gerne diese Jacke in Größe L, aber in Blau, wenn möglich.",
+                "sprecher": "Kunde"
+              },
+              {
+                "text": "In Blau haben wir nur noch Größe M und XL. L ist leider ausverkauft.",
+                "sprecher": "Verkäuferin"
+              },
+              {
+                "text": "Schade. Und in Grün?",
+                "sprecher": "Kunde"
+              },
+              {
+                "text": "In Grün haben wir alle Größen vorrätig, auch L.",
+                "sprecher": "Verkäuferin"
+              }
+            ]
+          },
+          {
+            "conv_num": 4,
+            "sprecher": [
+              {
+                "name": "Lars"
+              },
+              {
+                "name": "Mia"
+              }
+            ],
+            "questions": [
+              {
+                "question_num": 4,
+                "question_text": "Der Stadtlauf findet am Stadtpark statt.",
+                "correct_answer": "Richtig"
+              }
+            ],
+            "script_segments": [
+              {
+                "text": "Mia, ich wollte dich fragen – machst du morgen Abend mit beim Stadtlauf?",
+                "sprecher": "Lars"
+              },
+              {
+                "text": "Stadtlauf? Wann fängt der an?",
+                "sprecher": "Mia"
+              },
+              {
+                "text": "Um halb sieben am Stadtpark. Es sind fünf Kilometer – nicht zu schwer.",
+                "sprecher": "Lars"
+              },
+              {
+                "text": "[überlegt] Das klingt gut. Ich bin dabei!",
+                "sprecher": "Mia"
+              }
+            ]
+          },
+          {
+            "conv_num": 5,
+            "sprecher": [
+              {
+                "name": "Frau Weber"
+              },
+              {
+                "name": "Herr Fischer"
+              }
+            ],
+            "questions": [
+              {
+                "question_num": 5,
+                "question_text": "Herr Fischer zieht in eine Wohnung ohne Balkon.",
+                "correct_answer": "Falsch"
+              }
+            ],
+            "script_segments": [
+              {
+                "text": "Herr Fischer, ich habe gehört, Sie ziehen nächsten Monat um?",
+                "sprecher": "Frau Weber"
+              },
+              {
+                "text": "Ja, genau. Ich habe eine neue Wohnung im Norden der Stadt gefunden – größer und mit Balkon.",
+                "sprecher": "Herr Fischer"
+              },
+              {
+                "text": "Das klingt wunderbar! Brauchen Sie Hilfe beim Umzug?",
+                "sprecher": "Frau Weber"
+              },
+              {
+                "text": "Das ist sehr nett, danke! Ich habe schon einen Umzugswagen gemietet.",
+                "sprecher": "Herr Fischer"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "typ": "gespraech",
+        "title": "Aufgabe 2 - Ein Gespräch",
+        "sprecher": [
+          {
+            "name": "Sandra"
+          },
+          {
+            "name": "Thomas"
+          }
+        ],
+        "questions": [
+          {
+            "options": [
+              "A) Nach Italien",
+              "B) Nach Spanien",
+              "C) Nach Portugal"
+            ],
+            "question_num": 6,
+            "question_text": "Wohin möchte Thomas im Urlaub fahren?",
+            "correct_answer": "B"
+          },
+          {
+            "options": [
+              "A) Im Juni",
+              "B) Im August",
+              "C) Im Juli"
+            ],
+            "question_num": 7,
+            "question_text": "Wann empfiehlt Sandra den Urlaub zu machen?",
+            "correct_answer": "C"
+          },
+          {
+            "options": [
+              "A) Mit dem Zug",
+              "B) Mit dem Flugzeug",
+              "C) Mit dem Auto"
+            ],
+            "question_num": 8,
+            "question_text": "Wie ist Sandra letztes Jahr gereist?",
+            "correct_answer": "B"
+          },
+          {
+            "options": [
+              "A) Es war sehr günstig.",
+              "B) Es hatte einen Pool.",
+              "C) Das Personal war freundlich."
+            ],
+            "question_num": 9,
+            "question_text": "Was war gut an Sandras Hotel?",
+            "correct_answer": "C"
+          },
+          {
+            "options": [
+              "A) Flüge buchen",
+              "B) Online ein Hotel suchen",
+              "C) Sandra besuchen"
+            ],
+            "question_num": 10,
+            "question_text": "Was will Thomas heute Abend machen?",
+            "correct_answer": "B"
+          }
+        ],
+        "aufgabe_num": 2,
+        "instruction": "Sie hören ein Gespräch zwischen zwei Personen. Wählen Sie die richtige Antwort.",
+        "script_segments": [
+          {
+            "text": "[entspannt] Thomas, hast du schon Pläne für den Urlaub nächsten Sommer?",
+            "sprecher": "Sandra"
+          },
+          {
+            "text": "Ja! Ich möchte gerne nach Spanien fahren – an die Costa Brava. Ich war noch nie dort.",
+            "sprecher": "Thomas"
+          },
+          {
+            "text": "Oh, das klingt toll! Ich war letztes Jahr da. Das Wasser ist wirklich wunderschön. Wie lange möchtest du fahren?",
+            "sprecher": "Sandra"
+          },
+          {
+            "text": "Zwei Wochen wären ideal. Aber ich weiß noch nicht genau wann – entweder Juli oder August.",
+            "sprecher": "Thomas"
+          },
+          {
+            "text": "[nachdenklich] Im August ist es sehr heiß und es gibt viele Touristen. Ich würde Juli empfehlen – angenehmer und nicht so überfüllt.",
+            "sprecher": "Sandra"
+          },
+          {
+            "text": "Guter Tipp, danke! Fliegst du mit dem Flugzeug oder fährst du lieber mit dem Zug?",
+            "sprecher": "Thomas"
+          },
+          {
+            "text": "Ich bin letztes Mal geflogen – nur zwei Stunden. Mit dem Zug wäre es viel länger, aber vielleicht interessanter.",
+            "sprecher": "Sandra"
+          },
+          {
+            "text": "Ich denke, ich nehme das Flugzeug. Es ist schneller und oft auch günstiger, wenn man früh bucht.",
+            "sprecher": "Thomas"
+          },
+          {
+            "text": "Hast du schon ein Hotel gesucht? In Juli sollte man früh buchen, sonst sind die guten Hotels ausgebucht.",
+            "sprecher": "Sandra"
+          },
+          {
+            "text": "[enthusiastisch] Nein, noch nicht. Ich schaue heute Abend online nach. Hast du eine Empfehlung?",
+            "sprecher": "Thomas"
+          },
+          {
+            "text": "Ja, ich war im Hotel Mediterrán – direkt am Strand, frühstück inklusive, und das Personal war sehr freundlich.",
+            "sprecher": "Sandra"
+          }
+        ]
+      },
+      {
+        "typ": "ansagen",
+        "title": "Aufgabe 3 - Ansagen und Mitteilungen",
+        "ansagen": [
+          {
+            "text": "[klar] Achtung, eine Durchsage für Reisende nach München: Der ICE 1234 ab Gleis 7 hat heute eine Verspätung von etwa 20 Minuten. Wir bitten um Ihr Verständnis.",
+            "sprecher": "Ansager",
+            "ansage_num": 1,
+            "question_num": 11,
+            "question_text": "Der Zug nach München fährt pünktlich ab.",
+            "correct_answer": "Falsch"
+          },
+          {
+            "text": "[professionell] Das Stadtmuseum ist ab nächster Woche jeden Mittwoch bis 21 Uhr geöffnet. Der Eintritt am Mittwochabend ist für alle Besucher kostenlos.",
+            "sprecher": "Moderatorin",
+            "ansage_num": 2,
+            "question_num": 12,
+            "question_text": "Das Stadtmuseum bietet mittwochabends kostenlosen Eintritt an.",
+            "correct_answer": "Richtig"
+          },
+          {
+            "text": "Liebe Kunden, unser Supermarkt ist am kommenden Sonntag wegen Inventur geschlossen. Wir sind am Montag wieder ab 8 Uhr für Sie da.",
+            "sprecher": "Ansager",
+            "ansage_num": 3,
+            "question_num": 13,
+            "question_text": "Der Supermarkt ist am Sonntag geöffnet.",
+            "correct_answer": "Falsch"
+          },
+          {
+            "text": "[warm] Das Wetter morgen: In der Nordhälfte gibt es Regen und Temperaturen um 12 Grad. Im Süden bleibt es trocken und sonnig, bis zu 18 Grad.",
+            "sprecher": "Moderatorin",
+            "ansage_num": 4,
+            "question_num": 14,
+            "question_text": "Im Süden wird es morgen regnen.",
+            "correct_answer": "Falsch"
+          },
+          {
+            "text": "Die Volkshochschule lädt ein: Deutschkurse für Anfänger starten am ersten September. Anmeldung bis zum 20. August online oder persönlich im Sekretariat.",
+            "sprecher": "Ansager",
+            "ansage_num": 5,
+            "question_num": 15,
+            "question_text": "Die Anmeldung für den Deutschkurs ist ab dem ersten September möglich.",
+            "correct_answer": "Falsch"
+          }
+        ],
+        "aufgabe_num": 3,
+        "instruction": "Sie hören fünf kurze Ansagen. Sind die Aussagen richtig oder falsch?"
+      }
+    ],
+    "total_questions": 15,
+    "duration_minutes": 40
+  },
+  "lesen": {
+    "aufgaben": [
+      {
+        "typ": "zuordnung",
+        "title": "Aufgabe 1 - Texte zuordnen",
+        "questions": [
+          {
+            "question_num": 1,
+            "question_text": "Hier kann man Bücher kostenlos mitnehmen.",
+            "correct_answer": "B"
+          },
+          {
+            "question_num": 2,
+            "question_text": "Hier kann man Fahrräder mieten.",
+            "correct_answer": "E"
+          },
+          {
+            "question_num": 3,
+            "question_text": "Hier kann man frische Lebensmittel kaufen.",
+            "correct_answer": "C"
+          },
+          {
+            "question_num": 4,
+            "question_text": "Hier kann man eine neue Sprache lernen.",
+            "correct_answer": "D"
+          },
+          {
+            "question_num": 5,
+            "question_text": "Hier kann man schwimmen gehen.",
+            "correct_answer": "A"
+          }
+        ],
+        "aufgabe_num": 1,
+        "instruction": "Welche Überschrift passt zu welchem Text? Ordnen Sie zu. Eine Überschrift passt nicht.",
+        "short_texts": [
+          {
+            "id": "A",
+            "text": "Das Stadtbad Mitte ist täglich von 7 bis 22 Uhr geöffnet. Wir bieten Schwimmkurse für Kinder ab 5 Jahren und Aquafitness für Erwachsene an. Familienkarte erhältlich. Sauna im Obergeschoss (nur für Erwachsene)."
+          },
+          {
+            "id": "B",
+            "text": "Stadtbücherei am Marktplatz: Bücher, Zeitschriften und DVDs kostenlos ausleihen. Montag bis Freitag 10–19 Uhr, Samstag 10–14 Uhr. Für die Anmeldung bringen Sie bitte Ihren Personalausweis mit."
+          },
+          {
+            "id": "C",
+            "text": "Frischer Obst- und Gemüsemarkt jeden Dienstag und Freitag von 8 bis 13 Uhr auf dem Rathausplatz. Regionale Produkte direkt vom Bauernhof. Auch Käse, Eier und Honig aus der Umgebung."
+          },
+          {
+            "id": "D",
+            "text": "Volkshochschule – Anmeldung Herbstkurse ab sofort möglich. Deutsch als Fremdsprache (alle Niveaus), Englisch, Spanisch, Kochen, Fotografie und vieles mehr. Infos und Anmeldung online oder persönlich."
+          },
+          {
+            "id": "E",
+            "text": "Fahrradverleih am Bahnhof: Cityräder, E-Bikes und Kindersitze verfügbar. Stundenpreise ab 3 Euro, Tageskarte 15 Euro. Personalausweis als Pfand erforderlich. Geöffnet täglich 8–20 Uhr."
+          }
+        ]
+      },
+      {
+        "typ": "richtig_falsch",
+        "text": "Homeoffice in Deutschland – Fluch oder Segen?\n\nSeit der Corona-Pandemie arbeiten immer mehr Deutsche von zu Hause aus. Laut einer aktuellen Studie des Instituts für Arbeitsmarkt- und Berufsforschung arbeiten heute etwa 24 Prozent aller Beschäftigten regelmäßig im Homeoffice – vor der Pandemie waren es nur 12 Prozent.\n\nDie Meinungen über das Homeoffice sind geteilt. Viele Arbeitnehmer schätzen die Flexibilität: Sie können sich ihre Arbeitszeit besser einteilen und sparen täglich Zeit und Geld für den Weg zur Arbeit. Für Eltern ist es oft leichter, Familie und Beruf zu vereinbaren.\n\nAllerdings gibt es auch Nachteile. Viele Menschen vermissen den Kontakt zu den Kollegen. Die Grenze zwischen Arbeit und Freizeit verschwimmt oft, und manche Mitarbeiter arbeiten im Homeoffice sogar länger als im Büro. Außerdem haben nicht alle zu Hause einen ruhigen Arbeitsplatz.\n\nExperten empfehlen deshalb ein hybrides Modell: ein bis zwei Tage Homeoffice pro Woche und den Rest der Zeit im Büro. So profitiert man von den Vorteilen beider Welten.",
+        "title": "Aufgabe 2 - Richtig, Falsch oder Nicht im Text?",
+        "questions": [
+          {
+            "question_num": 6,
+            "question_text": "Vor der Pandemie arbeiteten 24 Prozent der Deutschen im Homeoffice.",
+            "correct_answer": "Falsch"
+          },
+          {
+            "question_num": 7,
+            "question_text": "Im Homeoffice sparen viele Arbeitnehmer Zeit und Geld für den Weg zur Arbeit.",
+            "correct_answer": "Richtig"
+          },
+          {
+            "question_num": 8,
+            "question_text": "Alle Mitarbeiter im Homeoffice haben einen ruhigen Arbeitsplatz.",
+            "correct_answer": "Falsch"
+          },
+          {
+            "question_num": 9,
+            "question_text": "Manche Mitarbeiter im Homeoffice verdienen mehr Geld als im Büro.",
+            "correct_answer": "Nicht im Text"
+          },
+          {
+            "question_num": 10,
+            "question_text": "Experten empfehlen, manchmal im Büro und manchmal zu Hause zu arbeiten.",
+            "correct_answer": "Richtig"
+          }
+        ],
+        "aufgabe_num": 2,
+        "instruction": "Lesen Sie den Text und entscheiden Sie: Ist die Aussage richtig, falsch oder steht das nicht im Text?"
+      },
+      {
+        "typ": "multiple_choice",
+        "text": "Stadtführungen mal anders\n\nDie Tourismusbehörde der Stadt Freiburg bietet ab diesem Sommer ein neues Programm an: Stadtführungen mit dem Fahrrad. Jeden Samstag um 10 Uhr starten geführte Radtouren vom Hauptbahnhof. Die Tour dauert etwa zwei Stunden und führt zu den wichtigsten Sehenswürdigkeiten der Altstadt, zum Münster und entlang der Dreisam.\n\nDie Führung kostet 15 Euro pro Person, Fahrräder können für 8 Euro gemietet werden. Für Gruppen ab 10 Personen gibt es einen Rabatt von 20 Prozent. Kinder unter 12 Jahren nehmen kostenlos teil, wenn sie von einem Erwachsenen begleitet werden.\n\nDie Stadtführerin Claudia Berger, die die Tour leitet, ist begeistert: \"Mit dem Fahrrad kann man die Stadt viel intensiver erleben als zu Fuß. Wir machen auch Stopps an weniger bekannten Orten, die normale Touristengruppen nicht besuchen.\"\n\nAnmeldung ist nicht erforderlich – man kann einfach am Startpunkt erscheinen. Bei schlechtem Wetter findet die Tour trotzdem statt, außer bei starkem Regen oder Sturm.",
+        "title": "Aufgabe 3 - Multiple Choice",
+        "questions": [
+          {
+            "options": [
+              "A) Am Münster",
+              "B) Am Hauptbahnhof",
+              "C) Am Rathaus"
+            ],
+            "question_num": 11,
+            "question_text": "Wo beginnt die Radtour?",
+            "correct_answer": "B"
+          },
+          {
+            "options": [
+              "A) 15 Euro",
+              "B) 8 Euro",
+              "C) Nichts"
+            ],
+            "question_num": 12,
+            "question_text": "Was kostet die Führung für ein Kind von 10 Jahren mit einem Erwachsenen?",
+            "correct_answer": "C"
+          },
+          {
+            "options": [
+              "A) Sie ist billiger als eine Fußtour.",
+              "B) Man sieht auch weniger bekannte Orte.",
+              "C) Man kann die Tour online buchen."
+            ],
+            "question_num": 13,
+            "question_text": "Was ist ein Vorteil der Radtour laut Claudia Berger?",
+            "correct_answer": "B"
+          },
+          {
+            "options": [
+              "A) Bei leichtem Regen",
+              "B) Bei starkem Regen oder Sturm",
+              "C) Im Winter"
+            ],
+            "question_num": 14,
+            "question_text": "Wann findet die Tour nicht statt?",
+            "correct_answer": "B"
+          },
+          {
+            "options": [
+              "A) 150 Euro",
+              "B) 120 Euro",
+              "C) 130 Euro"
+            ],
+            "question_num": 15,
+            "question_text": "Wie viel zahlt eine Gruppe von 10 Personen für die Führung insgesamt?",
+            "correct_answer": "B"
+          }
+        ],
+        "aufgabe_num": 3,
+        "instruction": "Lesen Sie den Text. Welche Antwort (A, B oder C) passt?"
+      }
+    ],
+    "total_questions": 15,
+    "duration_minutes": 90
+  },
+  "schreiben": {
+    "aufgaben": [
+      {
+        "aufgabe": "Sie haben diese E-Mail von Ihrem Freund Jonas bekommen:\n\n'Hallo! Ich ziehe nächsten Monat in eine neue Wohnung um und brauche Hilfe. Hast du am Samstag, den 15., Zeit? Wir könnten danach zusammen essen gehen. Liebe Grüße, Jonas'\n\nSchreiben Sie eine Antwort-E-Mail. Schreiben Sie:\n• ob Sie helfen können und warum (nicht)\n• wann Sie Zeit haben\n• einen Vorschlag für das Abendessen\n\nSchreiben Sie ca. 100 Wörter.",
+        "max_words": 130,
+        "min_words": 80,
+        "aufgabe_num": 1,
+        "aufgabe_typ": "brief_email"
+      }
+    ],
+    "total_time_minutes": 30
+  },
+  "sprechen": {
+    "teile": [
+      {
+        "titel": "Kontaktaufnahme",
+        "fragen": [
+          {
+            "frage_num": 1,
+            "frage_text": "[warm] Guten Tag! Willkommen zur Prüfung. Wie heißen Sie und woher kommen Sie ursprünglich?",
+            "needs_audio": true
+          },
+          {
+            "frage_num": 2,
+            "frage_text": "Was machen Sie zurzeit – arbeiten Sie oder studieren Sie?",
+            "needs_audio": true
+          },
+          {
+            "frage_num": 3,
+            "frage_text": "Was sind Ihre Hobbys? Was machen Sie in Ihrer Freizeit gerne?",
+            "needs_audio": true
+          }
+        ],
+        "teil_num": 1,
+        "instructions": "Der Prüfer stellt Ihnen einige Fragen zu Ihrer Person. Antworten Sie auf Deutsch."
+      },
+      {
+        "titel": "Über ein Thema sprechen",
+        "fragen": [
+          {
+            "frage_num": 4,
+            "frage_text": "Beschreiben Sie dieses Bild. Was sehen Sie?",
+            "needs_audio": true
+          },
+          {
+            "frage_num": 5,
+            "frage_text": "Gehen Sie manchmal auf den Markt? Was kaufen Sie dort gerne?",
+            "needs_audio": true
+          },
+          {
+            "frage_num": 6,
+            "frage_text": "Was finden Sie besser – im Supermarkt einkaufen oder auf dem Wochenmarkt? Warum?",
+            "needs_audio": true
+          }
+        ],
+        "teil_num": 2,
+        "instructions": "Sie sehen ein Bild. Beschreiben Sie das Bild und beantworten Sie die Fragen.",
+        "bild_beschreibung": "Ein belebter Wochenmarkt in einer deutschen Stadt: Stände mit frischem Gemüse, Obst und Blumen. Verkäufer und Kunden im Gespräch. Menschen schlendern zwischen den Ständen."
+      },
+      {
+        "titel": "Gemeinsam etwas planen",
+        "fragen": [
+          {
+            "frage_num": 7,
+            "frage_text": "Also, für Peters Geburtstag – haben Sie schon Ideen? Machen wir eine Party bei jemandem zu Hause oder gehen wir lieber aus?",
+            "needs_audio": true
+          },
+          {
+            "frage_num": 8,
+            "frage_text": "Wie viele Personen sollen eingeladen werden? Und was essen wir – kochen wir selbst oder bestellen wir?",
+            "needs_audio": true
+          }
+        ],
+        "aufgabe": "Sie und ein Freund oder eine Freundin möchten den Geburtstag eines gemeinsamen Freundes feiern. Diskutieren Sie, wie Sie die Party organisieren möchten.",
+        "teil_num": 3,
+        "instructions": "Planen Sie gemeinsam mit dem Prüfer eine Veranstaltung."
+      }
+    ],
+    "total_time_minutes": 15
+  },
+  "created_at": "2026-05-17T19:31:00.537225+00:00"
+}
