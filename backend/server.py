@@ -1280,10 +1280,10 @@ TOPICS: Everyday life, work, school, shopping, travel, leisure, family, health (
 VOCABULARY: High-frequency everyday words only (~2,000–3,000 word range). NO academic, technical or low-frequency vocabulary.
 GRAMMAR: Present, Perfekt, Präteritum (sein/haben/modals), basic subordinate clauses (weil, dass, wenn). NO Konjunktiv II, NO complex passive, NO participial constructions.
 TEXT COMPLEXITY: Short, clear sentences. Simple paragraph structure. Explicit information — no inference required.
-LISTENING SCRIPTS: Slow-to-normal speed, clear pronunciation, simple colloquial speech. Topics: booking appointments, everyday shopping, weather, transport, simple workplace talks.
+LISTENING SCRIPTS: Slow-to-normal speed, clear pronunciation, simple colloquial speech. Topics: daily routines, booking appointments, everyday shopping, weather, local events, simple workplace chats.
 QUESTIONS: Test explicit/literal understanding. Correct answer is directly stated in the text. Distractors are plausible but clearly wrong.
 WRONG-LEVEL EXAMPLES TO AVOID: No academic articles, no professional jargon, no abstract social commentary, no complex argumentation."""
-    else:  # B2
+    elif level == "B2":
         return """CEFR B2 LEVEL REQUIREMENTS — apply strictly:
 TOPICS: Abstract and professional: environment, technology, society, culture, health systems, professional development, globalisation, media, science. NOT everyday shopping or simple travel.
 VOCABULARY: Wide range including abstract nouns, academic collocations, topic-specific terminology (e.g. "Nachhaltigkeit", "Globalisierung", "Fachkräftemangel"). Idiomatic expressions.
@@ -1291,6 +1291,14 @@ GRAMMAR: Konjunktiv II (hypotheticals/indirect speech), Passiv constructions (wi
 TEXT COMPLEXITY: Complex multi-paragraph texts with argumentation, counterarguments, implicit meaning. Requires inferencing beyond literal text.
 LISTENING SCRIPTS: Normal/natural speed, complex sentence structures, speaker attitude/opinion must be inferred. Topics: expert interviews, radio discussions, workplace conflicts, academic lectures.
 QUESTIONS: Test ability to infer, identify opinions, understand nuance. Correct answers often require combining two pieces of information or recognising implicit meaning. Distractors are very close to the correct answer."""
+    else:  # C1
+        return """CEFR C1 LEVEL REQUIREMENTS — apply strictly:
+TOPICS: Specialist and academic: law, ethics, economics, cognitive science, geopolitics, literary criticism, complex social phenomena, philosophy, advanced technology debates.
+VOCABULARY: Near-native range including rare collocations, nominalisations, discipline-specific terminology (e.g. "Regressionsanalyse", "Verfassungswidrigkeit", "kognitive Dissonanz"). Figurative language, irony, hedging expressions.
+GRAMMAR: All B2 structures plus: complex nominalisations, extended participial constructions, elaborate concessive/conditional structures (nicht nur... sondern auch; wenngleich; insofern als), indirect speech with multiple tense shifts, rhetorical devices.
+TEXT COMPLEXITY: Long, nuanced texts with implicit stance, irony, presuppositions and unstated assumptions. Requires critical reading and evaluation of positions.
+LISTENING SCRIPTS: Near-native speed with authentic hesitations, self-corrections, complex subordination, hedged claims. Speakers express nuanced or contradictory positions requiring critical analysis.
+QUESTIONS: Primarily test ability to evaluate arguments, detect implicit stance, distinguish main from subsidiary points, recognise rhetorical strategy. Distractors deliberately misleading — partially correct or plausible but wrong at a nuanced level."""
 
 
 async def ai_generate_telc_exam(exam_id: str, level: str):
@@ -1356,52 +1364,153 @@ Return JSON:
         lesen_data["duration_minutes"] = 90
 
         # ── HÖRVERSTEHEN ──────────────────────────────────────────────────────
-        hoeren_prompt = f"""Generate a telc Deutsch {level} Hörverstehen test with 3 Aufgaben.
-All questions are Richtig/Falsch only.
+        hoeren_prompt = f"""Generate a telc Deutsch {level} Hörverstehen (Listening Comprehension) test with exactly 3 Aufgaben.
+ALL questions use ONLY Richtig/Falsch format — absolutely no multiple-choice options.
 
-MANDATORY LEVEL: {{level_spec}}
+MANDATORY LEVEL: {level_spec}
 
-Aufgabe 1 (q1-5): Kurzgespräche
-5 short conversations (4-5 exchanges each).
-Topics for B1: booking appointments, transport, everyday shopping, simple workplace.
-Topics for B2: expert interviews, workplace conflicts, academic discussions, social debates.
-Each: 1 Richtig/Falsch. Heard ONCE.
-B2 requirement: questions should test inference of speaker attitude, not just literal facts.
+═══════════════════════════════════════════════════════════════
+AUFGABE 1 — Kurztexte (5 Monologe zum gleichen Thema)
+═══════════════════════════════════════════════════════════════
+• 5 SHORT MONOLOGUES — each spoken by a DIFFERENT single speaker
+• All 5 texts share ONE common topic — each speaker gives their personal view/experience
+• B1 topic ideas: Hausarbeit im Alltag, Haustiere halten, Urlaub planen, Sport und Freizeit
+• B2 topic ideas: Homeoffice-Erfahrungen, Klimaschutz im Alltag, soziale Medien und Gesellschaft
+• C1 topic ideas: KI und die Zukunft der Arbeit, Bildungsreform aus verschiedenen Perspektiven
+• Each monologue: 5–8 sentences expressing personal opinion or experience on that topic
+• B1: simple sentences, everyday vocabulary, direct statements
+• B2: medium-complex clauses, topic-specific vocabulary, implied attitude
+• C1: hedged statements, irony, nuanced positions, academic register
+• 1 Richtig/Falsch question per monologue (question_num 1–5)
+• heard_times: 1 (heard ONCE only — keine Wiederholung)
+• preparation_seconds: 30
+• Use `conversations` array; each entry has exactly ONE sprecher giving a monologue
 
-Aufgabe 2 (q6-15): Gespräch
-One longer conversation (14-16 exchanges).
-B1: everyday dialogue — friends planning, customer service call, simple meeting.
-B2: expert interview or discussion on abstract topic — environment, technology, social issues.
-10 Richtig/Falsch (q6-15). Heard TWICE.
-B2: at least 4 questions require understanding implied meaning or speaker viewpoint.
+═══════════════════════════════════════════════════════════════
+AUFGABE 2 — Ein Gespräch / Interview
+═══════════════════════════════════════════════════════════════
+• 1 radio interview or discussion between 2 speakers (e.g. Moderatorin + Experte/Gast)
+• B1: local community topic or everyday theme, 10–12 exchanges, simple language
+• B2: expert interview on abstract/professional topic (Umwelt, Technologie, Gesellschaft), 12–14 exchanges
+• C1: specialist debate with complex reasoning, hedged claims, 14–16 exchanges
+• 10 Richtig/Falsch questions (question_num 6–15) — NO options array
+• B1: all questions test explicit stated facts
+• B2: at least 4 questions require inferring speaker attitude or implicit meaning
+• C1: at least 6 questions require evaluating implicit stance or detecting nuanced position
+• heard_times: 2 (heard TWICE — zweimal)
+• preparation_seconds: 60
 
-Aufgabe 3 (q16-20): Ansagen
-5 short announcements. B1: station/shop/event info (2-3 simple sentences).
-B2: official radio bulletin or company message with conditions/exceptions (3-4 sentences, complex structure).
-1 Richtig/Falsch per announcement (q16-20). Heard TWICE.
+═══════════════════════════════════════════════════════════════
+AUFGABE 3 — Kurze Ansagen
+═══════════════════════════════════════════════════════════════
+• 5 independent short announcements (radio, Bahnhof, telephone recording, store intercom)
+• B1: 2–3 simple sentences, everyday info (departure times, opening hours, event details)
+• B2: 3–4 sentences with conditions or exceptions, semi-official register
+• C1: 4–5 sentences with complex official/legal language, conditions, exceptions
+• 1 Richtig/Falsch per announcement (question_num 16–20)
+• heard_times: 2 (heard TWICE each)
+• preparation_seconds: 30
+• Single announcer voice per ansage; use "Ansagerin"/"Ansager" or specific role names
 
-Speech style B1: clear, standard, moderate pace. B2: natural speed, fillers, complex clauses.
-Sprecher: "Frau Müller", "Herr Schmidt", "Moderatorin", "Ansager", etc.
-
-Return JSON:
+Return valid JSON only — no markdown, no commentary:
 {{"aufgaben": [
-  {{"aufgabe_num": 1, "typ": "kurzgespraeche",
-    "sprecher": [{{"name": "...", "voice_id": ""}}],
+  {{
+    "aufgabe_num": 1,
+    "typ": "kurzgespraeche",
+    "title": "Aufgabe 1",
+    "instruction": "Sie hören fünf kurze Texte. Kreuzen Sie an: Sind die Aussagen richtig oder falsch? Sie hören jeden Text einmal.",
+    "heard_times": 1,
+    "preparation_seconds": 30,
+    "topic": "...[the shared topic, e.g. 'Hausarbeit im Alltag']",
     "conversations": [
-      {{"conv_num": 1,
-        "sprecher": [{{"name": "Frau Koch", "voice_id": ""}}, {{"name": "Herr Bauer", "voice_id": ""}}],
-        "script_segments": [{{"sprecher": "Frau Koch", "text": "..."}}],
-        "questions": [{{"question_num": 1, "question_text": "...", "correct_answer": "Richtig"}}]
+      {{
+        "conv_num": 1,
+        "sprecher": [{{"name": "Frau Berger", "voice_id": ""}}],
+        "script_segments": [
+          {{"sprecher": "Frau Berger", "text": "...sentence 1... sentence 2... sentence 3... sentence 4... sentence 5..."}},
+          {{"sprecher": "Frau Berger", "text": "...sentence 6... sentence 7..."}}
+        ],
+        "questions": [{{"question_num": 1, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}}]
+      }},
+      {{
+        "conv_num": 2,
+        "sprecher": [{{"name": "Herr Koch", "voice_id": ""}}],
+        "script_segments": [{{"sprecher": "Herr Koch", "text": "...monologue..."}}],
+        "questions": [{{"question_num": 2, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Falsch"}}]
+      }},
+      {{
+        "conv_num": 3,
+        "sprecher": [{{"name": "eine Studentin", "voice_id": ""}}],
+        "script_segments": [{{"sprecher": "eine Studentin", "text": "..."}}],
+        "questions": [{{"question_num": 3, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}}]
+      }},
+      {{
+        "conv_num": 4,
+        "sprecher": [{{"name": "Herr Müller", "voice_id": ""}}],
+        "script_segments": [{{"sprecher": "Herr Müller", "text": "..."}}],
+        "questions": [{{"question_num": 4, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Falsch"}}]
+      }},
+      {{
+        "conv_num": 5,
+        "sprecher": [{{"name": "Frau Schmidt", "voice_id": ""}}],
+        "script_segments": [{{"sprecher": "Frau Schmidt", "text": "..."}}],
+        "questions": [{{"question_num": 5, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}}]
       }}
-    ]}},
-  {{"aufgabe_num": 2, "typ": "gespraech",
-    "sprecher": [{{"name": "Moderatorin", "voice_id": ""}}, {{"name": "Herr Bauer", "voice_id": ""}}],
-    "script_segments": [{{"sprecher": "Moderatorin", "text": "..."}}],
-    "questions": [{{"question_num": 6, "question_text": "...", "correct_answer": "Falsch"}}]}},
-  {{"aufgabe_num": 3, "typ": "ansagen",
+    ]
+  }},
+  {{
+    "aufgabe_num": 2,
+    "typ": "gespraech",
+    "title": "Aufgabe 2",
+    "instruction": "Sie hören jetzt ein Gespräch. Kreuzen Sie an: Sind die Aussagen richtig oder falsch? Sie hören das Gespräch zweimal.",
+    "heard_times": 2,
+    "preparation_seconds": 60,
+    "sprecher": [
+      {{"name": "Moderatorin", "voice_id": ""}},
+      {{"name": "Herr Dr. Weber", "voice_id": ""}}
+    ],
+    "script_segments": [
+      {{"sprecher": "Moderatorin", "text": "...opening question..."}},
+      {{"sprecher": "Herr Dr. Weber", "text": "...answer..."}},
+      {{"sprecher": "Moderatorin", "text": "...follow-up..."}},
+      {{"sprecher": "Herr Dr. Weber", "text": "..."}},
+      {{"sprecher": "Moderatorin", "text": "..."}},
+      {{"sprecher": "Herr Dr. Weber", "text": "..."}},
+      {{"sprecher": "Moderatorin", "text": "..."}},
+      {{"sprecher": "Herr Dr. Weber", "text": "..."}},
+      {{"sprecher": "Moderatorin", "text": "..."}},
+      {{"sprecher": "Herr Dr. Weber", "text": "..."}},
+      {{"sprecher": "Moderatorin", "text": "..."}},
+      {{"sprecher": "Herr Dr. Weber", "text": "...closing remark..."}}
+    ],
+    "questions": [
+      {{"question_num": 6, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}},
+      {{"question_num": 7, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Falsch"}},
+      {{"question_num": 8, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}},
+      {{"question_num": 9, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Falsch"}},
+      {{"question_num": 10, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}},
+      {{"question_num": 11, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Falsch"}},
+      {{"question_num": 12, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}},
+      {{"question_num": 13, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Falsch"}},
+      {{"question_num": 14, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}},
+      {{"question_num": 15, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Falsch"}}
+    ]
+  }},
+  {{
+    "aufgabe_num": 3,
+    "typ": "ansagen",
+    "title": "Aufgabe 3",
+    "instruction": "Sie hören fünf kurze Texte aus dem Radio und anderen Medien. Kreuzen Sie an: Sind die Aussagen richtig oder falsch? Sie hören jeden Text zweimal.",
+    "heard_times": 2,
+    "preparation_seconds": 30,
     "ansagen": [
-      {{"ansage_num": 1, "text": "...", "question_num": 11, "question_text": "...", "correct_answer": "Richtig"}}
-    ]}}
+      {{"ansage_num": 1, "sprecher": "Ansagerin", "voice_id": "", "text": "...", "question_num": 16, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}},
+      {{"ansage_num": 2, "sprecher": "Ansager", "voice_id": "", "text": "...", "question_num": 17, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Falsch"}},
+      {{"ansage_num": 3, "sprecher": "Ansagerin", "voice_id": "", "text": "...", "question_num": 18, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}},
+      {{"ansage_num": 4, "sprecher": "Ansager", "voice_id": "", "text": "...", "question_num": 19, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Falsch"}},
+      {{"ansage_num": 5, "sprecher": "Ansagerin", "voice_id": "", "text": "...", "question_num": 20, "question_type": "richtig_falsch", "question_text": "...", "correct_answer": "Richtig"}}
+    ]
+  }}
 ]}}"""
 
         hoeren_raw = await call_openrouter([
@@ -1414,17 +1523,27 @@ Return JSON:
 
         # Assign gender-appropriate German voices to TELC sprecher
         for aufgabe in hoeren_data.get("aufgaben", []):
+            # Top-level sprecher (Aufgabe 2 gespraech)
             assign_voices_to_speakers(
                 aufgabe.get("sprecher", []),
                 female_pool=_FEMALE_VOICES_DE,
                 male_pool=_MALE_VOICES_DE,
             )
+            # Per-conversation sprecher (Aufgabe 1 monologues / kurzgespraeche)
             for conv in aufgabe.get("conversations", []):
                 assign_voices_to_speakers(
                     conv.get("sprecher", []),
                     female_pool=_FEMALE_VOICES_DE,
                     male_pool=_MALE_VOICES_DE,
                 )
+            # Ansagen voices (Aufgabe 3)
+            for ansage in aufgabe.get("ansagen", []):
+                if not ansage.get("voice_id"):
+                    sprecher_name = ansage.get("sprecher", "Ansager")
+                    gender = _speaker_gender(sprecher_name)
+                    ansage["voice_id"] = (
+                        _FEMALE_VOICES_DE[0] if gender == "female" else _MALE_VOICES_DE[0]
+                    )
 
         # ── SPRACHBAUSTEINE ───────────────────────────────────────────────────
         sprachbausteine_prompt = f"""Generate a telc Deutsch {level} Sprachbausteine test with exactly 2 Aufgaben.

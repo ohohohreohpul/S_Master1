@@ -61,15 +61,22 @@ export default function ExamPage() {
       if (aufgabe.typ === "kurzgespraeche") {
         (aufgabe.conversations || []).forEach(conv => {
           script_segments.push(...(conv.script_segments || []));
-          questions.push(...(conv.questions || []));
+          questions.push(...(conv.questions || []).map(q => ({
+            ...q,
+            question_type: "richtig_falsch",
+          })));
         });
+        // Also pick up any top-level script_segments (unusual but safe)
         script_segments.push(...(aufgabe.script_segments || []));
       } else if (aufgabe.typ === "gespraech") {
         script_segments = aufgabe.script_segments || [];
-        questions = aufgabe.questions || [];
+        questions = (aufgabe.questions || []).map(q => ({
+          ...q,
+          question_type: "richtig_falsch",
+        }));
       } else if (aufgabe.typ === "ansagen") {
         (aufgabe.ansagen || []).forEach(ansage => {
-          script_segments.push({ sprecher: "Ansager", text: ansage.text, audio_id: ansage.audio_id });
+          script_segments.push({ sprecher: ansage.sprecher || "Ansager", text: ansage.text, audio_id: ansage.audio_id });
           if (ansage.question_num) {
             questions.push({
               question_num: ansage.question_num,
@@ -81,7 +88,17 @@ export default function ExamPage() {
         });
       }
 
-      return { section_num: idx + 1, title: `Teil ${idx + 1}`, script_segments, questions, speakers: aufgabe.sprecher || [] };
+      return {
+        section_num: idx + 1,
+        title: aufgabe.title || `Teil ${idx + 1}`,
+        instruction: aufgabe.instruction || "",
+        heard_times: aufgabe.heard_times || (idx === 0 ? 1 : 2),
+        preparation_seconds: aufgabe.preparation_seconds || (idx === 1 ? 60 : 30),
+        topic: aufgabe.topic || null,
+        script_segments,
+        questions,
+        speakers: aufgabe.sprecher || [],
+      };
     });
   }
 
