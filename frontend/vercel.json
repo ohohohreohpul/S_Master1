@@ -1,0 +1,8 @@
+{
+  "buildCommand": "DISABLE_ESLINT_PLUGIN=true CI=false yarn build",
+  "outputDirectory": "build",
+  "framework": null,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}
