@@ -40,13 +40,13 @@ function AuthProvider({ children }) {
   }, []);
 
   useEffect(() => {
-    // CRITICAL: If returning from OAuth callback, skip the /me check.
-    // AuthCallback will exchange the session_id and establish the session first.
+    // Open-access mode: always mark loading done immediately.
+    // Auth is optional — signed-in users get their profile; guests get a guest user.
     if (window.location.hash?.includes("session_id=")) {
       setLoading(false);
       return;
     }
-    checkAuth();
+    checkAuth().finally(() => setLoading(false));
   }, [checkAuth]);
 
   const logout = async () => {

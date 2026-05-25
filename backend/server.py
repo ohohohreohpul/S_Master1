@@ -136,20 +136,30 @@ class StripeCheckoutRequest(BaseModel):
     plan: str  # "monthly" or "annual"
 
 # ==========================================
-# AUTH
+# AUTH  (open-access mode — no login required)
 # ==========================================
+_GUEST_USER = {
+    "user_id": "guest",
+    "email": "guest@example.com",
+    "name": "Guest",
+    "picture": "",
+    "subscription": {},
+    "is_admin": False,
+}
+
 async def get_current_user(request: Request) -> dict:
     session_token = request.cookies.get("session_token")
     if not session_token:
         auth_header = request.headers.get("Authorization", "")
         if auth_header.startswith("Bearer "):
             session_token = auth_header[7:]
+    # No session → return guest user (open access)
     if not session_token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        return _GUEST_USER
 
     session = await db.user_sessions.find_one({"session_token": session_token}, {"_id": 0})
     if not session:
-        raise HTTPException(status_code=401, detail="Invalid session")
+        return _GUEST_USER
 
     expires_at = session["expires_at"]
     if isinstance(expires_at, str):

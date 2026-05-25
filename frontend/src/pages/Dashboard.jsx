@@ -389,7 +389,7 @@ export default function Dashboard() {
 
   const handleLogout = async () => { await logout(); navigate("/"); };
 
-  const isPro = subscription?.tier === "pro" || user?.is_admin === true;
+  const isPro = true; // open-access mode — all features unlocked
 
   const filteredExams = exams.filter(exam => {
     if (selectedType === "ielts") return !exam.exam_type || exam.exam_type === "ielts";
@@ -460,18 +460,8 @@ export default function Dashboard() {
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <ExamTypeCard type="ielts" selected={selectedType === "ielts"} onSelect={() => setSelectedType("ielts")} />
-            <ExamTypeCard type="telc"  selected={selectedType === "telc"}  onSelect={() => { if (isPro) setSelectedType("telc"); else navigate("/pricing"); }} />
+            <ExamTypeCard type="telc"  selected={selectedType === "telc"}  onSelect={() => setSelectedType("telc")} />
           </div>
-          {!isPro && (
-            <p className="text-xs mt-3 flex items-center gap-1.5" style={{ color: "var(--ps-body-gray)" }}>
-              <Lock size={11} style={{ color: "var(--ps-blue)" }} />
-              TELC Deutsch requires a Pro subscription.{" "}
-              <button onClick={() => navigate("/pricing")}
-                className="font-semibold hover:underline" style={{ color: "var(--ps-blue)" }}>
-                Upgrade now
-              </button>
-            </p>
-          )}
         </motion.section>
 
         {/* ── Progress ── */}
