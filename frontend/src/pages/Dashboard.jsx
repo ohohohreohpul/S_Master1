@@ -314,7 +314,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [subscription, setSubscription] = useState(null);
 
-  const [selectedType, setSelectedType] = useState("ielts");
+  const [selectedType, setSelectedType] = useState("telc");
   const [generating, setGenerating] = useState(false);
   const [generatingTelc, setGeneratingTelc] = useState(false);
   const [showTelcDropdown, setShowTelcDropdown] = useState(false);
@@ -458,9 +458,8 @@ export default function Dashboard() {
           <p className="text-xs font-semibold uppercase tracking-widest mb-4" style={{ color: "var(--ps-body-gray)" }}>
             What are you practicing today?
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <ExamTypeCard type="ielts" selected={selectedType === "ielts"} onSelect={() => setSelectedType("ielts")} />
-            <ExamTypeCard type="telc"  selected={selectedType === "telc"}  onSelect={() => setSelectedType("telc")} />
+          <div className="grid grid-cols-1 gap-4">
+            <ExamTypeCard type="telc" selected={true} onSelect={() => {}} />
           </div>
         </motion.section>
 
