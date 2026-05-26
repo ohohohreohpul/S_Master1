@@ -1,373 +1,336 @@
 """
-Supabase database layer — MongoDB-compatible shim.
+InsForge database layer — MongoDB-compatible shim.
 
-Provides a `DB` class whose collection attributes expose the same
-async API as Motor (find_one, insert_one, update_one / $set / $unset,
-delete_one, delete_many, count_documents, find().sort().to_list()).
-This lets server.py keep all its `db.collection.method()` calls unchanged.
+Uses the InsForge REST API (/api/database/records/{table}) instead of the
+Supabase Python SDK (which requires PostgREST at /rest/v1/ — not available on
+InsForge). Provides the same async API as before so server.py is unchanged.
 
-Audio files are the exception: call `insert_audio_file()` directly so
-bytes go to Supabase Storage instead of a base64 column.
+Audio files go through the InsForge Storage API (/api/storage/buckets/).
 """
 from __future__ import annotations
 
 import asyncio
+import copy
 import logging
 import os
-from datetime import datetime, timezone
 from typing import Any
 
-from supabase import create_client, Client
+import httpx
 
 logger = logging.getLogger(__name__)
 
-AUDIO_BUCKET: str = os.environ.get("SUPABASE_AUDIO_BUCKET", "audio-files")
+# ── Config ─────────────────────────────────────────────────────────────────────
+_BASE_URL: str = (
+    os.environ.get("INSFORGE_URL")
+    or os.environ.get("SUPABASE_URL")
+    or ""
+)
+_API_KEY: str = (
+    os.environ.get("INSFORGE_API_KEY")
+    or os.environ.get("SUPABASE_SERVICE_KEY")
+    or ""
+)
+AUDIO_BUCKET: str = (
+    os.environ.get("INSFORGE_AUDIO_BUCKET")
+    or os.environ.get("SUPABASE_AUDIO_BUCKET")
+    or "audio-files"
+)
 
-_supabase: Client | None = None
-
-
-def _get() -> Client:
-    global _supabase
-    if _supabase is None:
-        _supabase = create_client(
-            os.environ["SUPABASE_URL"],
-            os.environ["SUPABASE_SERVICE_KEY"],
-        )
-    return _supabase
-
-
-async def _run(fn) -> Any:
-    loop = asyncio.get_event_loop()
-    try:
-        return await loop.run_in_executor(None, fn)
-    except Exception as e:
-        # Supabase drops HTTP/2 connections after idle; recreate client and retry once
-        if "RemoteProtocolError" in type(e).__name__ or "ConnectionTerminated" in str(e):
-            global _supabase
-            _supabase = None
-            logger.warning("Supabase connection dropped, reconnecting...")
-            return await loop.run_in_executor(None, fn)
-        raise
+_HEADERS = {
+    "Authorization": f"Bearer {_API_KEY}",
+    "Content-Type": "application/json",
+}
 
 
-# ── JSONB path helpers ────────────────────────────────────────────────────────
-
-def _set_at_path(obj: Any, path: list, value: Any) -> None:
-    for key in path[:-1]:
-        try:
-            key = int(key)
-        except (ValueError, TypeError):
-            pass
-        obj = obj[key] if isinstance(obj, list) else obj.setdefault(str(key), {})
-    final = path[-1]
-    try:
-        final = int(final)
-    except (ValueError, TypeError):
-        pass
-    if isinstance(obj, list):
-        obj[final] = value
-    else:
-        obj[str(final)] = value
+def _records_url(table: str) -> str:
+    return f"{_BASE_URL}/api/database/records/{table}"
 
 
-def _del_at_path(obj: Any, path: list) -> None:
-    for key in path[:-1]:
-        try:
-            key = int(key)
-        except (ValueError, TypeError):
-            pass
-        if isinstance(obj, list):
-            obj = obj[int(key)]
+def _storage_url(path: str = "") -> str:
+    return f"{_BASE_URL}/api/storage{path}"
+
+
+# ── Filter builder ─────────────────────────────────────────────────────────────
+
+def _build_params(filter_dict: dict) -> dict:
+    """Convert a MongoDB-style filter dict to InsForge query params."""
+    params: dict = {}
+    for k, v in (filter_dict or {}).items():
+        if k.startswith("$"):
+            continue  # skip top-level operators ($or etc — not used here)
+        if isinstance(v, dict):
+            for op, val in v.items():
+                if op == "$eq":
+                    params[k] = f"eq.{val}"
+                elif op == "$ne":
+                    params[k] = f"neq.{val}"
+                elif op == "$gt":
+                    params[k] = f"gt.{val}"
+                elif op == "$gte":
+                    params[k] = f"gte.{val}"
+                elif op == "$lt":
+                    params[k] = f"lt.{val}"
+                elif op == "$lte":
+                    params[k] = f"lte.{val}"
+                elif op == "$in":
+                    params[k] = f"in.({','.join(str(x) for x in val)})"
         else:
-            obj = obj.get(str(key), {})
-    final = path[-1]
-    try:
-        final = int(final)
-        if isinstance(obj, list):
-            obj[final] = None
-    except (ValueError, TypeError):
-        if isinstance(obj, dict) and str(final) in obj:
-            del obj[str(final)]
+            params[k] = f"eq.{v}"
+    return params
 
 
-# ── Query builder (returned by Collection.find()) ────────────────────────────
+# ── Deep-merge helpers for $set / $unset ──────────────────────────────────────
+
+def _apply_set(doc: dict, set_dict: dict) -> dict:
+    """Return a new doc with $set values applied (supports dot-notation paths)."""
+    result = copy.deepcopy(doc)
+    for path, value in set_dict.items():
+        parts = path.split(".")
+        node = result
+        for part in parts[:-1]:
+            try:
+                idx = int(part)
+                node = node[idx]
+            except (ValueError, TypeError):
+                if part not in node or not isinstance(node[part], (dict, list)):
+                    node[part] = {}
+                node = node[part]
+        leaf = parts[-1]
+        try:
+            leaf_idx = int(leaf)
+            node[leaf_idx] = value
+        except (ValueError, TypeError):
+            node[leaf] = value
+    return result
+
+
+def _apply_unset(doc: dict, unset_dict: dict) -> dict:
+    """Return a new doc with $unset keys removed."""
+    result = copy.deepcopy(doc)
+    for path in unset_dict:
+        parts = path.split(".")
+        node = result
+        for part in parts[:-1]:
+            try:
+                node = node[int(part)]
+            except (ValueError, TypeError, KeyError, IndexError):
+                node = node.get(part, {})
+        leaf = parts[-1]
+        try:
+            del node[int(leaf)]
+        except (ValueError, TypeError, KeyError, IndexError):
+            node.pop(leaf, None)
+    return result
+
+
+# ── HTTP helpers ───────────────────────────────────────────────────────────────
+
+async def _get(table: str, params: dict) -> list:
+    async with httpx.AsyncClient(timeout=30) as c:
+        r = await c.get(_records_url(table), headers=_HEADERS, params=params)
+        r.raise_for_status()
+        return r.json() or []
+
+
+async def _post(table: str, body: list, prefer: str = "") -> list:
+    headers = {**_HEADERS}
+    if prefer:
+        headers["Prefer"] = prefer
+    async with httpx.AsyncClient(timeout=30) as c:
+        r = await c.post(_records_url(table), headers=headers, json=body)
+        r.raise_for_status()
+        return r.json() or []
+
+
+async def _patch(table: str, params: dict, body: dict, prefer: str = "return=representation") -> list:
+    headers = {**_HEADERS, "Prefer": prefer}
+    async with httpx.AsyncClient(timeout=30) as c:
+        r = await c.patch(_records_url(table), headers=headers, params=params, json=body)
+        r.raise_for_status()
+        return r.json() or []
+
+
+async def _delete(table: str, params: dict) -> None:
+    async with httpx.AsyncClient(timeout=30) as c:
+        r = await c.delete(_records_url(table), headers=_HEADERS, params=params)
+        r.raise_for_status()
+
+
+async def _count(table: str, params: dict) -> int:
+    headers = {**_HEADERS, "Prefer": "count=exact"}
+    async with httpx.AsyncClient(timeout=30) as c:
+        r = await c.get(_records_url(table), headers=headers, params={**params, "limit": "0"})
+        r.raise_for_status()
+        total = r.headers.get("X-Total-Count", "0")
+        return int(total)
+
+
+# ── Collection interface ───────────────────────────────────────────────────────
 
 class FindQuery:
-    def __init__(self, table: str, filter_: dict):
+    def __init__(self, table: str, params: dict, projection: dict | None = None):
         self._table = table
-        self._filter = filter_
+        self._params = dict(params)
+        self._projection = projection
         self._sort_field: str | None = None
-        self._sort_desc = True
+        self._sort_dir: str = "asc"
+        self._limit_val: int | None = None
 
-    def sort(self, field: str, direction: int) -> "FindQuery":
+    def sort(self, field: str, direction: int = 1) -> "FindQuery":
         self._sort_field = field
-        self._sort_desc = direction == -1
+        self._sort_dir = "asc" if direction >= 0 else "desc"
         return self
 
-    async def to_list(self, max_count: int) -> list:
-        table = self._table
-        filter_ = self._filter
-        sort_field = self._sort_field
-        sort_desc = self._sort_desc
+    def limit(self, n: int) -> "FindQuery":
+        self._limit_val = n
+        return self
 
-        def _():
-            q = _get().table(table).select("*")
-            q = _apply_filter(q, filter_)
-            if sort_field:
-                q = q.order(sort_field, desc=sort_desc)
-            r = q.limit(max_count).execute()
-            return r.data or []
+    async def to_list(self, length: int | None = None) -> list:
+        params = dict(self._params)
+        if self._sort_field:
+            params["order"] = f"{self._sort_field}.{self._sort_dir}"
+        cap = length or self._limit_val or 1000
+        params["limit"] = str(cap)
+        rows = await _get(self._table, params)
+        return rows
 
-        return await _run(_)
-
-
-def _apply_filter(q, filter_: dict):
-    for k, v in filter_.items():
-        if isinstance(v, dict):
-            if "$in" in v:
-                vals = v["$in"]
-                non_null = [x for x in vals if x is not None]
-                has_null = any(x is None for x in vals)
-                if non_null and has_null:
-                    q = q.or_(
-                        f"{k}.in.({','.join(str(x) for x in non_null)}),{k}.is.null"
-                    )
-                elif non_null:
-                    q = q.in_(k, non_null)
-                elif has_null:
-                    q = q.is_(k, "null")
-        elif v is None:
-            q = q.is_(k, "null")
-        elif "." in k:
-            # Dot-notation → JSONB text access: subscription.tier → subscription->>'tier'
-            col, jsonb_key = k.split(".", 1)
-            q = q.filter(f"{col}->>{jsonb_key!r}", "eq", str(v))
-        else:
-            q = q.eq(k, v)
-    return q
-
-
-# ── DeleteResult shim ─────────────────────────────────────────────────────────
-
-class DeleteResult:
-    def __init__(self, count: int):
-        self.deleted_count = count
-
-
-# ── Collection ────────────────────────────────────────────────────────────────
 
 class Collection:
     def __init__(self, table: str):
         self._table = table
 
-    async def find_one(self, filter_: dict, projection: dict = None) -> dict | None:
-        table = self._table
+    async def find_one(self, filter_dict: dict, projection: dict | None = None) -> dict | None:
+        params = _build_params(filter_dict)
+        params["limit"] = "1"
+        rows = await _get(self._table, params)
+        return rows[0] if rows else None
 
-        def _():
-            q = _apply_filter(_get().table(table).select("*"), filter_)
-            r = q.limit(1).execute()
-            return r.data[0] if r.data else None
+    def find(self, filter_dict: dict | None = None, projection: dict | None = None) -> FindQuery:
+        params = _build_params(filter_dict or {})
+        return FindQuery(self._table, params, projection)
 
-        return await _run(_)
+    async def insert_one(self, doc: dict) -> dict:
+        rows = await _post(self._table, [doc], prefer="return=representation")
+        return rows[0] if rows else doc
 
-    async def insert_one(self, doc: dict) -> None:
-        table = self._table
-        await _run(lambda: _get().table(table).insert(doc).execute())
+    async def update_one(self, filter_dict: dict, update: dict) -> None:
+        """
+        Applies $set / $unset operators by fetching the existing doc,
+        merging changes, and PATCHing it back — required for JSONB columns.
+        """
+        existing = await self.find_one(filter_dict)
+        if existing is None:
+            return
 
-    async def update_one(self, filter_: dict, update: dict) -> None:
-        pk_field, pk_value = next(iter(filter_.items()))
-
+        result = copy.deepcopy(existing)
         if "$set" in update:
-            await self._apply_set(pk_field, pk_value, update["$set"])
+            result = _apply_set(result, update["$set"])
         if "$unset" in update:
-            await self._apply_unset(pk_field, pk_value, update["$unset"])
-        if not any(k.startswith("$") for k in update):
-            await self._apply_set(pk_field, pk_value, update)
+            result = _apply_unset(result, update["$unset"])
 
-    async def _apply_set(self, pk_field: str, pk_value: Any, updates: dict) -> None:
-        flat: dict[str, Any] = {}
-        nested: dict[str, list[tuple[str, Any]]] = {}
+        # Remove internal InsForge meta-fields that can't be patched
+        result.pop("_id", None)
 
-        for key, value in updates.items():
-            if "." in key:
-                col, subpath = key.split(".", 1)
-                nested.setdefault(col, []).append((subpath, value))
-            else:
-                flat[key] = value
+        params = _build_params(filter_dict)
+        await _patch(self._table, params, result)
 
-        table = self._table
+    async def delete_one(self, filter_dict: dict) -> None:
+        row = await self.find_one(filter_dict)
+        if row is None:
+            return
+        # Build params from original filter — limit to 1 via a unique field if possible
+        params = _build_params(filter_dict)
+        params["limit"] = "1"
+        await _delete(self._table, params)
 
-        if flat:
-            await _run(
-                lambda: _get().table(table).update(flat).eq(pk_field, pk_value).execute()
-            )
+    async def delete_many(self, filter_dict: dict) -> None:
+        await _delete(self._table, _build_params(filter_dict))
 
-        for col, path_updates in nested.items():
-            col_snap = col
+    async def count_documents(self, filter_dict: dict) -> int:
+        return await _count(self._table, _build_params(filter_dict))
 
-            def _fetch(col_snap=col_snap):
-                r = (
-                    _get()
-                    .table(table)
-                    .select(col_snap)
-                    .eq(pk_field, pk_value)
-                    .limit(1)
-                    .execute()
-                )
-                return r.data[0].get(col_snap) or {} if r.data else {}
-
-            col_data = await _run(_fetch)
-
-            for subpath, value in path_updates:
-                _set_at_path(col_data, subpath.split("."), value)
-
-            snap = col_data
-
-            await _run(
-                lambda snap=snap, col_snap=col_snap: _get()
-                .table(table)
-                .update({col_snap: snap})
-                .eq(pk_field, pk_value)
-                .execute()
-            )
-
-    async def _apply_unset(self, pk_field: str, pk_value: Any, unsets: dict) -> None:
-        flat_nulls: list[str] = []
-        nested: dict[str, list[str]] = {}
-
-        for key in unsets:
-            if "." in key:
-                col, subpath = key.split(".", 1)
-                nested.setdefault(col, []).append(subpath)
-            else:
-                flat_nulls.append(key)
-
-        table = self._table
-
-        if flat_nulls:
-            await _run(
-                lambda: _get()
-                .table(table)
-                .update({k: None for k in flat_nulls})
-                .eq(pk_field, pk_value)
-                .execute()
-            )
-
-        for col, paths in nested.items():
-            col_snap = col
-
-            def _fetch(col_snap=col_snap):
-                r = (
-                    _get()
-                    .table(table)
-                    .select(col_snap)
-                    .eq(pk_field, pk_value)
-                    .limit(1)
-                    .execute()
-                )
-                return r.data[0].get(col_snap) or {} if r.data else {}
-
-            col_data = await _run(_fetch)
-
-            for path in paths:
-                _del_at_path(col_data, path.split("."))
-
-            snap = col_data
-            await _run(
-                lambda snap=snap, col_snap=col_snap: _get()
-                .table(table)
-                .update({col_snap: snap})
-                .eq(pk_field, pk_value)
-                .execute()
-            )
-
-    async def delete_one(self, filter_: dict) -> None:
-        table = self._table
-        pk_field, pk_value = next(iter(filter_.items()))
-        await _run(
-            lambda: _get().table(table).delete().eq(pk_field, pk_value).execute()
-        )
-
-    async def delete_many(self, filter_: dict) -> DeleteResult:
-        table = self._table
-        pk_field, pk_value = next(iter(filter_.items()))
-        r = await _run(
-            lambda: _get().table(table).delete().eq(pk_field, pk_value).execute()
-        )
-        return DeleteResult(len(r.data) if r.data else 0)
-
-    async def count_documents(self, filter_: dict) -> int:
-        table = self._table
-
-        def _():
-            q = _apply_filter(
-                _get().table(table).select("*", count="exact"), filter_
-            )
-            r = q.execute()
-            return r.count or 0
-
-        return await _run(_)
-
-    def find(self, filter_: dict, projection: dict = None) -> FindQuery:
-        return FindQuery(self._table, filter_)
-
-
-# ── DB facade (drop-in for `motor` db object) ─────────────────────────────────
 
 class DB:
     def __init__(self):
+        self.exams         = Collection("exams")
         self.users         = Collection("users")
         self.user_sessions = Collection("user_sessions")
-        self.exams         = Collection("exams")
-        self.audio_files   = Collection("audio_files")
         self.attempts      = Collection("attempts")
+        self.audio_files   = Collection("audio_files")
 
 
-# ── Audio storage helpers ─────────────────────────────────────────────────────
+# ── Audio / Storage helpers ────────────────────────────────────────────────────
 
-async def insert_audio_file(
-    audio_id: str,
-    exam_id: str,
-    audio_bytes: bytes,
-    meta: dict,
-) -> None:
-    """Upload audio to Supabase Storage and record metadata in audio_files table."""
-    storage_path = f"{exam_id}/{audio_id}.mp3"
+async def insert_audio_file(audio_id: str, exam_id: str, audio_bytes: bytes, metadata: dict) -> None:
+    """Upload audio bytes to InsForge Storage and record the reference in audio_files."""
+    filename = f"{audio_id}.mp3"
 
-    def _():
-        _get().storage.from_(AUDIO_BUCKET).upload(
-            storage_path,
-            audio_bytes,
-            {"content-type": "audio/mpeg", "upsert": "true"},
+    # Step 1: get upload strategy
+    async with httpx.AsyncClient(timeout=30) as c:
+        strat_r = await c.post(
+            _storage_url(f"/buckets/{AUDIO_BUCKET}/upload-strategy"),
+            headers=_HEADERS,
+            json={"filename": filename, "contentType": "audio/mpeg", "size": len(audio_bytes)},
         )
-        _get().table("audio_files").insert(
-            {
-                "audio_id": audio_id,
-                "exam_id": exam_id,
-                "storage_path": storage_path,
-                "format": "mp3",
-                "created_at": datetime.now(timezone.utc).isoformat(),
-                **{k: v for k, v in meta.items() if v is not None},
-            }
-        ).execute()
+        strat_r.raise_for_status()
+        strat = strat_r.json()
 
-    await _run(_)
+    method = strat.get("method", "direct")
+    object_key: str
+
+    if method == "presigned":
+        # S3 presigned upload
+        upload_url = strat["uploadUrl"]
+        fields = strat.get("fields", {})
+        object_key = fields.get("key", f"{AUDIO_BUCKET}/{filename}")
+
+        async with httpx.AsyncClient(timeout=60) as c:
+            form = {k: (None, v) for k, v in fields.items()}
+            form["file"] = (filename, audio_bytes, "audio/mpeg")
+            r = await c.post(upload_url, files=form)
+            r.raise_for_status()
+
+        # Step 3: confirm upload (S3 only)
+        async with httpx.AsyncClient(timeout=30) as c:
+            conf_r = await c.post(
+                _storage_url(f"/buckets/{AUDIO_BUCKET}/upload-confirm"),
+                headers=_HEADERS,
+                json={"key": object_key},
+            )
+            conf_r.raise_for_status()
+    else:
+        # Direct upload
+        upload_url = strat.get("uploadUrl", _storage_url(f"/buckets/{AUDIO_BUCKET}/objects/{filename}"))
+        object_key = strat.get("objectKey", filename)
+
+        async with httpx.AsyncClient(timeout=60) as c:
+            r = await c.put(
+                upload_url,
+                content=audio_bytes,
+                headers={**_HEADERS, "Content-Type": "audio/mpeg"},
+            )
+            r.raise_for_status()
+
+    # Record in audio_files table
+    await _post("audio_files", [{
+        "audio_id": audio_id,
+        "exam_id": exam_id,
+        "file_path": object_key,
+        "bucket": AUDIO_BUCKET,
+        **{k: v for k, v in metadata.items()},
+    }])
 
 
 async def get_audio_path(audio_id: str) -> str | None:
-    def _():
-        r = (
-            _get()
-            .table("audio_files")
-            .select("storage_path")
-            .eq("audio_id", audio_id)
-            .limit(1)
-            .execute()
-        )
-        return r.data[0]["storage_path"] if r.data else None
-
-    return await _run(_)
+    rows = await _get("audio_files", {"audio_id": f"eq.{audio_id}", "limit": "1"})
+    if not rows:
+        return None
+    return rows[0].get("file_path")
 
 
-def get_audio_public_url(storage_path: str) -> str:
-    return _get().storage.from_(AUDIO_BUCKET).get_public_url(storage_path)
+async def get_audio_public_url(audio_id: str) -> str | None:
+    path = await get_audio_path(audio_id)
+    if not path:
+        return None
+    # Public URL for InsForge storage
+    return f"{_BASE_URL}/api/storage/buckets/{AUDIO_BUCKET}/objects/{path}?download=false"
