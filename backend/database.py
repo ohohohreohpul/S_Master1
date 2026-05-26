@@ -264,46 +264,43 @@ class DB:
 async def insert_audio_file(audio_id: str, exam_id: str, audio_bytes: bytes, metadata: dict) -> None:
     """Upload audio bytes to InsForge Storage and record the reference in audio_files."""
     filename = f"{audio_id}.mp3"
+    size = len(audio_bytes)
 
-    # Step 1: get upload strategy
-    async with httpx.AsyncClient(timeout=30) as c:
+    async with httpx.AsyncClient(timeout=60) as c:
+        # Step 1: get upload strategy
         strat_r = await c.post(
             _storage_url(f"/buckets/{AUDIO_BUCKET}/upload-strategy"),
             headers=_HEADERS,
-            json={"filename": filename, "contentType": "audio/mpeg", "size": len(audio_bytes)},
+            json={"filename": filename, "contentType": "audio/mpeg", "size": size},
         )
         strat_r.raise_for_status()
         strat = strat_r.json()
 
-    method = strat.get("method", "direct")
-    object_key: str
+        method = strat.get("method", "direct")
+        object_key: str = strat.get("key", filename)
 
-    if method == "presigned":
-        # S3 presigned upload
-        upload_url = strat["uploadUrl"]
-        fields = strat.get("fields", {})
-        object_key = fields.get("key", f"{AUDIO_BUCKET}/{filename}")
-
-        async with httpx.AsyncClient(timeout=60) as c:
+        if method == "presigned":
+            # S3 presigned multipart POST — fields must come before file
+            upload_url = strat["uploadUrl"]
+            fields = strat.get("fields", {})
             form = {k: (None, v) for k, v in fields.items()}
             form["file"] = (filename, audio_bytes, "audio/mpeg")
-            r = await c.post(upload_url, files=form)
-            r.raise_for_status()
+            r = await c.post(upload_url, files=form, timeout=60)
+            if r.status_code not in (200, 204):
+                r.raise_for_status()
 
-        # Step 3: confirm upload (S3 only)
-        async with httpx.AsyncClient(timeout=30) as c:
-            conf_r = await c.post(
-                _storage_url(f"/buckets/{AUDIO_BUCKET}/upload-confirm"),
-                headers=_HEADERS,
-                json={"key": object_key},
-            )
-            conf_r.raise_for_status()
-    else:
-        # Direct upload
-        upload_url = strat.get("uploadUrl", _storage_url(f"/buckets/{AUDIO_BUCKET}/objects/{filename}"))
-        object_key = strat.get("objectKey", filename)
-
-        async with httpx.AsyncClient(timeout=60) as c:
+            # Step 2: confirm (if required) — must pass size
+            if strat.get("confirmRequired"):
+                confirm_path = strat["confirmUrl"]  # relative, e.g. /api/storage/buckets/…
+                conf_r = await c.post(
+                    f"{_BASE_URL}{confirm_path}",
+                    headers=_HEADERS,
+                    json={"size": size},
+                )
+                conf_r.raise_for_status()
+        else:
+            # Direct upload
+            upload_url = strat.get("uploadUrl", _storage_url(f"/buckets/{AUDIO_BUCKET}/objects/{filename}"))
             r = await c.put(
                 upload_url,
                 content=audio_bytes,
@@ -311,13 +308,12 @@ async def insert_audio_file(audio_id: str, exam_id: str, audio_bytes: bytes, met
             )
             r.raise_for_status()
 
-    # Record in audio_files table
+    # Record in audio_files table (column is storage_path, not file_path)
     await _post("audio_files", [{
         "audio_id": audio_id,
         "exam_id": exam_id,
-        "file_path": object_key,
-        "bucket": AUDIO_BUCKET,
-        **{k: v for k, v in metadata.items()},
+        "storage_path": object_key,
+        "audio_type": metadata.get("audio_type", "content"),
     }])
 
 
@@ -325,12 +321,12 @@ async def get_audio_path(audio_id: str) -> str | None:
     rows = await _get("audio_files", {"audio_id": f"eq.{audio_id}", "limit": "1"})
     if not rows:
         return None
-    return rows[0].get("file_path")
+    return rows[0].get("storage_path")
 
 
 async def get_audio_public_url(audio_id: str) -> str | None:
     path = await get_audio_path(audio_id)
     if not path:
         return None
-    # Public URL for InsForge storage
-    return f"{_BASE_URL}/api/storage/buckets/{AUDIO_BUCKET}/objects/{path}?download=false"
+    # Public URL — bucket is public, no auth needed
+    return f"{_BASE_URL}/api/storage/buckets/{AUDIO_BUCKET}/objects/{path}"
