@@ -637,16 +637,14 @@ async def get_exam_status(exam_id: str):
 # ==========================================
 @api_router.get("/audio/{audio_id}")
 async def get_audio(audio_id: str):
+    from starlette.responses import RedirectResponse as _Redirect
     storage_path = await database.get_audio_path(audio_id)
     if not storage_path:
         raise HTTPException(404, "Audio not found")
     public_url = database.get_audio_public_url(storage_path)
-    async with httpx.AsyncClient(timeout=30) as client:
-        r = await client.get(public_url)
-        r.raise_for_status()
-    return Response(content=r.content, media_type="audio/mpeg",
-        headers={"Content-Disposition": f"inline; filename={audio_id}.mp3",
-                 "Cache-Control": "public, max-age=86400"})
+    # InsForge storage returns a 302 → CDN. Redirect the client directly;
+    # browsers + fetch(credentials:"include") follow redirects transparently.
+    return _Redirect(public_url, status_code=302)
 
 # ==========================================
 # SPEECH-TO-TEXT (Replicate openai/whisper)

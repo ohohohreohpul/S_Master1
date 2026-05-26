@@ -324,9 +324,6 @@ async def get_audio_path(audio_id: str) -> str | None:
     return rows[0].get("storage_path")
 
 
-async def get_audio_public_url(audio_id: str) -> str | None:
-    path = await get_audio_path(audio_id)
-    if not path:
-        return None
-    # Public URL — bucket is public, no auth needed
-    return f"{_BASE_URL}/api/storage/buckets/{AUDIO_BUCKET}/objects/{path}"
+def get_audio_public_url(storage_path: str) -> str:
+    """Construct public URL from a storage_path (key within the bucket)."""
+    return f"{_BASE_URL}/api/storage/buckets/{AUDIO_BUCKET}/objects/{storage_path}"
