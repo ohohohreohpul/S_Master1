@@ -2594,6 +2594,1363 @@ Die langfristigen gesellschaftlichen Auswirkungen sind noch nicht absehbar. Stad
         }
     }
 
+
+def get_telc_b2_seed_002():
+    return {
+        "exam_id": "exam_telc_b2_002",
+        "title": "TELC Deutsch B2 - Übungstest 2",
+        "exam_type": "telc",
+        "telc_level": "B2",
+        "pathway": "telc_b2",
+        "status": "pending_audio",
+        "audio_progress": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "lesen": {
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "zuordnung",
+                    "instructions": "Lesen Sie die folgenden Texte A–E und die Überschriften a–j. Ordnen Sie jedem Text die passende Überschrift zu. Fünf Überschriften passen nicht.",
+                    "texts": [
+                        {
+                            "id": "A",
+                            "text": "Immer mehr Unternehmen stellen fest, dass ihre Mitarbeiter im Homeoffice produktiver arbeiten als im Büro. Eine aktuelle Studie des Fraunhofer-Instituts zeigt, dass Beschäftigte zu Hause durchschnittlich 15 Prozent mehr Aufgaben erledigen. Experten führen dies auf die ruhigere Arbeitsumgebung und die wegfallenden Pendelzeiten zurück. Allerdings betonen Arbeitspsychologen, dass dies stark von der individuellen Persönlichkeit und den häuslichen Verhältnissen abhänge.",
+                            "word_count": 78
+                        },
+                        {
+                            "id": "B",
+                            "text": "Die Digitalisierung verändert nicht nur die Art, wie wir arbeiten, sondern auch, welche Qualifikationen Arbeitgeber suchen. Kenntnisse in der Datenanalyse, im Umgang mit künstlicher Intelligenz und in der Cybersicherheit sind heute in nahezu jeder Branche gefragt. Bildungseinrichtungen reagieren auf diesen Wandel mit neuen Studiengängen und berufsbegleitenden Zertifikatsprogrammen, die auf die Anforderungen der digitalen Wirtschaft zugeschnitten sind.",
+                            "word_count": 70
+                        },
+                        {
+                            "id": "C",
+                            "text": "Das sogenannte Recht auf Nichterreichbarkeit wird in Deutschland zunehmend diskutiert. Gewerkschaften fordern gesetzliche Regelungen, die Arbeitnehmer davor schützen, außerhalb der regulären Arbeitszeiten per E-Mail oder Telefon kontaktiert zu werden. In Frankreich und Portugal existieren solche Regelungen bereits. Kritiker hingegen argumentieren, dass flexible Arbeitszeiten und moderne Kommunikationsmittel eine starre Trennung von Arbeits- und Freizeit ohnehin unmöglich machen.",
+                            "word_count": 73
+                        },
+                        {
+                            "id": "D",
+                            "text": "Co-Working-Spaces erleben seit der Pandemie einen neuen Aufschwung. Viele Selbstständige und Remote-Mitarbeiter schätzen diese geteilten Arbeitsflächen als Kompromiss zwischen Homeoffice und klassischem Büro. Sie bieten nicht nur Schreibtischplätze und schnelles Internet, sondern auch die Möglichkeit, spontan Kontakte zu knüpfen und sich auszutauschen. In Großstädten wie Berlin, Hamburg und München wächst das Angebot an solchen Räumen stetig.",
+                            "word_count": 72
+                        },
+                        {
+                            "id": "E",
+                            "text": "Videokonferenzen sind aus dem modernen Arbeitsleben nicht mehr wegzudenken. Doch viele Beschäftigte leiden unter der sogenannten Zoom-Fatigue — einer Erschöpfung, die durch stundenlange virtuelle Besprechungen entsteht. Forschungen zeigen, dass der intensive Blickkontakt auf dem Bildschirm, die ständige Selbstwahrnehmung durch das eigene Kamerabild und das Fehlen nonverbaler Kommunikation das Gehirn stärker beanspruchen als Gespräche in Präsenz.",
+                            "word_count": 70
+                        }
+                    ],
+                    "headings": [
+                        {"id": "a", "text": "Neue Kompetenzen für die digitale Arbeitswelt"},
+                        {"id": "b", "text": "Warum virtuelle Meetings so ermüdend sind"},
+                        {"id": "c", "text": "Höhere Leistung außerhalb des Büros"},
+                        {"id": "d", "text": "Gemeinsam arbeiten — aber nicht zusammen"},
+                        {"id": "e", "text": "Gesetzlicher Schutz vor ständiger Erreichbarkeit"},
+                        {"id": "f", "text": "Homeoffice als Ursache sozialer Isolation"},
+                        {"id": "g", "text": "Technologische Sicherheitsrisiken im Heimnetzwerk"},
+                        {"id": "h", "text": "Nachhaltigkeit durch digitale Prozesse"},
+                        {"id": "i", "text": "Führungskräfte im Wandel der digitalen Ära"},
+                        {"id": "j", "text": "Flexibles Arbeiten als Karrierehemmnis"}
+                    ],
+                    "questions": [
+                        {"question_num": 1, "question_text": "Text A", "correct_answer": "c"},
+                        {"question_num": 2, "question_text": "Text B", "correct_answer": "a"},
+                        {"question_num": 3, "question_text": "Text C", "correct_answer": "e"},
+                        {"question_num": 4, "question_text": "Text D", "correct_answer": "d"},
+                        {"question_num": 5, "question_text": "Text E", "correct_answer": "b"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "multiple_choice",
+                    "instructions": "Lesen Sie den folgenden Text und beantworten Sie die Fragen. Wählen Sie bei jeder Frage die richtige Antwort a, b oder c.",
+                    "text_title": "Fachkräftemangel in Deutschland: Herausforderungen und Lösungsansätze",
+                    "text": "Der Fachkräftemangel ist eine der drängendsten wirtschaftlichen Herausforderungen Deutschlands. Laut einer Studie des Instituts für Arbeitsmarkt- und Berufsforschung (IAB) fehlen derzeit in Deutschland über 1,7 Millionen qualifizierte Arbeitskräfte. Besonders betroffen sind die Bereiche Pflege, Handwerk, Ingenieurwesen und Informationstechnologie. Die Folgen sind gravierend: Unternehmen können Aufträge nicht annehmen, Projekte verzögern sich, und die Wettbewerbsfähigkeit des Standortes Deutschland leidet.\n\nDie Ursachen des Mangels sind vielfältig. Einerseits scheiden geburtenstarke Jahrgänge der sogenannten Babyboomer-Generation aus dem Arbeitsleben aus, ohne dass ausreichend jüngere Arbeitskräfte nachfolgen. Andererseits hat die Digitalisierung in vielen Branchen neue Berufsbilder entstehen lassen, für die bislang kaum ausgebildete Fachleute zur Verfügung stehen.\n\nPolitik und Wirtschaft reagieren mit verschiedenen Strategien. Das Fachkräfteeinwanderungsgesetz, das 2020 in Kraft trat und 2023 weiter reformiert wurde, soll die Zuwanderung qualifizierter Arbeitskräfte aus Nicht-EU-Ländern erleichtern. Anerkennungsverfahren für ausländische Berufsabschlüsse wurden vereinfacht, und die Möglichkeiten zur Jobsuche vor der eigentlichen Einwanderung wurden ausgeweitet. Erste Erfolge sind sichtbar: Die Zahl der zugewanderten Fachkräfte ist gestiegen.\n\nGleichzeitig setzen Unternehmen verstärkt auf die Qualifizierung ihrer bestehenden Belegschaft. Weiterbildungsprogramme, die gezielt digitale Kompetenzen vermitteln, werden staatlich gefördert. Das Konzept des lebenslangen Lernens gewinnt an Bedeutung, wobei Online-Plattformen und berufsbegleitende Kurse eine zentrale Rolle spielen.\n\nExperten warnen jedoch, dass kurzfristige Maßnahmen allein nicht ausreichen werden. Eine nachhaltige Lösung erfordere strukturelle Veränderungen im Bildungssystem, attraktivere Rahmenbedingungen für Familien und eine konsequente Förderung von Frauen in technischen Berufen. Nur ein umfassender Ansatz könne den Fachkräftemangel mittelfristig beheben.",
+                    "questions": [
+                        {
+                            "question_num": 6,
+                            "question_text": "Wie viele Fachkräfte fehlen laut IAB-Studie in Deutschland?",
+                            "options": ["a) Über 1,7 Millionen", "b) Rund 500.000", "c) Mehr als 3 Millionen"],
+                            "correct_answer": "a"
+                        },
+                        {
+                            "question_num": 7,
+                            "question_text": "Was ist eine der Hauptursachen des Fachkräftemangels?",
+                            "options": ["a) Zu viele Studienabgänger in technischen Fächern", "b) Das Ausscheiden der Babyboomer-Generation aus dem Berufsleben", "c) Rückgang der Digitalisierung in deutschen Unternehmen"],
+                            "correct_answer": "b"
+                        },
+                        {
+                            "question_num": 8,
+                            "question_text": "Was hat das reformierte Fachkräfteeinwanderungsgesetz zum Ziel?",
+                            "options": ["a) Die Einwanderung aus EU-Ländern zu begrenzen", "b) Qualifizierten Fachkräften aus Nicht-EU-Ländern die Zuwanderung zu erleichtern", "c) Deutsche Arbeitnehmer vor ausländischer Konkurrenz zu schützen"],
+                            "correct_answer": "b"
+                        },
+                        {
+                            "question_num": 9,
+                            "question_text": "Wie reagieren Unternehmen auf den Fachkräftemangel?",
+                            "options": ["a) Sie reduzieren ihr Angebot an Stellen", "b) Sie setzen auf Weiterbildung der bestehenden Belegschaft", "c) Sie verlagern ihre Produktionsstätten ins Ausland"],
+                            "correct_answer": "b"
+                        },
+                        {
+                            "question_num": 10,
+                            "question_text": "Was fordern Experten für eine nachhaltige Lösung des Problems?",
+                            "options": ["a) Ausschließlich mehr Einwanderung", "b) Kürzere Ausbildungszeiten in allen Bereichen", "c) Strukturelle Veränderungen im Bildungssystem und bessere Bedingungen für Familien"],
+                            "correct_answer": "c"
+                        }
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "anzeigen",
+                    "instructions": "Lesen Sie die Anzeigen a–l und die Situationen 11–20. Welche Anzeige passt zu welcher Situation? Für zwei Situationen gibt es keine passende Anzeige. Schreiben Sie dann x.",
+                    "ads": [
+                        {
+                            "id": "a",
+                            "title": "IT-Projektmanager (m/w/d) – Remote möglich",
+                            "text": "Wir suchen erfahrene IT-Projektmanager für die Leitung internationaler Softwareprojekte. Mindestens 5 Jahre Berufserfahrung, PMP-Zertifizierung erwünscht. 60 % Homeoffice möglich. Gehalt: 75.000–90.000 € jährlich. Bewerbung an: jobs@digitalworks.de"
+                        },
+                        {
+                            "id": "b",
+                            "title": "Webinar: Effektiv im Homeoffice arbeiten",
+                            "text": "Zweitägiges Online-Seminar für Berufstätige, die ihre Produktivität im Homeoffice steigern möchten. Themen: Zeitmanagement, digitale Tools, Kommunikation mit Kollegen. Termin: 14.–15. März. Kosten: 120 €. Anmeldung: www.digitalseminar.de"
+                        },
+                        {
+                            "id": "c",
+                            "title": "Zertifikatskurs: Datenschutz und DSGVO",
+                            "text": "Berufsbegleitender Kurs für Fach- und Führungskräfte. Lernen Sie die wichtigsten Grundlagen der Datenschutz-Grundverordnung. 8 Abendkurse à 90 Minuten. Teilnahmegebühr: 380 €. Zertifikat der IHK. Anmeldung: www.ihk-weiterbildung.de"
+                        },
+                        {
+                            "id": "d",
+                            "title": "Bürokaufmann/-frau gesucht – Vollzeit",
+                            "text": "Kleines Familienunternehmen sucht zuverlässige Bürokraft für administrative Aufgaben. Kenntnisse in MS Office erforderlich. Keine Homeoffice-Möglichkeit. Gehalt nach Tarif. Bitte Bewerbung mit Lebenslauf senden an: info@familienbetrieb-berlin.de"
+                        },
+                        {
+                            "id": "e",
+                            "title": "Technischer Redakteur (m/w/d) – 100 % remote",
+                            "text": "Für unser wachsendes Softwareunternehmen suchen wir einen erfahrenen technischen Redakteur zur Erstellung von Handbüchern und Online-Hilfen. Sehr gute Deutschkenntnisse (C1), Englischkenntnisse von Vorteil. Vollständig remote. Bewerbung: karriere@softwaredoc.com"
+                        },
+                        {
+                            "id": "f",
+                            "title": "Online-Kurs: Grundlagen der künstlichen Intelligenz",
+                            "text": "Selbstlernkurs für Einsteiger ohne Vorkenntnisse. Lernen Sie, wie KI funktioniert und wie Sie sie in Ihrem Berufsalltag einsetzen können. Kursdauer: 6 Wochen à 3 Stunden/Woche. Preis: 199 €. Start jederzeit möglich. www.ki-kurs-online.de"
+                        },
+                        {
+                            "id": "g",
+                            "title": "Stellenangebot: Customer Success Manager – hybrid",
+                            "text": "Sie betreuen unsere B2B-Kunden und sichern deren langfristige Zufriedenheit. Erfahrung im Kundenservice, gutes Englisch, CRM-Kenntnisse erwünscht. 2 Tage/Woche Büropräsenz erforderlich, Rest Homeoffice. Bewerbung: hr@businesssolutions.de"
+                        },
+                        {
+                            "id": "h",
+                            "title": "Intensivkurs Spanisch für Berufstätige",
+                            "text": "Kleine Gruppen (max. 8 Personen), erfahrene Muttersprachler als Lehrer. Niveau A1 bis B2. Kurse montags und mittwochs, 18:30–20:00 Uhr. Monatliche Kursgebühr: 85 €. Erstes Schnuppertreffen kostenlos! www.sprachschule-zentrum.de"
+                        },
+                        {
+                            "id": "i",
+                            "title": "Buchhalter/in (m/w/d) – Teilzeit, remote",
+                            "text": "Steuerberatungskanzlei sucht erfahrene Buchhalter/in für 20–25 Stunden/Woche. Kenntnisse in DATEV erforderlich. Vollständig von zu Hause aus möglich. Flexibel einteilbare Arbeitszeiten. Vergütung: 28 €/Stunde. jobs@steuerkanzlei-nord.de"
+                        },
+                        {
+                            "id": "j",
+                            "title": "Seminar: Führen auf Distanz",
+                            "text": "Eintägiges Präsenzseminar für Führungskräfte, die verteilte Teams leiten. Inhalte: virtuelle Kommunikation, Vertrauensaufbau, Mitarbeitermotivation im Homeoffice. Termin: 22. April. Ort: Frankfurt am Main. Preis: 450 €. www.fuehrungsakademie.de"
+                        },
+                        {
+                            "id": "k",
+                            "title": "Grafikdesigner (m/w/d) – Festanstellung oder Freelance",
+                            "text": "Kreativagentur sucht talentierte Grafikdesigner für Print- und Digitalprojekte. Adobe Creative Suite erforderlich. Festanstellung oder Freelance-Basis möglich. Überwiegend remote. Portfolio bitte einreichen unter: design@kreaturagentur.de"
+                        },
+                        {
+                            "id": "l",
+                            "title": "Online-Workshop: Stressbewältigung im Homeoffice",
+                            "text": "Interaktiver Workshop für alle, die im Homeoffice unter hohem Druck stehen. Psychologin Dr. Müller vermittelt praktische Entspannungstechniken und Strategien zur Work-Life-Balance. Samstag, 9:00–13:00 Uhr. Teilnahme: 75 €. www.mental-balance-online.de"
+                        }
+                    ],
+                    "questions": [
+                        {
+                            "question_num": 11,
+                            "question_text": "Martina ist ausgebildete Buchhalterin und möchte wegen ihrer Kinder nur halbtags arbeiten. Sie sucht eine Stelle, bei der sie von zu Hause aus arbeiten kann.",
+                            "correct_answer": "i"
+                        },
+                        {
+                            "question_num": 12,
+                            "question_text": "Klaus ist Abteilungsleiter und hat seit der Pandemie ein Team von zwölf Personen, die alle von verschiedenen Standorten aus arbeiten. Er sucht eine Möglichkeit, seine Führungskompetenzen in dieser Situation zu verbessern.",
+                            "correct_answer": "j"
+                        },
+                        {
+                            "question_num": 13,
+                            "question_text": "Sandra arbeitet als freiberufliche Designerin und sucht eine Festanstellung oder Freelance-Projekte, bei denen sie hauptsächlich von zu Hause aus arbeiten kann.",
+                            "correct_answer": "k"
+                        },
+                        {
+                            "question_num": 14,
+                            "question_text": "Tobias fühlt sich im Homeoffice oft gestresst und hat Schwierigkeiten, Beruf und Privatleben zu trennen. Er sucht einen Kurs, der ihm dabei helfen kann.",
+                            "correct_answer": "l"
+                        },
+                        {
+                            "question_num": 15,
+                            "question_text": "Anna hat einen kaufmännischen Abschluss und möchte sich im Bereich Datenschutz weiterbilden, um für ihren Arbeitgeber den DSGVO-Datenschutzbeauftragten zu entlasten.",
+                            "correct_answer": "c"
+                        },
+                        {
+                            "question_num": 16,
+                            "question_text": "Peter ist erfahrener Projektleiter in der IT-Branche und sucht eine gut bezahlte Stelle, bei der er größtenteils von zu Hause aus arbeiten kann.",
+                            "correct_answer": "a"
+                        },
+                        {
+                            "question_num": 17,
+                            "question_text": "Elena möchte lernen, wie sie KI-Tools in ihrem Büroalltag einsetzen kann. Sie hat keine Vorkenntnisse und möchte flexibel lernen.",
+                            "correct_answer": "f"
+                        },
+                        {
+                            "question_num": 18,
+                            "question_text": "Georg ist Ingenieur und sucht eine vollständig remote Stelle, bei der er technische Dokumentationen auf Deutsch verfasst.",
+                            "correct_answer": "e"
+                        },
+                        {
+                            "question_num": 19,
+                            "question_text": "Monika arbeitet in der Personalabteilung und sucht eine Stelle als Bürokauffrau in Vollzeit. Sie möchte jedoch nicht von zu Hause aus arbeiten.",
+                            "correct_answer": "d"
+                        },
+                        {
+                            "question_num": 20,
+                            "question_text": "Lukas möchte ein Musikinstrument erlernen und sucht einen geeigneten Abendkurs in seiner Stadt.",
+                            "correct_answer": "x"
+                        }
+                    ]
+                }
+            ]
+        },
+        "hoeren": {
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "kurzgespraeche",
+                    "heard_times": 1,
+                    "preparation_seconds": 30,
+                    "topic": "Homeoffice — persönliche Erfahrungen",
+                    "instructions": "Sie hören fünf kurze Aussagen zum Thema Homeoffice. Sie hören jeden Text einmal. Entscheiden Sie bei jeder Aussage, ob die Aussage richtig oder falsch ist.",
+                    "conversations": [
+                        {
+                            "id": 1,
+                            "sprecher": "Sprecher 1",
+                            "voice_id": "Fenrir",
+                            "script": "Ich arbeite jetzt seit zwei Jahren vollständig von zu Hause aus und würde niemals mehr ins Büro zurückwechseln wollen. Der größte Vorteil ist für mich die eingesparte Pendelzeit. Früher habe ich täglich fast zwei Stunden im Zug gesessen. Diese Zeit nutze ich jetzt für Sport und Kochen. Meine Chefin war anfangs skeptisch, aber meine Leistungen haben sich sogar verbessert. Ich denke, dass Homeoffice nicht für jeden geeignet ist, aber für mich persönlich ist es die ideale Arbeitsform.",
+                            "questions": [
+                                {
+                                    "question_num": 1,
+                                    "question_text": "Der Sprecher möchte wieder ins Büro zurückwechseln.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "falsch"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 2,
+                            "sprecher": "Sprecher 2",
+                            "voice_id": "Kore",
+                            "script": "Ich habe das Homeoffice zunächst sehr genossen, aber nach einigen Monaten merkte ich, dass mir der soziale Kontakt zu meinen Kollegen fehlte. Die kurzen Gespräche in der Küche, das gemeinsame Mittagessen — das alles fehlt mir jetzt sehr. Außerdem habe ich zu Hause keine klare Trennung zwischen Arbeitszeit und Freizeit. Ich sitze manchmal bis spät abends am Computer, weil ich das Gefühl habe, nicht genug geleistet zu haben. Deswegen gehe ich inzwischen wieder drei Tage pro Woche ins Büro.",
+                            "questions": [
+                                {
+                                    "question_num": 2,
+                                    "question_text": "Die Sprecherin geht gar nicht mehr ins Büro.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "falsch"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 3,
+                            "sprecher": "Sprecher 3",
+                            "voice_id": "Fenrir",
+                            "script": "Als Vater von zwei kleinen Kindern ist das Homeoffice für mich eine riesige Herausforderung. Die Kinder verstehen nicht, dass Papa arbeitet, auch wenn er zu Hause ist. Ich habe mir daher ein kleines Arbeitszimmer eingerichtet, das ich während der Arbeitszeit abschließe. Meine Frau übernimmt in dieser Zeit die Kinderbetreuung. Dieses Modell funktioniert bei uns gut, aber es erfordert eine klare Absprache und gegenseitigen Respekt. Ohne diese Struktur wäre Homeoffice mit Kindern für mich unmöglich.",
+                            "questions": [
+                                {
+                                    "question_num": 3,
+                                    "question_text": "Der Sprecher hat ein eigenes Arbeitszimmer eingerichtet.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "richtig"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 4,
+                            "sprecher": "Sprecher 4",
+                            "voice_id": "Kore",
+                            "script": "Ich leite ein kleines Team von acht Personen, und das komplett digital ist eine echte Herausforderung. Am Anfang hatten wir viele Missverständnisse, weil die nonverbale Kommunikation per Video einfach nicht funktioniert wie im echten Leben. Wir haben dann regelmäßige virtuelle Kaffeepausen eingeführt und ein klares Kommunikationsprotokoll vereinbart. Seitdem läuft es deutlich besser. Ich glaube, dass gute Führung auf Distanz vor allem Vertrauen und klare Strukturen erfordert.",
+                            "questions": [
+                                {
+                                    "question_num": 4,
+                                    "question_text": "Die Sprecherin findet, dass virtuelle Kaffeepausen die Kommunikation verbessert haben.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "richtig"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 5,
+                            "sprecher": "Sprecher 5",
+                            "voice_id": "Fenrir",
+                            "script": "Ich bin Softwareentwickler und arbeite seit der Pandemie fast ausschließlich remote. Technisch gesehen ist das für meinen Beruf kein Problem — ich brauche nur meinen Laptop und eine stabile Internetverbindung. Was ich allerdings vermisse, ist das spontane Brainstorming mit Kollegen. Wenn man ein Problem hat, kann man nicht einfach kurz zum Nachbartisch gehen. Deshalb haben wir in unserem Team feste Zeiten für gemeinsame digitale Arbeitssessions eingeführt, was gut funktioniert.",
+                            "questions": [
+                                {
+                                    "question_num": 5,
+                                    "question_text": "Der Sprecher hat technische Probleme mit dem Homeoffice.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "falsch"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "gespraech",
+                    "heard_times": 2,
+                    "preparation_seconds": 60,
+                    "topic": "Homeoffice und Arbeitswelt der Zukunft",
+                    "instructions": "Sie hören ein Interview zum Thema Homeoffice und Arbeitswelt der Zukunft. Sie hören das Gespräch zweimal. Entscheiden Sie bei jeder Aussage, ob sie richtig oder falsch ist.",
+                    "sprecher": [
+                        {"id": "sprecher_1", "name": "Aoede", "rolle": "Moderatorin", "voice_id": "Aoede"},
+                        {"id": "sprecher_2", "name": "Dr. Petra Lange", "rolle": "Arbeitspsychologin", "voice_id": "Kore"}
+                    ],
+                    "script_segments": [
+                        {
+                            "sprecher_id": "sprecher_1",
+                            "text": "Herzlich willkommen zu unserem heutigen Gespräch. Ich begrüße Dr. Petra Lange, Arbeitspsychologin an der Universität Mannheim. Frau Dr. Lange, Homeoffice hat in den letzten Jahren massiv zugenommen. Ist das eine positive Entwicklung?"
+                        },
+                        {
+                            "sprecher_id": "sprecher_2",
+                            "text": "Guten Tag. Das ist in der Tat eine komplexe Frage. Aus psychologischer Sicht hat das Homeoffice sowohl Vor- als auch Nachteile. Studien zeigen, dass viele Beschäftigte im Homeoffice konzentrierter arbeiten können, weil sie weniger durch Lärm und Kollegen abgelenkt werden. Gleichzeitig beobachten wir aber auch eine Zunahme von Einsamkeitsgefühlen und eine Verwischung der Grenzen zwischen Arbeit und Privatleben."
+                        },
+                        {
+                            "sprecher_id": "sprecher_1",
+                            "text": "Welche Berufsgruppen profitieren besonders vom Homeoffice, und für wen ist es eher ungeeignet?"
+                        },
+                        {
+                            "sprecher_id": "sprecher_2",
+                            "text": "Wissensarbeiter — also Programmierer, Analysten, Autoren oder Berater — können im Homeoffice oft sehr effizient arbeiten. Für Berufe, die direkte physische Präsenz erfordern, wie Handwerker, Ärzte oder Lehrkräfte, ist es natürlich keine Option. Interessant ist aber, dass auch viele Führungskräfte Schwierigkeiten mit dem Remote-Führen haben, weil sie gelernt haben, Anwesenheit mit Leistung gleichzusetzen."
+                        },
+                        {
+                            "sprecher_id": "sprecher_1",
+                            "text": "Sie erwähnten die Verwischung von Arbeit und Freizeit. Wie können Arbeitnehmer damit umgehen?"
+                        },
+                        {
+                            "sprecher_id": "sprecher_2",
+                            "text": "Das wichtigste ist die Schaffung klarer Rituale und Strukturen. Feste Arbeitszeiten, ein separater Arbeitsbereich zu Hause und bewusste Abendrituale, die den Übergang in die Freizeit markieren, sind sehr hilfreich. Außerdem empfehle ich, das Arbeitsmaterial am Ende des Tages wegzuräumen oder zumindest den Bildschirm zu deaktivieren, sodass man nicht ständig daran erinnert wird, dass noch Arbeit wartet."
+                        },
+                        {
+                            "sprecher_id": "sprecher_1",
+                            "text": "Was sind Ihre Beobachtungen zur sozialen Isolation im Homeoffice?"
+                        },
+                        {
+                            "sprecher_id": "sprecher_2",
+                            "text": "Das ist tatsächlich eines der größten Probleme. Menschen sind soziale Wesen, und der informelle Austausch am Arbeitsplatz ist wichtiger, als viele denken. Er fördert nicht nur das Wohlbefinden, sondern auch die Kreativität und die Identifikation mit dem Unternehmen. Unternehmen, die komplett auf Homeoffice setzen, sollten daher regelmäßige Präsenztreffen organisieren, auch wenn sie nicht zwingend arbeitsbezogen sein müssen."
+                        },
+                        {
+                            "sprecher_id": "sprecher_1",
+                            "text": "Wie sehen Sie die Zukunft des Arbeitens? Wird das Büro überflüssig?"
+                        },
+                        {
+                            "sprecher_id": "sprecher_2",
+                            "text": "Nein, das glaube ich nicht. Ich prognostiziere, dass sich hybride Arbeitsmodelle langfristig durchsetzen werden. Also Modelle, bei denen Mitarbeiter einen Teil ihrer Zeit im Büro und einen Teil zu Hause oder anderswo arbeiten. Das Büro wird sich dabei verändern — es wird weniger ein Ort für konzentriertes Einzelarbeiten sein, sondern stärker ein Ort für Kollaboration, Kreativität und Gemeinschaft."
+                        },
+                        {
+                            "sprecher_id": "sprecher_1",
+                            "text": "Haben Unternehmen eine Verpflichtung, ihre Mitarbeiter beim Homeoffice zu unterstützen?"
+                        },
+                        {
+                            "sprecher_id": "sprecher_2",
+                            "text": "Auf jeden Fall. Arbeitgeber haben eine Fürsorgepflicht gegenüber ihren Mitarbeitern, die auch im Homeoffice gilt. Das bedeutet, dass sie für eine angemessene technische Ausstattung sorgen, Weiterbildungsangebote bereitstellen und aktiv gegen soziale Isolation vorgehen sollten. Unternehmen, die das ignorieren, riskieren langfristig einen Rückgang des Engagements und eine höhere Fluktuation."
+                        },
+                        {
+                            "sprecher_id": "sprecher_1",
+                            "text": "Frau Dr. Lange, vielen Dank für das aufschlussreiche Gespräch."
+                        },
+                        {
+                            "sprecher_id": "sprecher_2",
+                            "text": "Danke für die Einladung. Ich hoffe, dass meine Ausführungen hilfreich waren."
+                        }
+                    ],
+                    "questions": [
+                        {
+                            "question_num": 6,
+                            "question_text": "Laut Dr. Lange können Mitarbeiter im Homeoffice konzentrierter arbeiten.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "richtig"
+                        },
+                        {
+                            "question_num": 7,
+                            "question_text": "Dr. Lange sagt, dass Homeoffice für Ärzte besonders gut geeignet ist.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "falsch"
+                        },
+                        {
+                            "question_num": 8,
+                            "question_text": "Viele Führungskräfte haben laut Dr. Lange Schwierigkeiten mit dem Remote-Führen.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "richtig"
+                        },
+                        {
+                            "question_num": 9,
+                            "question_text": "Dr. Lange empfiehlt, am Abend den Bildschirm zu deaktivieren.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "richtig"
+                        },
+                        {
+                            "question_num": 10,
+                            "question_text": "Laut Dr. Lange schadet informeller Austausch der Kreativität.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "falsch"
+                        },
+                        {
+                            "question_num": 11,
+                            "question_text": "Dr. Lange glaubt, dass das Büro in Zukunft überflüssig werden wird.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "falsch"
+                        },
+                        {
+                            "question_num": 12,
+                            "question_text": "Dr. Lange prognostiziert, dass hybride Arbeitsmodelle sich langfristig durchsetzen werden.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "richtig"
+                        },
+                        {
+                            "question_num": 13,
+                            "question_text": "Das Büro der Zukunft soll laut Dr. Lange hauptsächlich für konzentriertes Einzelarbeiten genutzt werden.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "falsch"
+                        },
+                        {
+                            "question_num": 14,
+                            "question_text": "Unternehmen haben laut Dr. Lange eine Fürsorgepflicht gegenüber Homeoffice-Mitarbeitern.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "richtig"
+                        },
+                        {
+                            "question_num": 15,
+                            "question_text": "Dr. Lange sagt, dass Unternehmen ohne Homeoffice-Unterstützung eine höhere Mitarbeiterfluktuation riskieren.",
+                            "question_type": "richtig_falsch",
+                            "correct_answer": "richtig"
+                        }
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "ansagen",
+                    "heard_times": 2,
+                    "preparation_seconds": 30,
+                    "instructions": "Sie hören fünf kurze Ansagen aus dem Radio oder aus einem Unternehmen. Sie hören jede Ansage zweimal. Entscheiden Sie, ob die Aussage richtig oder falsch ist.",
+                    "ansagen": [
+                        {
+                            "id": 1,
+                            "voice_id": "Fenrir",
+                            "register": "radio",
+                            "script": "Hier ist eine Mitteilung der Bundesagentur für Arbeit: Ab dem ersten Januar des nächsten Jahres erhalten Arbeitnehmer, die im Homeoffice arbeiten, einen steuerlichen Freibetrag von bis zu sechshundert Euro jährlich für die Einrichtung ihres Heimarbeitsplatzes. Voraussetzung ist, dass der Heimarbeitsplatz ausschließlich beruflich genutzt wird und mindestens zwanzig Stunden pro Woche dort gearbeitet wird. Weitere Informationen finden Sie auf der Website der Bundesagentur für Arbeit.",
+                            "questions": [
+                                {
+                                    "question_num": 16,
+                                    "question_text": "Der steuerliche Freibetrag gilt auch für Heimarbeitsplätze, die privat genutzt werden.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "falsch"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 2,
+                            "voice_id": "Kore",
+                            "register": "company",
+                            "script": "Sehr geehrte Mitarbeiterinnen und Mitarbeiter, wir möchten Sie darüber informieren, dass ab nächstem Monat alle Abteilungen auf das neue digitale Zeiterfassungssystem umgestellt werden. Bitte melden Sie sich bis Freitag bei Ihrer direkten Führungskraft an, um Ihre Zugangsdaten zu erhalten. Das alte System wird zum Ende des Monats abgeschaltet. Bei technischen Fragen steht Ihnen unser IT-Helpdesk unter der internen Rufnummer 4499 zur Verfügung.",
+                            "questions": [
+                                {
+                                    "question_num": 17,
+                                    "question_text": "Mitarbeiter sollen sich bei der IT-Abteilung anmelden, um Zugangsdaten zu erhalten.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "falsch"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 3,
+                            "voice_id": "Fenrir",
+                            "register": "radio",
+                            "script": "Radio Wirtschaft berichtet: Eine neue Studie der Universität Köln zeigt, dass Unternehmen, die flexible Arbeitsmodelle anbieten, im Durchschnitt dreißig Prozent weniger Personalfluktuation verzeichnen als Unternehmen mit starren Büropflichten. Besonders bei Fachkräften zwischen dreißig und fünfzig Jahren sei die Möglichkeit zum Homeoffice ein entscheidendes Kriterium bei der Jobwahl. Die Studie befragte über zweitausend Arbeitnehmer in ganz Deutschland.",
+                            "questions": [
+                                {
+                                    "question_num": 18,
+                                    "question_text": "Laut der Studie haben Unternehmen mit flexiblen Arbeitsmodellen weniger Personalfluktuation.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "richtig"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 4,
+                            "voice_id": "Kore",
+                            "register": "company",
+                            "script": "Liebe Kolleginnen und Kollegen, wir laden Sie herzlich zu unserem nächsten digitalen Team-Event ein. Am Donnerstagabend, dem zwölften Mai, findet ab neunzehn Uhr unser virtuelles Sommer-Quiz statt. Die Teilnahme ist freiwillig, aber wir freuen uns über möglichst viele Mitmacher. Den Zugangslink erhalten Sie am Mittwoch per E-Mail. Wir freuen uns auf einen spaßigen Abend mit Ihnen!",
+                            "questions": [
+                                {
+                                    "question_num": 19,
+                                    "question_text": "Die Teilnahme am virtuellen Team-Event ist für alle Mitarbeiter verpflichtend.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "falsch"
+                                }
+                            ]
+                        },
+                        {
+                            "id": 5,
+                            "voice_id": "Fenrir",
+                            "register": "radio",
+                            "script": "Meldung aus der Wirtschaft: Der Deutsche Gewerkschaftsbund hat heute einen Gesetzentwurf vorgestellt, der Arbeitnehmern in Deutschland ein Recht auf mindestens zwei Homeoffice-Tage pro Woche einräumen soll, sofern die Tätigkeit dies erlaubt. Arbeitgeberverbände reagierten mit Kritik und betonten, dass ein solches Gesetz die unternehmerische Flexibilität einschränken würde. Das Bundesarbeitsministerium erklärte, den Vorschlag prüfen zu wollen.",
+                            "questions": [
+                                {
+                                    "question_num": 20,
+                                    "question_text": "Der DGB-Gesetzentwurf sieht mindestens zwei Homeoffice-Tage pro Woche für alle Arbeitnehmer vor.",
+                                    "question_type": "richtig_falsch",
+                                    "correct_answer": "richtig"
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        },
+        "sprachbausteine": {
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "lueckentext_mc",
+                    "instructions": "Lesen Sie den folgenden Brief und wählen Sie für jede Lücke die richtige Antwort a, b oder c.",
+                    "text_title": "Antrag auf Homeoffice-Regelung",
+                    "text_parts": [
+                        "Sehr geehrte Frau Becker,",
+                        "ich {21} mich an Sie wenden, um eine Homeoffice-Regelung für meine Tätigkeit zu beantragen. Wie Sie wissen, {22} ich meine Aufgaben seit Beginn der Pandemie größtenteils digital {23}. In dieser Zeit habe ich festgestellt, dass ich zu Hause konzentrierter arbeiten {24}, da ich weniger durch Bürolärm abgelenkt {25}.",
+                        "Ich {26} vorschlagen, dass ich künftig an drei Tagen pro Woche von zu Hause aus arbeite. {27} würden mir Pendelzeiten von insgesamt zwei Stunden täglich erspart bleiben, die ich stattdessen in zusätzliche Arbeitsleistung investieren {28}. Die {29} Kommunikation mit dem Team könnte weiterhin über die bestehenden digitalen Kanäle {30}.",
+                        "Ich stehe gerne für ein persönliches Gespräch zur Verfügung und freue mich auf Ihre positive Rückmeldung.",
+                        "Mit freundlichen Grüßen,\nMarkus Hoffmann"
+                    ],
+                    "gaps": [
+                        {
+                            "gap_num": 21,
+                            "options": ["a) möchte", "b) müsste", "c) dürfte"],
+                            "correct_answer": "a"
+                        },
+                        {
+                            "gap_num": 22,
+                            "options": ["a) erledige", "b) habe", "c) bin"],
+                            "correct_answer": "a"
+                        },
+                        {
+                            "gap_num": 23,
+                            "options": ["a) ausgeführt", "b) erledigt", "c) gemacht"],
+                            "correct_answer": "b"
+                        },
+                        {
+                            "gap_num": 24,
+                            "options": ["a) kann", "b) könnte", "c) soll"],
+                            "correct_answer": "b"
+                        },
+                        {
+                            "gap_num": 25,
+                            "options": ["a) werde", "b) bin", "c) wurde"],
+                            "correct_answer": "a"
+                        },
+                        {
+                            "gap_num": 26,
+                            "options": ["a) will", "b) würde", "c) sollte"],
+                            "correct_answer": "b"
+                        },
+                        {
+                            "gap_num": 27,
+                            "options": ["a) Daher", "b) Damit", "c) Dadurch"],
+                            "correct_answer": "c"
+                        },
+                        {
+                            "gap_num": 28,
+                            "options": ["a) könnte", "b) kann", "c) werde"],
+                            "correct_answer": "a"
+                        },
+                        {
+                            "gap_num": 29,
+                            "options": ["a) erforderliche", "b) nötigste", "c) tägliche"],
+                            "correct_answer": "a"
+                        },
+                        {
+                            "gap_num": 30,
+                            "options": ["a) stattfinden", "b) erfolgen", "c) ablaufen"],
+                            "correct_answer": "b"
+                        }
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "lueckentext_wortbank",
+                    "instructions": "Lesen Sie den folgenden Text und füllen Sie die Lücken mit den passenden Wörtern aus der Wortbank. Fünf Wörter passen nicht.",
+                    "text_title": "Digitalisierung im Unternehmen — Unser Weg in die Zukunft",
+                    "text_parts": [
+                        "Liebe Mitarbeiterinnen und Mitarbeiter,",
+                        "in den vergangenen Jahren hat die Digitalisierung unsere Arbeitswelt {31} verändert. Als Unternehmen {32} wir auf diese Entwicklung reagieren, um wettbewerbsfähig zu bleiben. Daher haben wir in den letzten Monaten verschiedene Maßnahmen {33}, die unseren Arbeitsalltag {34} und gleichzeitig unsere {35} steigern sollen.",
+                        "Ein zentrales Projekt ist die {36} eines neuen digitalen Kommunikationssystems, das alle Abteilungen miteinander {37}. Dieses System ermöglicht es, Informationen in {38} zu teilen und gemeinsam an Dokumenten zu {39}. Zudem werden wir in den nächsten Monaten Schulungen {40}, damit alle Mitarbeiter die neuen Tools optimal nutzen können.",
+                        "Wir sind überzeugt, dass diese Investitionen in die Digitalisierung langfristig allen zugutekommen werden.",
+                        "Mit freundlichen Grüßen,\nDie Geschäftsführung"
+                    ],
+                    "wortbank": [
+                        {"id": "a", "word": "GRUNDLEGEND"},
+                        {"id": "b", "word": "MÜSSEN"},
+                        {"id": "c", "word": "EINGEFÜHRT"},
+                        {"id": "d", "word": "VEREINFACHEN"},
+                        {"id": "e", "word": "EFFIZIENZ"},
+                        {"id": "f", "word": "EINFÜHRUNG"},
+                        {"id": "g", "word": "VERBINDET"},
+                        {"id": "h", "word": "ECHTZEIT"},
+                        {"id": "i", "word": "ARBEITEN"},
+                        {"id": "j", "word": "ANBIETEN"},
+                        {"id": "k", "word": "ERHEBLICH"},
+                        {"id": "l", "word": "SOLLTEN"},
+                        {"id": "m", "word": "BESCHLOSSEN"},
+                        {"id": "n", "word": "ERLEICHTERN"},
+                        {"id": "o", "word": "KOSTEN"}
+                    ],
+                    "gaps": [
+                        {"gap_num": 31, "correct_answer": "a"},
+                        {"gap_num": 32, "correct_answer": "b"},
+                        {"gap_num": 33, "correct_answer": "c"},
+                        {"gap_num": 34, "correct_answer": "d"},
+                        {"gap_num": 35, "correct_answer": "e"},
+                        {"gap_num": 36, "correct_answer": "f"},
+                        {"gap_num": 37, "correct_answer": "g"},
+                        {"gap_num": 38, "correct_answer": "h"},
+                        {"gap_num": 39, "correct_answer": "i"},
+                        {"gap_num": 40, "correct_answer": "j"}
+                    ]
+                }
+            ]
+        },
+        "schreiben": {
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "erörterung",
+                    "instructions": "Schreiben Sie einen zusammenhängenden Text (ca. 200 Wörter) zu folgendem Thema. Nennen Sie Argumente für und gegen die These und formulieren Sie Ihre eigene Meinung.",
+                    "thema": "Sollte Homeoffice für alle Arbeitnehmer ein gesetzliches Recht sein?",
+                    "leitfragen": [
+                        "Welche Vorteile hätte ein gesetzliches Recht auf Homeoffice?",
+                        "Welche Nachteile oder Probleme könnten entstehen?",
+                        "Was ist Ihre persönliche Meinung zu diesem Thema?"
+                    ],
+                    "example_answer": "Die Frage, ob Homeoffice ein gesetzliches Recht werden sollte, wird in Deutschland kontrovers diskutiert. Einerseits gibt es überzeugende Argumente dafür: Arbeitnehmer könnten ihre Zeit flexibler einteilen, Pendelwege entfallen und die Vereinbarkeit von Familie und Beruf würde erleichtert. Zudem haben Studien gezeigt, dass viele Menschen zu Hause produktiver arbeiten.\n\nAndererseits gibt es gewichtige Gegenargumente. Nicht alle Berufe sind für Homeoffice geeignet — Handwerker, Pflegepersonal oder Kassierer können ihre Arbeit nicht von zu Hause aus erledigen. Ein gesetzliches Recht würde hier zu Ungleichheiten führen. Außerdem haben viele Arbeitnehmer keine geeigneten Wohnverhältnisse für ein Homeoffice, und soziale Isolation kann ein ernsthaftes Problem sein.\n\nIch persönlich bin der Meinung, dass ein gesetzliches Recht auf Homeoffice grundsätzlich sinnvoll wäre, allerdings mit Ausnahmen für Berufe, die physische Präsenz erfordern. Wichtig wäre auch, dass Arbeitgeber verpflichtet werden, die notwendige Ausstattung bereitzustellen. Ein flexibles Hybridmodell, bei dem Mitarbeiter selbst entscheiden können, wann sie ins Büro kommen, scheint mir der ideale Kompromiss zu sein.",
+                    "min_words": 180,
+                    "max_words": 250
+                }
+            ]
+        },
+        "sprechen": {
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "titel": "Gespräch über Erfahrungen und Meinungen",
+                    "instructions": "Sprechen Sie mit Ihrem Gesprächspartner über die folgenden Fragen zum Thema Arbeit und Homeoffice.",
+                    "fragen": [
+                        {"frage_num": 1, "frage_text": "Haben Sie Erfahrungen mit Homeoffice oder kennen Sie jemanden, der im Homeoffice arbeitet? Was sind Ihre Eindrücke?", "needs_audio": True},
+                        {"frage_num": 2, "frage_text": "Welche Eigenschaften sind Ihrer Meinung nach wichtig, um erfolgreich im Homeoffice zu arbeiten?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "titel": "Diskussion über ein aktuelles Thema",
+                    "instructions": "Diskutieren Sie mit Ihrem Gesprächspartner das folgende Thema. Bringen Sie Argumente vor und reagieren Sie auf die Argumente Ihres Partners.",
+                    "thema": "Homeoffice verändert die Unternehmenskultur — zum Guten oder zum Schlechten?",
+                    "fragen": [
+                        {"frage_num": 3, "frage_text": "Welche Aspekte der Unternehmenskultur leiden Ihrer Meinung nach unter dem Homeoffice am stärksten?", "needs_audio": True},
+                        {"frage_num": 4, "frage_text": "Wie können Unternehmen eine starke Teamkultur aufrechterhalten, wenn viele Mitarbeiter remote arbeiten?", "needs_audio": True},
+                        {"frage_num": 5, "frage_text": "Denken Sie, dass neue Mitarbeiter genauso gut ins Unternehmen integriert werden können, wenn sie hauptsächlich im Homeoffice arbeiten?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "titel": "Problemlösung und gemeinsame Entscheidung",
+                    "instructions": "Sie und Ihr Gesprächspartner sollen gemeinsam eine Lösung für das folgende Problem entwickeln.",
+                    "aufgabe": "Ihr Unternehmen möchte eine neue Homeoffice-Richtlinie einführen. Es gibt verschiedene Meinungen: Manche Führungskräfte wollen alle Mitarbeiter mindestens vier Tage pro Woche im Büro sehen, während viele Mitarbeiter lieber vollständig remote arbeiten möchten. Entwickeln Sie gemeinsam einen Kompromissvorschlag.",
+                    "fragen": [
+                        {"frage_num": 6, "frage_text": "Was würden Sie als faire Regelung für alle Beteiligten vorschlagen? Welche Mindestanforderungen an Büropräsenz wären sinnvoll?", "needs_audio": True},
+                        {"frage_num": 7, "frage_text": "Wie würden Sie sicherstellen, dass die neue Regelung sowohl die Bedürfnisse der Mitarbeiter als auch die Anforderungen der Führungskräfte berücksichtigt?", "needs_audio": True}
+                    ]
+                }
+            ]
+        }
+    }
+
+
+# ── TELC B2 Seed 003 — Klimawandel und gesellschaftliche Verantwortung ────────
+def get_telc_b2_seed_003():
+    return {
+        "exam_id": "exam_telc_b2_003",
+        "title": "TELC Deutsch B2 - Übungstest 3",
+        "exam_type": "telc",
+        "telc_level": "B2",
+        "pathway": "telc_b2",
+        "status": "pending_audio",
+        "audio_progress": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "lesen": {
+            "total_questions": 20,
+            "duration_minutes": 90,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "zuordnung",
+                    "title": "Aufgabe 1 – Texte und Überschriften",
+                    "instruction": "Lesen Sie die Texte A–E und ordnen Sie ihnen die passenden Überschriften zu. Zwei Überschriften passen nicht.",
+                    "short_texts": [
+                        {"id": "A", "text": "Die Energiewende in Deutschland schreitet voran, doch das Tempo bleibt umstritten. Während erneuerbare Energien im Jahr 2023 bereits mehr als 50 Prozent des Stroms lieferten, kämpft das Land mit dem Ausbau der Übertragungsnetze. Ohne leistungsfähige Leitungen, die Windstrom aus dem Norden in den Süden transportieren, bleiben selbst neue Windparks wirtschaftlich ineffizient. Netzausbau und Erzeugungskapazität müssen synchronisiert werden."},
+                        {"id": "B", "text": "Plastik in den Weltmeeren bedroht nicht nur Meerestiere, sondern gelangt über Mikroplastik in die menschliche Nahrungskette. Forscher haben winzige Plastikpartikel in Trinkwasser, Meeresfrüchten und sogar in menschlichem Blut nachgewiesen. Die Ursache liegt zu einem großen Teil in unsachgemäß entsorgten Einwegprodukten. Ohne wirksame internationale Abkommen zur Reduktion von Plastikmüll ist eine Trendumkehr kaum denkbar."},
+                        {"id": "C", "text": "Städte wie Wien, Kopenhagen und Singapur gelten als Vorreiter urbaner Klimaanpassung. Sie investieren in begrünte Dächer, Schwammstädte und Frischluftschneisen, um Hitzewellen und Starkregen abzupuffern. Diese Maßnahmen kosten erhebliche Summen, rechnen sich aber langfristig, wenn man die vermiedenen Schäden durch Überschwemmungen und Hitzetote einrechnet. Andere Kommunen beobachten die Konzepte und beginnen schrittweise mit der Umsetzung."},
+                        {"id": "D", "text": "Die Agrarwirtschaft steht vor einem Dilemma: Einerseits trägt sie mit Methanemissionen aus der Tierhaltung und Lachgasfreisetzung aus überdüngten Böden erheblich zum Klimawandel bei. Andererseits sind Bauern selbst die ersten Betroffenen von Dürren, Spätfrösten und Extremwettereignissen. Eine nachhaltige Transformation der Landwirtschaft erfordert finanzielle Anreize, Wissenstransfer und eine gesellschaftliche Neubewertung von Lebensmittelpreisen."},
+                        {"id": "E", "text": "Carbonpreise und Emissionshandelssysteme gelten als effizienteste Instrumente, um klimaschädliche Aktivitäten zu verteuern und saubere Alternativen wettbewerbsfähig zu machen. Das EU-Emissionshandelssystem (ETS) erfasst inzwischen Industrie, Energie und Luftfahrt. Kritiker bemängeln jedoch, dass die Preise lange zu niedrig lagen, um wirkliche Verhaltensänderungen auszulösen. Seit 2022 sind die Preise deutlich gestiegen, was erste Verlagerungseffekte in Nicht-EU-Länder befürchten lässt."}
+                    ],
+                    "ueberschriften": [
+                        {"id": "a", "text": "Warum Landwirte gleichzeitig Verursacher und Opfer des Klimawandels sind"},
+                        {"id": "b", "text": "Wie Städte sich gegen extreme Wetterereignisse wappnen"},
+                        {"id": "c", "text": "Der Preis für Kohlenstoff und seine wirtschaftlichen Auswirkungen"},
+                        {"id": "d", "text": "Netzinfrastruktur als Engpass der Energiewende"},
+                        {"id": "e", "text": "Warum Elektroautos allein den Verkehr nicht retten"},
+                        {"id": "f", "text": "Mikroplastik als unsichtbare Bedrohung für Mensch und Tier"},
+                        {"id": "g", "text": "Neue Anbaumethoden als Antwort auf den Klimawandel"},
+                        {"id": "h", "text": "Internationaler Vergleich von Klimaschutzgesetzen"},
+                        {"id": "i", "text": "Bürgerproteste als Motor der Klimapolitik"},
+                        {"id": "j", "text": "Wie Schwammstädte und grüne Dächer Extremwetter abmildern"}
+                    ],
+                    "questions": [
+                        {"question_num": 1, "question_text": "Text A", "correct_answer": "d"},
+                        {"question_num": 2, "question_text": "Text B", "correct_answer": "f"},
+                        {"question_num": 3, "question_text": "Text C", "correct_answer": "b"},
+                        {"question_num": 4, "question_text": "Text D", "correct_answer": "a"},
+                        {"question_num": 5, "question_text": "Text E", "correct_answer": "c"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "multiple_choice",
+                    "title": "Aufgabe 2 – Einen Text verstehen",
+                    "instruction": "Lesen Sie den Text und wählen Sie die richtige Antwort (a, b oder c).",
+                    "text": "Die Deutsche Energiewende: Zwischen Anspruch und Wirklichkeit\n\nAls Deutschland 2011 beschloss, bis 2022 alle Kernkraftwerke abzuschalten und gleichzeitig den CO₂-Ausstoß drastisch zu reduzieren, wurde das als historisches Experiment gefeiert. Mehr als ein Jahrzehnt später zeigt sich, dass der Weg steiniger ist als erwartet – aber auch erfolgreicher in mancher Hinsicht.\n\nAuf der Habenseite steht der massive Ausbau erneuerbarer Energien: Wind- und Solarkraft deckten 2023 knapp 59 Prozent des Bruttostromverbrauchs. Gleichzeitig sanken die Kosten für Photovoltaik seit 2010 um über 90 Prozent, was neue Geschäftsmodelle wie Mieterstromprojekte und Energiegemeinschaften ermöglicht. Hunderttausende Bürgerinnen und Bürger sind inzwischen selbst Energieerzeuger.\n\nAuf der Schuldenseite stehen strukturelle Schwächen. Der Netzausbau hinkt der Erzeugungskapazität hinterher: Während im windreichen Norden zeitweise überschüssiger Strom ins Ausland verschenkt wird, müssen im Süden konventionelle Kraftwerke weiterlaufen, weil die Leitungen fehlen. Die Netzentgelte – also der Anteil der Stromrechnung, der für Infrastruktur bezahlt wird – stiegen 2024 auf ein Rekordniveau und belasten besonders Haushalte mit geringem Einkommen.\n\nEin weiteres Strukturproblem ist der Rückstand beim Wärmesektor. Heizungen, Warmwasser und Industrieöfen verbrauchen in Deutschland mehr Energie als der gesamte Stromsektor. Die Wärmewende – also die Umstellung auf Wärmepumpen, Fernwärme und solare Thermie – kommt deutlich langsamer voran als die Stromwende, unter anderem weil Sanierungsmaßnahmen teuer und bürokratisch aufwändig sind.\n\nDennoch: Im internationalen Vergleich gilt Deutschland trotz aller Widersprüche als Referenzmodell. Kein anderes großes Industrieland hat bisher eine vergleichbare Transformation gewagt. Die entscheidende Frage ist, ob der politische Wille ausreicht, die Lücken zu schließen – Netze ausbauen, Wärme dekarbonisieren, soziale Ausgleichsmechanismen stärken –, bevor die Klimaziele 2030 unwiederbringlich verfehlt werden.",
+                    "questions": [
+                        {"question_num": 6, "question_text": "Was wird auf der Habenseite der Energiewende genannt?", "options": ["a) Der vollständige Ausstieg aus fossilen Brennstoffen", "b) Der starke Ausbau von Wind- und Solarenergie", "c) Der pünktliche Abschluss des Netzausbaus"], "correct_answer": "b"},
+                        {"question_num": 7, "question_text": "Warum wird im Norden Deutschlands manchmal Strom verschenkt?", "options": ["a) Weil der Strombedarf im Norden sehr gering ist", "b) Weil es zu wenig Windkraftanlagen gibt", "c) Weil fehlende Leitungen den Transport in den Süden verhindern"], "correct_answer": "c"},
+                        {"question_num": 8, "question_text": "Was versteht der Text unter der 'Wärmewende'?", "options": ["a) Die Umstellung des Heizsektors auf erneuerbare Energien", "b) Die Erhöhung der Raumtemperatur in öffentlichen Gebäuden", "c) Die Verbesserung des Wetters durch weniger CO₂"], "correct_answer": "a"},
+                        {"question_num": 9, "question_text": "Welche Haltung nimmt der Text zur Energiewende insgesamt ein?", "options": ["a) Rein kritisch — die Energiewende ist gescheitert", "b) Rein optimistisch — die Energiewende ist ein voller Erfolg", "c) Differenziert — Fortschritte und Probleme werden gleichzeitig anerkannt"], "correct_answer": "c"},
+                        {"question_num": 10, "question_text": "Was ist laut Text die entscheidende Voraussetzung, um die Klimaziele 2030 zu erreichen?", "options": ["a) Mehr Kernkraftwerke bauen", "b) Netzausbau, Wärmedekarbonisierung und sozialen Ausgleich beschleunigen", "c) Den Stromverbrauch in Privathaushalten halbieren"], "correct_answer": "b"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "anzeigen",
+                    "title": "Aufgabe 3 – Anzeigen verstehen",
+                    "instruction": "Lesen Sie die Situationen 11–20 und die Anzeigen a–l. Welche Anzeige passt zu welcher Situation? Zwei Anzeigen passen zu keiner Situation (x).",
+                    "anzeigen": [
+                        {"id": "a", "text": "Klimavolontariat – 6 Monate in Costa Rica: Mitarbeit an Wiederaufforstungsprojekten im Regenwald. Vorkenntnisse in Biologie oder Forstwirtschaft erwünscht, aber nicht Pflicht. Unterkunft inklusive. Mindestalter 20 Jahre."},
+                        {"id": "b", "text": "Fernkurs: Energieberatung für Wohngebäude (IHK-zertifiziert). 12 Monate, vollständig online. Ideal für Handwerker, Architekten und Ingenieure, die Kunden beim energetischen Sanieren beraten möchten."},
+                        {"id": "c", "text": "Stellenangebot: Klimaschutzmanager/in für mittelständisches Produktionsunternehmen (Vollzeit, Stuttgart). Aufgabe: Emissionsbilanzierung, Maßnahmenplanung, Reporting an Geschäftsleitung."},
+                        {"id": "d", "text": "Bürgerwindpark Nordfriesland sucht Mitglieder: Investieren Sie ab 1.000 Euro in lokale Windenergie und erhalten Sie jährliche Ausschüttungen. Informationsabend am 15. Mai, Gemeindehaus Husum."},
+                        {"id": "e", "text": "Forschungsstipendium Klimaökonomie: Die Heinrich-Böll-Stiftung vergibt 5 Promotionsstipendien für Projekte an der Schnittstelle von Klima- und Wirtschaftswissenschaften. Bewerbung bis 30. September."},
+                        {"id": "f", "text": "Nachhilfekurs Deutsch B1/B2 für Umweltberufe: Fachsprachliche Kommunikation in Umweltbehörden, NGOs und Nachhaltigkeitsabteilungen. Online, Di/Do 18–20 Uhr."},
+                        {"id": "g", "text": "Solar-Contracting für Mehrfamilienhäuser: Wir installieren eine Photovoltaikanlage auf Ihrem Dach ohne Investitionskosten. Mieter und Eigentümer profitieren vom Mieterstrom. Kostenlose Beratung: 0800 123 456."},
+                        {"id": "h", "text": "Ehrenamtliche Klimabildung: Werden Sie Klimabotschafter/in und besuchen Sie Schulen in Ihrer Region. Schulungen erfolgen durch die Deutsche Klimastiftung. Zeitaufwand: ca. 4 Std./Monat."},
+                        {"id": "i", "text": "Masterarbeit-Förderung Erneuerbare Energien: Hannover Rück und TU Hamburg vergeben gemeinsam drei Förderungen à 3.000 Euro für Abschlussarbeiten zu Versicherungslösungen für Klimarisiken. Nur für Masterstudierende."},
+                        {"id": "j", "text": "Wohngemeinschaft sucht umweltbewusste Mitbewohner/in (80 m², 3 Zimmer, Passivhaus, Leipzig). Gemeinschaftsgarten, Lastenrad vorhanden. Miete 420 Euro warm."},
+                        {"id": "k", "text": "Grüne Berufsausbildung: Ausbildung zum/zur Anlagenmechaniker/in mit Spezialisierung auf Wärmepumpen und Solarthermie. Betrieb in Hamburg, Ausbildungsdauer 3 Jahre. Bewerbung bis 1. März."},
+                        {"id": "l", "text": "Workshop 'Klimakommunikation': Wie erkläre ich Klimawandel verständlich? Für Lehrer, Journalisten und NGO-Mitarbeitende. Samstag, 9–17 Uhr, München. Teilnahme kostenlos, Anmeldung erforderlich."}
+                    ],
+                    "questions": [
+                        {"question_num": 11, "situation": "Frau Schulz ist Architektin und möchte sich auf die energetische Sanierung von Gebäuden spezialisieren, ohne ihren Job aufzugeben.", "question_text": "Welche Anzeige passt?", "correct_answer": "b"},
+                        {"question_num": 12, "situation": "Herr Okafor hat einen Abschluss in Wirtschaftswissenschaften und möchte promovieren. Er interessiert sich für die ökonomischen Aspekte des Klimaschutzes.", "question_text": "Welche Anzeige passt?", "correct_answer": "e"},
+                        {"question_num": 13, "situation": "Eine Wohnungseigentümerin möchte Solarstrom für ihre Mieter bereitstellen, hat aber kein Kapital für eine PV-Anlage.", "question_text": "Welche Anzeige passt?", "correct_answer": "g"},
+                        {"question_num": 14, "situation": "Ein Lehrer möchte lernen, wie er das Thema Klimawandel für Schüler anschaulich erklären kann.", "question_text": "Welche Anzeige passt?", "correct_answer": "l"},
+                        {"question_num": 15, "situation": "Herr Bauer ist Masterstudent Ingenieurwesen und sucht eine finanzielle Unterstützung für seine Abschlussarbeit über klimabezogene Versicherungsprodukte.", "question_text": "Welche Anzeige passt?", "correct_answer": "i"},
+                        {"question_num": 16, "situation": "Frau Meier ist Betriebswirtin (35) und sucht eine Vollzeitstelle, bei der sie die Klimabilanz eines Unternehmens verbessern kann.", "question_text": "Welche Anzeige passt?", "correct_answer": "c"},
+                        {"question_num": 17, "situation": "Ein junger Schulabgänger möchte eine handwerkliche Ausbildung machen und sich gleichzeitig auf Heiztechnik mit erneuerbaren Energien spezialisieren.", "question_text": "Welche Anzeige passt?", "correct_answer": "k"},
+                        {"question_num": 18, "situation": "Frau Tanaka sucht eine Wohnung in einer umweltbewussten Wohngemeinschaft und möchte wenig Miete zahlen.", "question_text": "Welche Anzeige passt?", "correct_answer": "j"},
+                        {"question_num": 19, "situation": "Eine Privatperson möchte 2.000 Euro in regionale erneuerbare Energie investieren und an Renditen beteiligt werden.", "question_text": "Welche Anzeige passt?", "correct_answer": "d"},
+                        {"question_num": 20, "situation": "Herr Diallo ist Biologiestudent und möchte mehrere Monate im Ausland an einem ökologischen Projekt mitarbeiten.", "question_text": "Welche Anzeige passt?", "correct_answer": "a"}
+                    ]
+                }
+            ]
+        },
+        "hoeren": {
+            "total_questions": 20,
+            "duration_minutes": 40,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "kurzgespraeche",
+                    "title": "Aufgabe 1 – Kurze Texte",
+                    "instruction": "Sie hören fünf kurze Texte. Jeder Sprecher äußert sich zum Thema Klimaschutz. Sind die Aussagen richtig oder falsch? Sie hören jeden Text einmal.",
+                    "heard_times": 1,
+                    "preparation_seconds": 30,
+                    "topic": "Klimaschutz — persönliche Verantwortung oder Aufgabe des Staates?",
+                    "conversations": [
+                        {
+                            "conv_num": 1,
+                            "sprecher": [{"name": "Frau Dr. Hoffmann", "voice_id": "Aoede"}],
+                            "script_segments": [
+                                {"sprecher": "Frau Dr. Hoffmann", "text": "[nachdenklich] Ich forsche seit zwanzig Jahren zu Klimapolitik, und eine Frage kehrt immer wieder: Wer ist eigentlich verantwortlich? Aus meiner Perspektive ist individuelles Verhalten zwar wichtig, aber ohne strukturelle Rahmenbedingungen verpufft es wirkungslos. Man kann nicht erwarten, dass Menschen freiwillig auf ihr Auto verzichten, solange der öffentliche Nahverkehr in ländlichen Regionen praktisch nicht existiert. Der Staat muss Alternativen schaffen, bevor er Verbote ausspricht. Klimaschutz durch schlechtes Gewissen funktioniert nicht dauerhaft."}
+                            ],
+                            "questions": [{"question_num": 1, "question_type": "richtig_falsch", "question_text": "Frau Dr. Hoffmann glaubt, dass individuelle Maßnahmen ohne staatliche Rahmenbedingungen ausreichen.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 2,
+                            "sprecher": [{"name": "Herr Mayer", "voice_id": "Charon"}],
+                            "script_segments": [
+                                {"sprecher": "Herr Mayer", "text": "[entschlossen] Ich habe letztes Jahr mein Leben umgestellt: kein Fleisch mehr, kein Flugzeug, Solaranlage auf dem Dach. Natürlich weiß ich, dass mein Fußabdruck allein nicht die Welt rettet. Aber ich weigere mich, auf Veränderungen der Politik zu warten, während die Welt brennt. Jeder Mensch der aufhört, kurzfristig nach Thailand zu fliegen und stattdessen mit dem Zug in die Alpen fährt, sendet ein Signal – an die Industrie, an Politiker und an Freunde. Wandel beginnt immer im Kleinen."}
+                            ],
+                            "questions": [{"question_num": 2, "question_type": "richtig_falsch", "question_text": "Herr Mayer hat seinen Lebensstil aus Überzeugung geändert, obwohl er die globale Wirkung für begrenzt hält.", "correct_answer": "Richtig"}]
+                        },
+                        {
+                            "conv_num": 3,
+                            "sprecher": [{"name": "eine Studentin", "voice_id": "Kore"}],
+                            "script_segments": [
+                                {"sprecher": "eine Studentin", "text": "[kritisch] Ich studiere Politikwissenschaft und bin ehrlich gesagt frustriert. Auf der einen Seite werden wir jungen Menschen moralisch unter Druck gesetzt, unseren Konsum zu reduzieren. Auf der anderen Seite subventioniert der Staat weiterhin fossile Brennstoffe mit Milliarden. Das ist Heuchelei. Wenn ich meinen Fleischkonsum reduziere, spart das Gramme an CO₂, während ein einziger Kurzstreckenflug eines Managers das Vielfache emittiert. Ich halte die Individualisierung von Klimaschutz für eine Ablenkungsstrategie der Industrie."}
+                            ],
+                            "questions": [{"question_num": 3, "question_type": "richtig_falsch", "question_text": "Die Studentin findet es gerecht, dass Einzelpersonen stärker in der Pflicht stehen als Unternehmen.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 4,
+                            "sprecher": [{"name": "Herr Prof. Bauer", "voice_id": "Orus"}],
+                            "script_segments": [
+                                {"sprecher": "Herr Prof. Bauer", "text": "[sachlich] Als Ökonom sehe ich das pragmatisch. Der effizienteste Hebel für Klimaschutz ist ein ausreichend hoher CO₂-Preis. Wenn Emissionen einen realen Preis tragen, verändert sich das Verhalten von Unternehmen und Konsumenten automatisch – ohne dass der Staat jede Entscheidung regulieren muss. Das setzt Innovationsanreize frei und lässt den Markt die kostengünstigsten Lösungen finden. Das Aufkommen aus dem Emissionshandel sollte gleichmäßig an alle Bürger zurückverteilt werden, um soziale Ungerechtigkeit zu vermeiden."}
+                            ],
+                            "questions": [{"question_num": 4, "question_type": "richtig_falsch", "question_text": "Prof. Bauer befürwortet eine direkte staatliche Regulierung aller Klimaentscheidungen.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 5,
+                            "sprecher": [{"name": "Frau Keller", "voice_id": "Aoede"}],
+                            "script_segments": [
+                                {"sprecher": "Frau Keller", "text": "[besorgt] Ich bin Rentnerin und lebe auf dem Land. Für mich ist Klimaschutz kein abstraktes Thema mehr. Letzten Sommer hat der Starkregen unsere Keller überschwemmt und die Ernte meines Nachbarn vernichtet. Ich versuche, sparsam zu leben, aber ich bin auf mein Auto angewiesen, weil der Bus hier nur zweimal am Tag fährt. Was mich ärgert: Die Maßnahmen, die diskutiert werden, treffen immer Menschen wie mich – die wenig verdienen und keine Wahl haben. Klimagerechtigkeit muss mitgedacht werden."}
+                            ],
+                            "questions": [{"question_num": 5, "question_type": "richtig_falsch", "question_text": "Frau Keller lebt in der Stadt und nutzt öffentliche Verkehrsmittel.", "correct_answer": "Falsch"}]
+                        }
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "gespraech",
+                    "title": "Aufgabe 2 – Ein Interview",
+                    "instruction": "Sie hören ein Radiointerview. Sind die Aussagen richtig oder falsch? Sie hören das Interview zweimal.",
+                    "heard_times": 2,
+                    "preparation_seconds": 60,
+                    "sprecher": [
+                        {"name": "Moderator", "voice_id": "Charon"},
+                        {"name": "Prof. Dr. Anna Brenner", "voice_id": "Kore"}
+                    ],
+                    "script_segments": [
+                        {"sprecher": "Moderator", "text": "[professionell] Herzlich willkommen zu 'Zukunft jetzt'. Heute sprechen wir über die Energiewende mit Prof. Dr. Anna Brenner von der Universität Freiburg. Frau Professor, ist die Energiewende auf Kurs?"},
+                        {"sprecher": "Prof. Dr. Anna Brenner", "text": "[differenziert] Kommt darauf an, wie man Kurs definiert. Im Stromsektor sind wir gut vorangekommen — fast 60 Prozent erneuerbare Energie ist bemerkenswert. Aber Strom ist nur ein Drittel unseres Energiesystems. Im Wärme- und Verkehrssektor hinken wir massiv hinterher."},
+                        {"sprecher": "Moderator", "text": "Was sind die größten Hindernisse?"},
+                        {"sprecher": "Prof. Dr. Anna Brenner", "text": "Drei Faktoren. Erstens: der Netzausbau. Wir bauen Windkraft schneller als Leitungen. Das führt paradoxerweise dazu, dass wir Windstrom abregeln und gleichzeitig Kohlekraftwerke laufen lassen. Zweitens: der Sanierungsstau bei Gebäuden. Zwei Drittel der deutschen Gebäude wurden vor 1979 gebaut und haben kaum Dämmung. Die Sanierungsquote liegt bei unter einem Prozent pro Jahr — wir müssten auf drei Prozent kommen. Drittens: die mangelnde Akzeptanz. Neue Stromleitungen und Windparks werden vor Ort oft abgelehnt."},
+                        {"sprecher": "Moderator", "text": "Wie könnte man die Sanierungsquote erhöhen?"},
+                        {"sprecher": "Prof. Dr. Anna Brenner", "text": "[überlegend] Das ist ein Verteilungskonflikt. Viele Hausbesitzer können sich Sanierungen nicht leisten oder wollen den Aufwand scheuen. Steuerliche Anreize helfen denjenigen, die ohnehin Steuern zahlen — also eher wohlhabenderen Eigentümern. Für Geringverdiener brauchen wir zinsgünstige Kredite und staatliche Zuschüsse, die unbürokratisch zugänglich sind."},
+                        {"sprecher": "Moderator", "text": "Kommen wir zur Akzeptanz. Warum ist sie so gering?"},
+                        {"sprecher": "Prof. Dr. Anna Brenner", "text": "Lokale Betroffenheit ist real. Wenn ein Windpark sechzig Meter von der Wohnbebauung entfernt gebaut wird, dann ist der Widerstand verständlich. Meine Forschung zeigt allerdings, dass Akzeptanz deutlich steigt, wenn Anwohner finanziell beteiligt werden — sei es durch Bürgerenergieprojekte oder kommunale Gewinnbeteiligungen. Wer profitiert, akzeptiert eher."},
+                        {"sprecher": "Moderator", "text": "Deutschland hat 2023 die letzten Kernkraftwerke abgeschaltet. War das richtig?"},
+                        {"sprecher": "Prof. Dr. Anna Brenner", "text": "[bedächtig] Aus strikt klimawissenschaftlicher Sicht wäre es sinnvoller gewesen, Kernkraft als Brückentechnologie zu behalten, solange Kohlekraftwerke noch laufen. Gleichzeitig verstehe ich die gesellschaftliche Entscheidung nach Fukushima. Der Atomkonsens war demokratisch legitimiert, und ihn jetzt rückgängig zu machen wäre politisch kaum durchsetzbar. Ich plädiere nicht für den Wiedereinstieg, aber für Ehrlichkeit: Dieser Ausstieg hat uns CO₂-Ziele gekostet."},
+                        {"sprecher": "Moderator", "text": "Was erwarten Sie von der Politik bis 2030?"},
+                        {"sprecher": "Prof. Dr. Anna Brenner", "text": "Mehr Tempo beim Netzausbau, eine Wärmepumpenoffensive mit sozialer Abfederung und verbindliche CO₂-Preise, die auch wirklich wehtun. Und Ehrlichkeit gegenüber der Bevölkerung: Die Transformation ist teuer, aber das Nichthandeln wäre noch teurer. Jeder Euro, den wir heute in Klimaschutz investieren, spart laut Schätzungen drei bis sieben Euro an Klimaschäden in der Zukunft."},
+                        {"sprecher": "Moderator", "text": "Frau Professor Brenner, vielen Dank für dieses Gespräch."},
+                        {"sprecher": "Prof. Dr. Anna Brenner", "text": "Gern geschehen."}
+                    ],
+                    "questions": [
+                        {"question_num": 6, "question_type": "richtig_falsch", "question_text": "Prof. Brenner ist der Ansicht, dass die Energiewende im Stromsektor gut vorankommt.", "correct_answer": "Richtig"},
+                        {"question_num": 7, "question_type": "richtig_falsch", "question_text": "Laut Prof. Brenner ist der Wärmesektor weiter fortgeschritten als der Stromsektor.", "correct_answer": "Falsch"},
+                        {"question_num": 8, "question_type": "richtig_falsch", "question_text": "Der Netzausbau hält mit dem Ausbau erneuerbarer Energien Schritt.", "correct_answer": "Falsch"},
+                        {"question_num": 9, "question_type": "richtig_falsch", "question_text": "Prof. Brenner hält steuerliche Anreize für das beste Mittel, um auch einkommensschwache Hausbesitzer zur Sanierung zu bewegen.", "correct_answer": "Falsch"},
+                        {"question_num": 10, "question_type": "richtig_falsch", "question_text": "Laut Forschung von Prof. Brenner steigt die Akzeptanz von Windparks, wenn Anwohner finanziell beteiligt werden.", "correct_answer": "Richtig"},
+                        {"question_num": 11, "question_type": "richtig_falsch", "question_text": "Prof. Brenner befürwortet einen Wiedereinstieg in die Kernkraft.", "correct_answer": "Falsch"},
+                        {"question_num": 12, "question_type": "richtig_falsch", "question_text": "Sie hält den Atomausstieg für klimapolitisch optimal.", "correct_answer": "Falsch"},
+                        {"question_num": 13, "question_type": "richtig_falsch", "question_text": "Die aktuelle Sanierungsquote bei Gebäuden liegt laut Prof. Brenner bei unter einem Prozent.", "correct_answer": "Richtig"},
+                        {"question_num": 14, "question_type": "richtig_falsch", "question_text": "Prof. Brenner ist der Meinung, dass Klimaschutzinvestitionen heute langfristig Geld sparen.", "correct_answer": "Richtig"},
+                        {"question_num": 15, "question_type": "richtig_falsch", "question_text": "Die Professorin fordert niedrigere CO₂-Preise, um die Wirtschaft zu entlasten.", "correct_answer": "Falsch"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "ansagen",
+                    "title": "Aufgabe 3 – Kurze Radiotexte",
+                    "instruction": "Sie hören fünf kurze Radiotexte. Sind die Aussagen richtig oder falsch? Sie hören jeden Text zweimal.",
+                    "heard_times": 2,
+                    "preparation_seconds": 30,
+                    "ansagen": [
+                        {
+                            "ansage_num": 1, "sprecher": "Moderatorin", "voice_id": "Kore",
+                            "text": "[sachlich] Nachrichten aus Brüssel: Das Europäische Parlament hat heute mit deutlicher Mehrheit verschärfte CO₂-Grenzwerte für Neuwagen ab 2030 beschlossen. Ab diesem Jahr dürfen neu zugelassene Pkw im Flottendurchschnitt maximal 50 Gramm CO₂ pro Kilometer ausstoßen — das entspricht einer Halbierung gegenüber den heutigen Werten. Automobilverbände kritisieren die Frist als zu kurz, Umweltorganisationen fordern einen vollständigen Verbrennerausstieg.",
+                            "question_num": 16, "question_type": "richtig_falsch", "question_text": "Die neuen CO₂-Grenzwerte für Neuwagen sehen eine Halbierung der Emissionen bis 2030 vor.", "correct_answer": "Richtig"
+                        },
+                        {
+                            "ansage_num": 2, "sprecher": "Ansager", "voice_id": "Fenrir",
+                            "text": "Meldung aus der Forschung: Ein internationales Wissenschaftlerteam hat im Fachjournal 'Nature' eine neue Methode zur CO₂-Speicherung vorgestellt. Das Verfahren bindet Kohlendioxid aus der Atmosphäre in mineralischen Gesteinsformationen — dauerhaft und ohne Leckagerisiko, so die Forscher. Die Technologie befindet sich jedoch noch im Pilotmaßstab und ist derzeit rund dreimal teurer als der aktuelle EU-Emissionshandelspreis.",
+                            "question_num": 17, "question_type": "richtig_falsch", "question_text": "Die neue CO₂-Speichermethode ist bereits kosteneffizient genug für den Massenmarkt.", "correct_answer": "Falsch"
+                        },
+                        {
+                            "ansage_num": 3, "sprecher": "Moderatorin", "voice_id": "Kore",
+                            "text": "[informativ] Verkehrsmeldung für den Klimastreik morgen in Berlin: Die Polizei rechnet mit bis zu 80.000 Teilnehmenden. Die Route führt vom Hauptbahnhof über die Invalidenstraße zum Brandenburger Tor. Mehrere S- und U-Bahnlinien werden ab 13 Uhr eingeschränkt. Reisende werden gebeten, frühere Verbindungen zu nutzen oder auf Umsteigemöglichkeiten auszuweichen.",
+                            "question_num": 18, "question_type": "richtig_falsch", "question_text": "Der Klimastreik in Berlin endet am Hauptbahnhof.", "correct_answer": "Falsch"
+                        },
+                        {
+                            "ansage_num": 4, "sprecher": "Ansager", "voice_id": "Fenrir",
+                            "text": "Wirtschaftsnachrichten: Der Bundesverband der deutschen Industrie warnt vor Wettbewerbsnachteilen durch einseitige europäische Klimapolitik. Wenn außereuropäische Konkurrenten keine vergleichbaren CO₂-Kosten tragen müssten, drohten Produktionsverlagerungen. Der Verband fordert deshalb eine Verlängerung kostenloser Emissionszertifikate für energieintensive Branchen bis mindestens 2035 sowie rasche Einigung auf einen EU-weiten CO₂-Grenzausgleichsmechanismus.",
+                            "question_num": 19, "question_type": "richtig_falsch", "question_text": "Der Industrieverband unterstützt eine sofortige vollständige Abschaffung kostenloser Emissionszertifikate.", "correct_answer": "Falsch"
+                        },
+                        {
+                            "ansage_num": 5, "sprecher": "Moderatorin", "voice_id": "Kore",
+                            "text": "[warm] Gute Nachrichten aus der Natur: Das Bundesamt für Naturschutz meldet, dass die Bestände des Weißstorchs in Deutschland erstmals seit Jahrzehnten wieder zugenommen haben. Rund 10.000 Brutpaare wurden 2023 gezählt — ein Anstieg von 15 Prozent gegenüber dem Vorjahr. Experten führen die Erholung auf mildere Winter und erfolgreiche Renaturierungsprojekte in der Elbaue und am Oberrhein zurück.",
+                            "question_num": 20, "question_type": "richtig_falsch", "question_text": "Die Zunahme der Weißstorch-Population wird unter anderem auf Renaturierungsprojekte zurückgeführt.", "correct_answer": "Richtig"
+                        }
+                    ]
+                }
+            ]
+        },
+        "sprachbausteine": {
+            "total_questions": 20,
+            "duration_minutes": 30,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "lueckentext_mc",
+                    "title": "Aufgabe 1 – Lückentext",
+                    "instruction": "Lesen Sie den Text und wählen Sie das passende Wort (a, b oder c).",
+                    "text_with_gaps": "Sehr geehrte Damen und Herren des Stadtrats,\n\nals Vertreterin der Bürgerinitiative 'Klimagerechtes Neustadt' {21} ich mich mit einem dringenden Anliegen an Sie. Unsere Stadt {22} erheblichen Nachholbedarf beim Ausbau der Fahrradinfrastruktur. {23} in anderen deutschen Städten längst komfortable Radschnellwege entstanden sind, {24} unsere Innenstadt nach wie vor von mehrspurigen Autostraßen geprägt.\n\nWir {25}, dass ein sicheres und zusammenhängendes Radwegenetz nicht nur den Klimaschutzzielen der Stadt dienen {26}, sondern auch die Lebensqualität für alle Einwohner verbessern {27}. Untersuchungen belegen, dass Städte, {28} stark in Radinfrastruktur investiert haben, deutlich niedrigere Unfallzahlen im Straßenverkehr {29}.\n\nWir bitten Sie daher, im kommenden Haushaltsplan mindestens drei Millionen Euro für den Radwegeausbau einzustellen. Sollte dies aus finanziellen Gründen nicht sofort möglich sein, {30} wir zumindest die Einrichtung temporärer Radwege durch Ummarkierung bestehender Fahrspuren als Sofortmaßnahme.",
+                    "options": [
+                        {"question_num": 21, "a": "wende", "b": "weise", "c": "zeige", "correct_answer": "a"},
+                        {"question_num": 22, "a": "besitzt", "b": "verfügt", "c": "hat", "correct_answer": "c"},
+                        {"question_num": 23, "a": "Obwohl", "b": "Während", "c": "Weil", "correct_answer": "b"},
+                        {"question_num": 24, "a": "bleibt", "b": "ist", "c": "wird", "correct_answer": "b"},
+                        {"question_num": 25, "a": "behaupten", "b": "sind überzeugt", "c": "beweisen", "correct_answer": "b"},
+                        {"question_num": 26, "a": "würde", "b": "wird", "c": "soll", "correct_answer": "a"},
+                        {"question_num": 27, "a": "kann", "b": "würde", "c": "dürfte", "correct_answer": "b"},
+                        {"question_num": 28, "a": "die", "b": "welche", "c": "wo", "correct_answer": "a"},
+                        {"question_num": 29, "a": "aufweisen", "b": "haben", "c": "zeigen", "correct_answer": "a"},
+                        {"question_num": 30, "a": "fordern", "b": "beantragen", "c": "ersuchen", "correct_answer": "a"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "lueckentext_wortbank",
+                    "title": "Aufgabe 2 – Wortschatz",
+                    "instruction": "Lesen Sie den Text. Welches Wort (a–o) passt in welche Lücke? Fünf Wörter passen nicht.",
+                    "text_with_gaps": "Klimapolitik zwischen Ambition und Realität\n\nDie internationale Klimapolitik steckt in einem {31}: Einerseits drängt die Wissenschaft auf rasches Handeln, andererseits bremsen nationale Eigeninteressen und wirtschaftliche Bedenken den Fortschritt. Seit dem Pariser {32} von 2015 haben sich über 190 Staaten verpflichtet, die Erderwärmung auf deutlich unter zwei Grad zu begrenzen. Doch die {33} zwischen Versprechen und tatsächlichen Emissionsreduktionen bleibt besorgniserregend groß.\n\nExperten betonen, dass technologische Lösungen allein nicht ausreichen. Nötig sei ein tiefgreifender gesellschaftlicher {34}, der Konsum- und Produktionsmuster grundlegend verändere. Besonders kritisch ist die Lage in {35} Ländern, die noch mitten in ihrer Industrialisierung stecken und zu Recht darauf hinweisen, dass reiche Industriestaaten ihren {36} durch fossile Brennstoffe historisch aufgebaut haben.\n\nEin {37} Instrument ist der CO₂-Preis: Er setzt wirtschaftliche Anreize, ohne direkte Verbote auszusprechen. Allerdings ist seine Wirkung begrenzt, wenn er zu niedrig angesetzt wird oder wenn er nicht international {38} wird. Länder, die einseitig hohe Klimastandards einführen, riskieren andernfalls, Industrien ins Ausland zu {39}.\n\nLetztlich gilt: Der {40} liegt nicht in einem einzigen Instrument, sondern in einem kohärenten Mix aus Regulierung, Preissignalen, Investitionen und gesellschaftlichem Wandel.",
+                    "wortbank": [
+                        {"id": "a", "word": "DILEMMA"},
+                        {"id": "b", "word": "ABKOMMEN"},
+                        {"id": "c", "word": "LÜCKE"},
+                        {"id": "d", "word": "WANDEL"},
+                        {"id": "e", "word": "AUFSTREBENDEN"},
+                        {"id": "f", "word": "WOHLSTAND"},
+                        {"id": "g", "word": "BEWÄHRTES"},
+                        {"id": "h", "word": "KOORDINIERT"},
+                        {"id": "i", "word": "VERLAGERN"},
+                        {"id": "j", "word": "SCHLÜSSEL"},
+                        {"id": "k", "word": "KONFLIKT"},
+                        {"id": "l", "word": "VERTRAG"},
+                        {"id": "m", "word": "DIFFERENZ"},
+                        {"id": "n", "word": "WACHSTUM"},
+                        {"id": "o", "word": "EFFIZIENZ"}
+                    ],
+                    "options": [
+                        {"question_num": 31, "correct_answer": "a"},
+                        {"question_num": 32, "correct_answer": "b"},
+                        {"question_num": 33, "correct_answer": "c"},
+                        {"question_num": 34, "correct_answer": "d"},
+                        {"question_num": 35, "correct_answer": "e"},
+                        {"question_num": 36, "correct_answer": "f"},
+                        {"question_num": 37, "correct_answer": "g"},
+                        {"question_num": 38, "correct_answer": "h"},
+                        {"question_num": 39, "correct_answer": "i"},
+                        {"question_num": 40, "correct_answer": "j"}
+                    ]
+                }
+            ]
+        },
+        "schreiben": {
+            "total_time_minutes": 45,
+            "aufgaben": [{
+                "aufgabe_num": 1,
+                "aufgabe_typ": "erorterung",
+                "aufgabe": "In Deutschland wird diskutiert, ob Inlandsflüge verboten werden sollten, um CO₂-Emissionen zu senken. Alternativen wie der Ausbau des Hochgeschwindigkeitszugs werden als Ersatz vorgeschlagen.\n\nSchreiben Sie einen argumentativen Aufsatz zu diesem Thema. Berücksichtigen Sie dabei:\n• Argumente für ein Verbot von Inlandsflügen\n• Argumente dagegen\n• Ihre eigene Position mit Begründung\n\nSchreiben Sie ca. 200 Wörter.",
+                "min_words": 180,
+                "max_words": 250
+            }]
+        },
+        "sprechen": {
+            "total_time_minutes": 15,
+            "teile": [
+                {
+                    "teil_num": 1,
+                    "titel": "Persönliche Einstellung zum Klimaschutz",
+                    "instructions": "Beschreiben Sie Ihre persönliche Haltung zum Thema Klimaschutz.",
+                    "fragen": [
+                        {"frage_num": 1, "frage_text": "[professionell] Herzlich willkommen. Bitte stellen Sie sich kurz vor und erzählen Sie mir, wie wichtig Ihnen Klimaschutz persönlich ist.", "needs_audio": True},
+                        {"frage_num": 2, "frage_text": "Welche konkreten Maßnahmen haben Sie in Ihrem Alltag umgesetzt, um Ihren CO₂-Fußabdruck zu reduzieren?", "needs_audio": True},
+                        {"frage_num": 3, "frage_text": "Glauben Sie, dass individuelle Maßnahmen wirklich einen Unterschied machen, oder liegt die Verantwortung hauptsächlich bei Staat und Wirtschaft?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "teil_num": 2,
+                    "titel": "Diskussion: Staatliche Verantwortung vs. individuelle Freiheit",
+                    "instructions": "Diskutieren Sie das folgende Thema mit dem Prüfer.",
+                    "fragen": [
+                        {"frage_num": 4, "frage_text": "Manche sagen, der Staat soll Bürger durch Verbote und Steuern zu klimafreundlichem Verhalten zwingen. Andere finden das einen Eingriff in die persönliche Freiheit. Wie sehen Sie das?", "needs_audio": True},
+                        {"frage_num": 5, "frage_text": "Würden Sie persönlich ein Verbot von Kurzstreckenflügen unterstützen, wenn es dafür günstigere und schnellere Zugverbindungen gäbe?", "needs_audio": True},
+                        {"frage_num": 6, "frage_text": "Wie könnte man sicherstellen, dass Klimaschutzmaßnahmen sozial gerecht sind und einkommensschwache Haushalte nicht unverhältnismäßig stark belasten?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "teil_num": 3,
+                    "titel": "Gemeinsam einen Stadtplan entwickeln",
+                    "instructions": "Entwickeln Sie gemeinsam mit dem Prüfer einen Klimaschutzplan für eine mittelgroße Stadt.",
+                    "aufgabe": "Eine Stadt mit 150.000 Einwohnern möchte bis 2035 klimaneutral werden. Diskutieren Sie, welche drei Maßnahmen die höchste Priorität haben sollten und warum.",
+                    "fragen": [
+                        {"frage_num": 7, "frage_text": "Welche drei Klimaschutzmaßnahmen würden Sie für eine Stadt dieser Größe priorisieren — zum Beispiel im Bereich Verkehr, Energie oder Gebäude?", "needs_audio": True},
+                        {"frage_num": 8, "frage_text": "Wie würden Sie mit Widerstand aus der Bevölkerung umgehen, wenn bestimmte Maßnahmen — wie eine City-Maut oder Parkgebührenerhöhungen — unpopulär sind?", "needs_audio": True}
+                    ]
+                }
+            ]
+        }
+    }
+
+
+# ── TELC B2 Seed 004 — Soziale Medien und digitale Gesellschaft ───────────────
+def get_telc_b2_seed_004():
+    return {
+        "exam_id": "exam_telc_b2_004",
+        "title": "TELC Deutsch B2 - Übungstest 4",
+        "exam_type": "telc",
+        "telc_level": "B2",
+        "pathway": "telc_b2",
+        "status": "pending_audio",
+        "audio_progress": 0,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "lesen": {
+            "total_questions": 20,
+            "duration_minutes": 90,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "zuordnung",
+                    "title": "Aufgabe 1 – Texte und Überschriften",
+                    "instruction": "Lesen Sie die Texte A–E und ordnen Sie ihnen die passenden Überschriften zu. Zwei Überschriften passen nicht.",
+                    "short_texts": [
+                        {"id": "A", "text": "Plattformen wie TikTok, Instagram und YouTube nutzen Algorithmen, die Nutzern immer weitere Inhalte vorschlagen, die zu ihren bisherigen Vorlieben passen. Dieses Prinzip steigert die Verweildauer enorm, kann jedoch zu sogenannten Filterblasen führen: Nutzer sehen vorwiegend Meinungen und Informationen, die ihre eigene Weltsicht bestätigen, während abweichende Perspektiven weitgehend ausgeblendet werden."},
+                        {"id": "B", "text": "Die Verbreitung von Falschinformationen über soziale Netzwerke hat in den letzten Jahren neue Dimensionen erreicht. Studien zeigen, dass unwahre Nachrichten auf Twitter/X sechsmal schneller geteilt werden als korrekte Meldungen. Emotionaler Inhalt, insbesondere Empörung und Angst, befördert die Weiterleitung — unabhängig vom Wahrheitsgehalt. Faktenchecks kommen oft zu spät, um der initialen Verbreitung entgegenzuwirken."},
+                        {"id": "C", "text": "Für Unternehmen sind soziale Medien zum unverzichtbaren Kommunikationskanal geworden. Influencer-Marketing, gezielte Werbeanzeigen und Community-Management ermöglichen eine direkte Ansprache der Zielgruppe — oft effizienter und kostengünstiger als klassische Medien. Gleichzeitig birgt die Öffentlichkeit sozialer Plattformen erhebliche Risiken: Ein viraler Fehler oder ein Shitstorm kann den Ruf eines Unternehmens innerhalb von Stunden nachhaltig schädigen."},
+                        {"id": "D", "text": "Psychologische Studien belegen einen Zusammenhang zwischen intensiver Social-Media-Nutzung und einem erhöhten Risiko für Depressionen und Angststörungen, besonders bei Jugendlichen. Der ständige Vergleich mit idealisierten Selbstdarstellungen anderer, Cybermobbing und die Angst, etwas zu verpassen (FOMO), belasten das psychische Wohlbefinden. Ob diese Korrelation kausal ist, bleibt wissenschaftlich umstritten."},
+                        {"id": "E", "text": "Immer mehr Länder diskutieren oder beschließen Regulierungen für digitale Plattformen. Die EU hat mit dem Digital Services Act (DSA) einen ambitionierten Rahmen geschaffen, der Plattformen zu mehr Transparenz, Rechenschaftspflicht und Bekämpfung illegaler Inhalte verpflichtet. Kritiker befürchten eine Beschränkung der Meinungsfreiheit; Befürworter sehen darin überfälligen Verbraucherschutz im digitalen Raum."}
+                    ],
+                    "ueberschriften": [
+                        {"id": "a", "text": "Warum emotionale Lügen sich schneller verbreiten als sachliche Wahrheiten"},
+                        {"id": "b", "text": "Wie Empfehlungsalgorithmen Meinungsvielfalt einschränken können"},
+                        {"id": "c", "text": "Soziale Medien als zweischneidiges Schwert für Unternehmen"},
+                        {"id": "d", "text": "Regulierung digitaler Plattformen: zwischen Schutz und Zensur"},
+                        {"id": "e", "text": "Psychische Gesundheit im Zeitalter der Selbstoptimierung online"},
+                        {"id": "f", "text": "Wie Influencer die Kaufentscheidungen junger Menschen beeinflussen"},
+                        {"id": "g", "text": "Warum Datenschutz im digitalen Zeitalter schwer durchzusetzen ist"},
+                        {"id": "h", "text": "KI-generierte Inhalte als neue Bedrohung für die Glaubwürdigkeit"},
+                        {"id": "i", "text": "Die wirtschaftliche Macht der sozialen Netzwerke"},
+                        {"id": "j", "text": "Digitale Entgiftung als Trend gegen übermäßigen Medienkonsum"}
+                    ],
+                    "questions": [
+                        {"question_num": 1, "question_text": "Text A", "correct_answer": "b"},
+                        {"question_num": 2, "question_text": "Text B", "correct_answer": "a"},
+                        {"question_num": 3, "question_text": "Text C", "correct_answer": "c"},
+                        {"question_num": 4, "question_text": "Text D", "correct_answer": "e"},
+                        {"question_num": 5, "question_text": "Text E", "correct_answer": "d"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "multiple_choice",
+                    "title": "Aufgabe 2 – Einen Text verstehen",
+                    "instruction": "Lesen Sie den Text und wählen Sie die richtige Antwort (a, b oder c).",
+                    "text": "Algorithmen und gesellschaftliche Meinungsbildung\n\nWie entscheiden Milliarden von Menschen täglich, was wahr ist, was relevant ist und welche politischen Positionen vertretbar sind? Zunehmend übernehmen Algorithmen diese Funktion — und das mit weitreichenden Konsequenzen für demokratische Gesellschaften.\n\nDie Logik sozialer Plattformen ist ökonomisch: Werbeumsätze steigen mit der Verweildauer der Nutzer, also werden Inhalte bevorzugt ausgespielt, die maximale Aufmerksamkeit erzeugen. Aufmerksamkeit wird am stärksten durch emotionale Erregung ausgelöst — Empörung, Angst, Bestätigung. Das Ergebnis: Algorithmen belohnen tendenziell Extreme, weil Extreme engagieren.\n\nDieses Prinzip verschärft gesellschaftliche Polarisierung. Zwei Nutzer, die denselben Suchbegriff eingeben, erhalten unterschiedliche Ergebnisse — gefiltert nach Standort, Gerät, Klickhistorie und sozialen Netzwerken. Innerhalb dieser personalisierten Informationsumgebungen — oft als Filterblasen bezeichnet — werden abweichende Meinungen immer seltener wahrgenommen. Das erschwert den gesellschaftlichen Diskurs, da eine gemeinsame Faktenbasis erodiert.\n\nBesonders problematisch ist die Intransparenz der Algorithmen. Welche Inhalte privilegiert werden und nach welchen Kriterien, bleibt meist ein Betriebsgeheimnis. Forscher haben gezeigt, dass auf YouTube der Algorithmus Nutzer schrittweise zu radikaleren Inhalten leitet — nicht aus ideologischen Gründen, sondern weil radikale Inhalte länger angeschaut werden.\n\nEine mögliche Gegenmaßnahme ist die algorithmische Pflicht zur Diversität: Plattformen könnten verpflichtet werden, neben inhaltlich bevorzugten Inhalten auch solche anzuzeigen, die anderen Perspektiven entsprechen. Dies hätte allerdings Einfluss auf Geschäftsmodelle und wirft Fragen zur Zensur auf. Die Debatte darüber, wer digitale Öffentlichkeit gestaltet — Konzerne, Staaten oder Nutzer selbst — ist eine der zentralen demokratischen Fragen unserer Zeit.",
+                    "questions": [
+                        {"question_num": 6, "question_text": "Warum werden emotionale Inhalte von Algorithmen bevorzugt ausgespielt?", "options": ["a) Weil emotionale Inhalte sachlich korrekter sind", "b) Weil sie die Verweildauer der Nutzer erhöhen", "c) Weil Plattformen gesellschaftliche Debatten fördern wollen"], "correct_answer": "b"},
+                        {"question_num": 7, "question_text": "Was versteht der Text unter 'Filterblasen'?", "options": ["a) Technische Fehler bei der Inhaltsanzeige", "b) Personalisierte Informationsumgebungen, die andere Meinungen ausblenden", "c) Sicherheitsmechanismen gegen Falschinformationen"], "correct_answer": "b"},
+                        {"question_num": 8, "question_text": "Warum leitet der YouTube-Algorithmus laut Forschern zu radikaleren Inhalten?", "options": ["a) Weil die Plattform bestimmte politische Inhalte fördert", "b) Weil radikalere Inhalte länger angeschaut werden", "c) Weil junge Nutzer diese Inhalte aktiv suchen"], "correct_answer": "b"},
+                        {"question_num": 9, "question_text": "Welche Maßnahme schlägt der Text als mögliche Lösung vor?", "options": ["a) Ein vollständiges Verbot von Empfehlungsalgorithmen", "b) Eine gesetzliche Pflicht für Plattformen, diverse Perspektiven anzuzeigen", "c) Die Einführung staatlicher Zensurbehörden"], "correct_answer": "b"},
+                        {"question_num": 10, "question_text": "Was ist laut Text das übergeordnete Problem, das der Artikel beschreibt?", "options": ["a) Übermäßige Nutzung sozialer Medien durch Jugendliche", "b) Der Einfluss von Algorithmen auf demokratische Meinungsbildung", "c) Die wirtschaftliche Dominanz amerikanischer Technologiekonzerne"], "correct_answer": "b"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "anzeigen",
+                    "title": "Aufgabe 3 – Anzeigen verstehen",
+                    "instruction": "Lesen Sie die Situationen 11–20 und die Anzeigen a–l. Welche Anzeige passt zu welcher Situation? Zwei Anzeigen passen zu keiner Situation (x).",
+                    "anzeigen": [
+                        {"id": "a", "text": "Medienkompetenztraining für Lehrkräfte: Wie erkennen Schüler Falschinformationen? Zweitägiger Workshop mit praktischen Unterrichtseinheiten. Zertifikat der Kultusministerkonferenz. Kosten: 120 Euro."},
+                        {"id": "b", "text": "Stellenangebot: Social-Media-Manager/in für gemeinnützige Organisation (Berlin, Teilzeit 20 Std/Woche). Aufgaben: Content-Erstellung, Community-Management, Analytics. Erfahrung mit Instagram und LinkedIn erforderlich."},
+                        {"id": "c", "text": "Masterprogramm Digital Communication & Society (M.A., 4 Semester, Universität Münster). Schwerpunkte: Algorithmen, Öffentlichkeit, Medienrecht. Zulassungsvoraussetzung: Bachelor in Sozial- oder Kommunikationswissenschaften."},
+                        {"id": "d", "text": "Coaching: Digitale Entgiftung — weniger Bildschirmzeit, mehr Lebensqualität. Einzelsitzungen und Gruppenangebote. Erstgespräch kostenlos. Für Privatpersonen und Unternehmen."},
+                        {"id": "e", "text": "Datenschutzberatung für KMU: Wir helfen Ihrem Unternehmen, DSGVO-konform zu werden. Audit, Dokumentation, Schulung. Erstberatung kostenfrei. Bundesweit tätig."},
+                        {"id": "f", "text": "Freie Stelle: Junior-Content-Creator für Lifestyle-Kanal auf YouTube (München). Videoproduktion und Schnitt, Trend-Recherche, Zusammenarbeit mit Influencern. Vorkenntnisse in Premiere Pro oder DaVinci Resolve erwünscht."},
+                        {"id": "g", "text": "Seminar: Algorithmen verstehen ohne Programmierkenntnisse — für Journalisten, Politologen und Sozialwissenschaftler. 2 Tage, Hamburg. Anmeldung bis 10 Tage vor Beginn."},
+                        {"id": "h", "text": "Eltern-Info-Abend: Soziale Medien und Jugendliche — Risiken, Chancen und Gesprächsstrategien. Kostenlos, Volksschule Augsburg, Donnerstag 19 Uhr. Kinder bitte zu Hause lassen."},
+                        {"id": "i", "text": "Doktorandenstelle: Lehrstuhl für Kommunikationswissenschaft, Universität Leipzig sucht Doktorand/in für DFG-Projekt zu politischer Polarisierung in sozialen Netzwerken. Voraussetzung: sehr guter Masterabschluss in Kommunikations-, Sozial- oder Politikwissenschaften."},
+                        {"id": "j", "text": "App-Entwicklung: Wir suchen UX-Designer (m/w/d) für ein Start-up im Bereich EdTech (Lernplattform). Erfahrung mit Figma oder Sketch. Remote-Option möglich. Gehalt: 50.000–65.000 Euro."},
+                        {"id": "k", "text": "Weiterbildung: Strategische Unternehmenskommunikation in sozialen Medien (IHK-Zertifikat). Abends und am Wochenende, 6 Monate. Ideal für PR- und Marketingfachleute, die sich aktualisieren möchten."},
+                        {"id": "l", "text": "Online-Kurs: Einführung in Datenjournalismus — von Excel bis Python. Für Journalisten und Kommunikationsprofis ohne Programmierkenntnisse. 8 Wochen, flexibel. Kosten: 299 Euro."}
+                    ],
+                    "questions": [
+                        {"question_num": 11, "situation": "Herr Koch ist Lehrer und möchte seinen Schülern beibringen, wie sie Falschinformationen im Internet erkennen. Er sucht eine professionelle Weiterbildung.", "question_text": "Welche Anzeige passt?", "correct_answer": "a"},
+                        {"question_num": 12, "situation": "Frau Ndiaye hat einen Masterabschluss in Sozialwissenschaften und möchte über politische Polarisierung in sozialen Medien promovieren.", "question_text": "Welche Anzeige passt?", "correct_answer": "i"},
+                        {"question_num": 13, "situation": "Ein kleines Unternehmen möchte sicherstellen, dass es alle Datenschutzvorschriften einhält, und sucht externe Unterstützung.", "question_text": "Welche Anzeige passt?", "correct_answer": "e"},
+                        {"question_num": 14, "situation": "Eine PR-Fachfrau mit fünf Jahren Berufserfahrung möchte ihre Kenntnisse im Bereich Social Media auf den neuesten Stand bringen — auch abends möglich.", "question_text": "Welche Anzeige passt?", "correct_answer": "k"},
+                        {"question_num": 15, "situation": "Frau Schmidt ist Journalistin ohne Programmierkenntnisse und möchte lernen, wie Algorithmen in sozialen Netzwerken funktionieren.", "question_text": "Welche Anzeige passt?", "correct_answer": "g"},
+                        {"question_num": 16, "situation": "Eine gemeinnützige Organisation sucht eine Teilzeitkraft für die Verwaltung ihrer Social-Media-Präsenz in Berlin.", "question_text": "Welche Anzeige passt?", "correct_answer": "b"},
+                        {"question_num": 17, "situation": "Herr Bauer hat einen Bachelor in Kommunikationswissenschaften und möchte tiefer in Themen wie Medienrecht und Algorithmen einsteigen.", "question_text": "Welche Anzeige passt?", "correct_answer": "c"},
+                        {"question_num": 18, "situation": "Eltern machen sich Sorgen um den übermäßigen Social-Media-Konsum ihrer Tochter (14) und suchen Beratung.", "question_text": "Welche Anzeige passt?", "correct_answer": "h"},
+                        {"question_num": 19, "situation": "Ein junger Absolvent mit Erfahrung in der Videoproduktion sucht eine Stelle in der Kreativbranche im Raum München.", "question_text": "Welche Anzeige passt?", "correct_answer": "f"},
+                        {"question_num": 20, "situation": "Eine Privatperson findet, dass sie zu viel Zeit mit dem Smartphone verbringt, und sucht professionelle Unterstützung dabei, weniger Bildschirmzeit zu haben.", "question_text": "Welche Anzeige passt?", "correct_answer": "d"}
+                    ]
+                }
+            ]
+        },
+        "hoeren": {
+            "total_questions": 20,
+            "duration_minutes": 40,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "kurzgespraeche",
+                    "title": "Aufgabe 1 – Kurze Texte",
+                    "instruction": "Sie hören fünf kurze Texte. Jeder Sprecher äußert sich zum Thema soziale Medien. Sind die Aussagen richtig oder falsch? Sie hören jeden Text einmal.",
+                    "heard_times": 1,
+                    "preparation_seconds": 30,
+                    "topic": "Soziale Medien — Fluch oder Segen?",
+                    "conversations": [
+                        {
+                            "conv_num": 1,
+                            "sprecher": [{"name": "Frau Lange", "voice_id": "Aoede"}],
+                            "script_segments": [
+                                {"sprecher": "Frau Lange", "text": "[kritisch] Ich bin Ärztin und sehe in meiner Praxis täglich, was exzessive Social-Media-Nutzung mit jungen Menschen macht. Schlafstörungen, Angststörungen, ein verzerrtes Körperbild — das sind keine Einzelfälle mehr. Das Problem ist nicht die Technologie selbst, sondern das Geschäftsmodell: Plattformen sind darauf ausgelegt, süchtig zu machen. Sie optimieren auf maximale Aufmerksamkeit, nicht auf Wohlbefinden. Solange das nicht reguliert wird, werden wir weiterhin eine Generation mit psychischen Problemen aufwachsen sehen."}
+                            ],
+                            "questions": [{"question_num": 1, "question_type": "richtig_falsch", "question_text": "Frau Lange sieht die Technologie selbst als Hauptproblem der Social-Media-Nutzung.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 2,
+                            "sprecher": [{"name": "Herr Schneider", "voice_id": "Charon"}],
+                            "script_segments": [
+                                {"sprecher": "Herr Schneider", "text": "[begeistert] Ich habe über Instagram mein Unternehmen aufgebaut. Als Fotograf ohne großes Marketingbudget wäre das in früheren Zeiten schlicht unmöglich gewesen. Soziale Medien demokratisieren Aufmerksamkeit — wer gute Arbeit macht, kann eine Reichweite aufbauen, die früher nur Großkonzernen vorbehalten war. Natürlich gibt es Schattenseiten, aber für Menschen wie mich sind Plattformen ein echter Aufstiegsmechanismus in einer Gesellschaft, in der Netzwerke und Herkunft sonst entscheiden."}
+                            ],
+                            "questions": [{"question_num": 2, "question_type": "richtig_falsch", "question_text": "Herr Schneider hat soziale Medien genutzt, um sein Geschäft ohne großes Budget aufzubauen.", "correct_answer": "Richtig"}]
+                        },
+                        {
+                            "conv_num": 3,
+                            "sprecher": [{"name": "eine Journalistin", "voice_id": "Kore"}],
+                            "script_segments": [
+                                {"sprecher": "eine Journalistin", "text": "[besorgt] Als Journalistin mache ich mir vor allem Sorgen um den Informationsraum. Wir haben früher angenommen, mehr Information bedeutet mehr Demokratie. Heute sehe ich, dass Menge nicht gleich Qualität ist. Soziale Plattformen belohnen Empörung, Einfachheit und Bestätigung — Journalismus braucht Zeit, Differenzierung und manchmal unangenehme Wahrheiten. Wir verlieren gerade die gemeinsame Faktenbasis, auf der Demokratie angewiesen ist. Das bereitet mir wirklich Sorgen."}
+                            ],
+                            "questions": [{"question_num": 3, "question_type": "richtig_falsch", "question_text": "Die Journalistin ist der Ansicht, dass mehr Informationen automatisch zu mehr Demokratie führen.", "correct_answer": "Falsch"}]
+                        },
+                        {
+                            "conv_num": 4,
+                            "sprecher": [{"name": "Herr Dr. Fischer", "voice_id": "Orus"}],
+                            "script_segments": [
+                                {"sprecher": "Herr Dr. Fischer", "text": "[ausgewogen] Ich forsche zu digitaler Kommunikation und versuche, weder Technikoptimist noch Kulturpessimist zu sein. Faktencheck: Es gibt keine eindeutige wissenschaftliche Einigkeit, dass soziale Medien per se psychische Erkrankungen verursachen. Korrelation ist nicht Kausalität. Was wir wissen: Die Nutzungsweise und der soziale Kontext sind entscheidend. Wer soziale Medien nutzt, um sich mit anderen zu verbinden und Interessen zu teilen, erlebt andere Wirkungen als jemand, der passiv scrollt und sich mit anderen vergleicht."}
+                            ],
+                            "questions": [{"question_num": 4, "question_type": "richtig_falsch", "question_text": "Herr Dr. Fischer hält die Nutzungsweise sozialer Medien für entscheidender als die Plattform selbst.", "correct_answer": "Richtig"}]
+                        },
+                        {
+                            "conv_num": 5,
+                            "sprecher": [{"name": "Frau Weber", "voice_id": "Aoede"}],
+                            "script_segments": [
+                                {"sprecher": "Frau Weber", "text": "[energisch] Ich engagiere mich in der Bürgerrechtsbewegung und kann sagen: Ohne soziale Medien wären viele Proteste der letzten Jahre gar nicht möglich gewesen. Von #MeToo bis zu den Klimastreiks — Plattformen ermöglichen horizontale Organisation ohne Hierarchien und ohne Medien als Gatekeeper. Natürlich nutzen auch autoritäre Regime und Desinformationskampagnen dieselben Werkzeuge. Aber das Potenzial für emanzipatorische Bewegungen ist real und darf nicht unterschätzt werden."}
+                            ],
+                            "questions": [{"question_num": 5, "question_type": "richtig_falsch", "question_text": "Frau Weber ist der Ansicht, dass soziale Medien ausschließlich negative gesellschaftliche Auswirkungen haben.", "correct_answer": "Falsch"}]
+                        }
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "gespraech",
+                    "title": "Aufgabe 2 – Ein Interview",
+                    "instruction": "Sie hören ein Radiointerview. Sind die Aussagen richtig oder falsch? Sie hören das Interview zweimal.",
+                    "heard_times": 2,
+                    "preparation_seconds": 60,
+                    "sprecher": [
+                        {"name": "Moderatorin", "voice_id": "Aoede"},
+                        {"name": "Prof. Dr. Klaus Richter", "voice_id": "Orus"}
+                    ],
+                    "script_segments": [
+                        {"sprecher": "Moderatorin", "text": "[professionell] Guten Abend und willkommen zu 'Gesellschaft im Gespräch'. Heute diskutieren wir mit Prof. Dr. Klaus Richter, Soziologe an der FU Berlin, über soziale Medien und ihre Auswirkungen auf die Demokratie. Herr Professor, beeinflussen Algorithmen wirklich unsere politische Meinung?"},
+                        {"sprecher": "Prof. Dr. Klaus Richter", "text": "[differenziert] Das ist eine berechtigte und gleichzeitig komplizierte Frage. Ja, Algorithmen beeinflussen, welche Inhalte wir sehen — und damit mittelbar, worüber wir nachdenken. Ob sie aber direkt politische Meinungen ändern, ist wissenschaftlich umstritten. Was wir sicherer sagen können: Sie verstärken bestehende Überzeugungen eher, als dass sie sie grundlegend ändern."},
+                        {"sprecher": "Moderatorin", "text": "Ist das dann nicht halb so schlimm?"},
+                        {"sprecher": "Prof. Dr. Klaus Richter", "text": "Keineswegs. Verstärkung ist das Problem. Wenn extremere Positionen innerhalb eines politischen Lagers immer sichtbarer werden, verschiebt sich das, was als normal gilt — die sogenannte Overton-Fensterdynamik. Jemand, der vor zehn Jahren als radikal galt, erscheint heute manchmal als Mainstream. Das hat sehr reale Konsequenzen für Wahlen und politische Mehrheiten."},
+                        {"sprecher": "Moderatorin", "text": "Brauchen wir also stärkere Regulierung?"},
+                        {"sprecher": "Prof. Dr. Klaus Richter", "text": "[nachdenklich] Regulierung ist nötig, aber schwierig. Der EU-Digital-Services-Act ist ein Schritt in die richtige Richtung: Er zwingt Plattformen zu mehr Transparenz über ihre Algorithmen und zur aktiven Bekämpfung von Desinformation. Das Problem ist die Durchsetzung. Plattformen operieren global, und nationale oder europäische Regulierungen erzeugen Umgehungsstrategien."},
+                        {"sprecher": "Moderatorin", "text": "Wie können Nutzer sich selbst schützen?"},
+                        {"sprecher": "Prof. Dr. Klaus Richter", "text": "Medienkompetenz ist essenziell, aber ich halte sie für unzureichend als alleinige Strategie. Es ist naiv zu glauben, dass Information allein gegen psychologisch ausgefeilte Manipulationsmechanismen schützt. Wir brauchen beides: individuelle Kompetenz und strukturelle Rahmenbedingungen. Schulen müssen kritisches Denken und Quellenprüfung lehren — aber Plattformen müssen gleichzeitig verpflichtet werden, weniger manipulative Designs einzusetzen."},
+                        {"sprecher": "Moderatorin", "text": "Stellt die Dominanz weniger US-amerikanischer Plattformen ein Problem dar?"},
+                        {"sprecher": "Prof. Dr. Klaus Richter", "text": "[bestimmt] Ja, und das wird meines Erachtens unterschätzt. Diese Plattformen wurden nach amerikanischen Werten, Rechtsbegriffen und Geschäftsinteressen gebaut. Was in Europa als problematisch gilt — etwa bestimmte Formen der Hassrede — ist in den USA durch den First Amendment anders geregelt. Europas digitale Souveränität steht auf dem Spiel, solange keine wettbewerbsfähigen europäischen Alternativen existieren."},
+                        {"sprecher": "Moderatorin", "text": "Gibt es Hoffnungszeichen?"},
+                        {"sprecher": "Prof. Dr. Klaus Richter", "text": "Durchaus. Wir erleben gerade eine Renaissance dezentraler Netzwerke wie Mastodon oder Bluesky, die auf offenen Protokollen basieren und keine zentrale Kontrolle haben. Ob sie Massenrelevanz erreichen, ist offen. Aber sie zeigen, dass alternative Architekturen möglich sind — und dass wir das heutige Social-Media-System nicht als naturgegeben hinnehmen müssen."},
+                        {"sprecher": "Moderatorin", "text": "Herr Professor Richter, herzlichen Dank für dieses aufschlussreiche Gespräch."},
+                        {"sprecher": "Prof. Dr. Klaus Richter", "text": "Gerne, danke für die wichtigen Fragen."}
+                    ],
+                    "questions": [
+                        {"question_num": 6, "question_type": "richtig_falsch", "question_text": "Prof. Richter sagt, dass Algorithmen politische Meinungen direkt und grundlegend verändern.", "correct_answer": "Falsch"},
+                        {"question_num": 7, "question_type": "richtig_falsch", "question_text": "Laut Prof. Richter verstärken Algorithmen bestehende Überzeugungen eher, als sie zu ändern.", "correct_answer": "Richtig"},
+                        {"question_num": 8, "question_type": "richtig_falsch", "question_text": "Prof. Richter hält den EU-Digital-Services-Act für einen sinnvollen ersten Schritt.", "correct_answer": "Richtig"},
+                        {"question_num": 9, "question_type": "richtig_falsch", "question_text": "Er glaubt, dass Medienkompetenz allein ausreicht, um Nutzer vor Manipulation zu schützen.", "correct_answer": "Falsch"},
+                        {"question_num": 10, "question_type": "richtig_falsch", "question_text": "Prof. Richter sieht die Dominanz US-amerikanischer Plattformen als ernstes Problem für Europas digitale Souveränität.", "correct_answer": "Richtig"},
+                        {"question_num": 11, "question_type": "richtig_falsch", "question_text": "Er ist der Ansicht, dass dezentrale Netzwerke wie Mastodon bereits Massenrelevanz haben.", "correct_answer": "Falsch"},
+                        {"question_num": 12, "question_type": "richtig_falsch", "question_text": "Laut Prof. Richter sind europäische und amerikanische Regeln zur Hassrede identisch.", "correct_answer": "Falsch"},
+                        {"question_num": 13, "question_type": "richtig_falsch", "question_text": "Prof. Richter befürwortet sowohl individuelle Medienkompetenz als auch strukturelle Regulierung.", "correct_answer": "Richtig"},
+                        {"question_num": 14, "question_type": "richtig_falsch", "question_text": "Er hält das heutige Social-Media-System für unveränderlich und alternativlos.", "correct_answer": "Falsch"},
+                        {"question_num": 15, "question_type": "richtig_falsch", "question_text": "Die Verschiebung des 'Overton-Fensters' wird von Prof. Richter als bedeutungslos für Wahlergebnisse eingestuft.", "correct_answer": "Falsch"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 3,
+                    "typ": "ansagen",
+                    "title": "Aufgabe 3 – Kurze Radiotexte",
+                    "instruction": "Sie hören fünf kurze Radiotexte. Sind die Aussagen richtig oder falsch? Sie hören jeden Text zweimal.",
+                    "heard_times": 2,
+                    "preparation_seconds": 30,
+                    "ansagen": [
+                        {
+                            "ansage_num": 1, "sprecher": "Moderatorin", "voice_id": "Aoede",
+                            "text": "[sachlich] Brüssel: Das Europäische Parlament hat heute mit großer Mehrheit die überarbeitete KI-Verordnung verabschiedet. Erstmals werden KI-Systeme nach Risikostufen klassifiziert. Hochrisiko-Anwendungen — etwa in der Strafverfolgung oder der Kreditvergabe — unterliegen strengen Transparenz- und Sicherheitsanforderungen. Generative KI-Modelle wie große Sprachmodelle müssen künftig offenlegen, welche Trainingsdaten verwendet wurden.",
+                            "question_num": 16, "question_type": "richtig_falsch", "question_text": "Die neue EU-KI-Verordnung stuft alle KI-Systeme als gleich riskant ein.", "correct_answer": "Falsch"
+                        },
+                        {
+                            "ansage_num": 2, "sprecher": "Ansager", "voice_id": "Fenrir",
+                            "text": "Neuigkeit aus der Tech-Branche: Das soziale Netzwerk Bluesky hat heute die Marke von 25 Millionen Nutzern überschritten — ein Anstieg von 400 Prozent innerhalb von sechs Monaten, ausgelöst durch eine Abwanderungswelle von der Plattform X nach umstrittenen Moderationsentscheidungen des Eigentümers. Anders als X basiert Bluesky auf einem dezentralen, offenen Protokoll, das es Nutzern ermöglicht, ihre Daten auf eigenen Servern zu speichern.",
+                            "question_num": 17, "question_type": "richtig_falsch", "question_text": "Bluesky ist eine zentral kontrollierte Plattform wie X.", "correct_answer": "Falsch"
+                        },
+                        {
+                            "ansage_num": 3, "sprecher": "Moderatorin", "voice_id": "Aoede",
+                            "text": "[informativ] Bildungsnachrichten: Die Kultusministerkonferenz hat heute ein neues Rahmenkonzept zur Medienkompetenz in Schulen verabschiedet. Ab dem kommenden Schuljahr sollen Schülerinnen und Schüler ab Klasse fünf systematisch lernen, wie Algorithmen funktionieren, wie Fake News erkannt werden und welche Datenschutzrechte Nutzer haben. Die Umsetzung liegt bei den Bundesländern, die finanzielle Ausstattung ist noch nicht gesichert.",
+                            "question_num": 18, "question_type": "richtig_falsch", "question_text": "Die Finanzierung des neuen Medienkompetenzkurses in Schulen ist bereits vollständig gesichert.", "correct_answer": "Falsch"
+                        },
+                        {
+                            "ansage_num": 4, "sprecher": "Ansager", "voice_id": "Fenrir",
+                            "text": "Wirtschaftsnachrichten: Meta hat im dritten Quartal einen Rekordumsatz von 40 Milliarden US-Dollar gemeldet. Über 98 Prozent der Einnahmen stammen aus Werbegeschäften. Kritiker weisen darauf hin, dass dieses Geschäftsmodell strukturelle Anreize setzt, nutzergenerierte Daten so umfassend wie möglich auszuwerten — und damit in Konflikt mit europäischen Datenschutzgesetzen steht. Die irische Datenschutzbehörde hat allein in diesem Jahr Bußgelder von insgesamt 1,3 Milliarden Euro gegen Meta verhängt.",
+                            "question_num": 19, "question_type": "richtig_falsch", "question_text": "Der größte Teil von Metas Umsatz stammt aus Werbeeinnahmen.", "correct_answer": "Richtig"
+                        },
+                        {
+                            "ansage_num": 5, "sprecher": "Moderatorin", "voice_id": "Aoede",
+                            "text": "[ernst] Studie zu Online-Hassrede: Eine aktuelle Untersuchung des Leibniz-Instituts für Medienforschung zeigt, dass 62 Prozent der befragten Frauen in Führungspositionen angeben, in den letzten zwölf Monaten online bedroht oder beleidigt worden zu sein. Besonders betroffen seien Politikerinnen und Journalistinnen. Viele Betroffene schränken infolgedessen ihre öffentliche Meinungsäußerung ein — was die Forscher als ernste Bedrohung für die Meinungsfreiheit werten.",
+                            "question_num": 20, "question_type": "richtig_falsch", "question_text": "Laut der Studie führen Bedrohungen online dazu, dass betroffene Frauen ihre öffentlichen Äußerungen einschränken.", "correct_answer": "Richtig"
+                        }
+                    ]
+                }
+            ]
+        },
+        "sprachbausteine": {
+            "total_questions": 20,
+            "duration_minutes": 30,
+            "aufgaben": [
+                {
+                    "aufgabe_num": 1,
+                    "typ": "lueckentext_mc",
+                    "title": "Aufgabe 1 – Lückentext",
+                    "instruction": "Lesen Sie den Text und wählen Sie das passende Wort (a, b oder c).",
+                    "text_with_gaps": "Sollten soziale Medien stärker reguliert werden?\n\nDie Debatte über die Regulierung sozialer Netzwerke {21} an Schärfe gewonnen. Während Plattformen lange {22} sich auf das Prinzip der Meinungsfreiheit berufen konnten, wächst in der EU der politische Wille, klare Regeln {23}. Der Digital Services Act verpflichtet große Plattformen dazu, systematisch gegen illegale Inhalte vorzugehen und ihre Algorithmen transparenter zu {24}.\n\nKritiker warnen jedoch, dass zu weitreichende Eingriffe das Risiko staatlicher Zensur {25}. Eine Regulierungsbehörde, die entscheidet, welche Inhalte legal sind, könnte zu einem Instrument politischer Kontrolle {26}. Befürworter entgegnen, dass der Status quo untragbar {27}: Plattformen hätten faktisch mehr Einfluss auf den öffentlichen Diskurs als demokratisch gewählte Institutionen, {28} jegliche Rechenschaftspflicht.\n\nLetztlich geht es um eine grundlegende Frage: {29} Meinungsfreiheit das absolute Recht ist, auch wenn sie zur Destabilisierung demokratischer Systeme missbraucht {30}?",
+                    "options": [
+                        {"question_num": 21, "a": "hat", "b": "ist", "c": "wurde", "correct_answer": "a"},
+                        {"question_num": 22, "a": "noch", "b": "immer", "c": "schon", "correct_answer": "b"},
+                        {"question_num": 23, "a": "setzen", "b": "festlegen", "c": "einzuführen", "correct_answer": "c"},
+                        {"question_num": 24, "a": "machen", "b": "gestalten", "c": "stellen", "correct_answer": "a"},
+                        {"question_num": 25, "a": "birgt", "b": "enthält", "c": "trägt", "correct_answer": "a"},
+                        {"question_num": 26, "a": "werden", "b": "werden können", "c": "werden müssen", "correct_answer": "a"},
+                        {"question_num": 27, "a": "sei", "b": "wäre", "c": "ist", "correct_answer": "c"},
+                        {"question_num": 28, "a": "ohne", "b": "aber ohne", "c": "jedoch ohne", "correct_answer": "c"},
+                        {"question_num": 29, "a": "Ob", "b": "Wenn", "c": "Falls", "correct_answer": "a"},
+                        {"question_num": 30, "a": "wird", "b": "werden kann", "c": "werden darf", "correct_answer": "b"}
+                    ]
+                },
+                {
+                    "aufgabe_num": 2,
+                    "typ": "lueckentext_wortbank",
+                    "title": "Aufgabe 2 – Wortschatz",
+                    "instruction": "Lesen Sie den Text. Welches Wort (a–o) passt in welche Lücke? Fünf Wörter passen nicht.",
+                    "text_with_gaps": "Digitale Kompetenz in der Schule — eine dringende Aufgabe\n\nIn einer Gesellschaft, in der Informationen zunehmend über digitale Kanäle {31} werden, ist Medienkompetenz keine optionale Zusatzqualifikation mehr, sondern eine {32} Kulturtechnik — vergleichbar mit Lesen und Schreiben. Trotzdem fehlt in deutschen Schulen bislang ein {33} Konzept zur systematischen Vermittlung digitaler Kompetenzen.\n\nUntersuchungen belegen, dass Schülerinnen und Schüler zwar technisch versiert im Umgang mit Smartphones sind, jedoch Schwierigkeiten haben, die {34} von Online-Quellen einzuschätzen oder Algorithmen als selektive Filter zu verstehen. Wer nicht erkennt, dass sein Newsfeed kuratiert ist, {35} ihn für eine objektive Abbildung der Realität.\n\nEine besondere Herausforderung stellt die rasante Entwicklung von KI-generierten Inhalten dar. Sogenannte Deepfakes — täuschend {36} gefälschte Video- oder Audioaufnahmen — sind mit bloßem Auge kaum noch zu identifizieren. Hier brauchen Schüler nicht nur technisches Wissen, sondern auch ein geschärftes {37} für Manipulationsabsichten.\n\nDie gute Nachricht: Medienkompetenz lässt sich lernen. Studien zeigen, dass bereits kurze {38} im kritischen Umgang mit Online-Informationen messbare Effekte haben. Nötig ist allerdings politischer {39}, entsprechende Ressourcen bereitzustellen — von der Lehrerausbildung bis zur technischen {40} der Schulen.",
+                    "wortbank": [
+                        {"id": "a", "word": "VERBREITET"},
+                        {"id": "b", "word": "GRUNDLEGENDE"},
+                        {"id": "c", "word": "VERBINDLICHES"},
+                        {"id": "d", "word": "GLAUBWUERDIGKEIT"},
+                        {"id": "e", "word": "HAELT"},
+                        {"id": "f", "word": "ECHT"},
+                        {"id": "g", "word": "BEWUSSTSEIN"},
+                        {"id": "h", "word": "TRAININGSEINHEITEN"},
+                        {"id": "i", "word": "WILLE"},
+                        {"id": "j", "word": "AUSSTATTUNG"},
+                        {"id": "k", "word": "ZUVERLAESSIGKEIT"},
+                        {"id": "l", "word": "KONSUMIERT"},
+                        {"id": "m", "word": "VERPFLICHTENDE"},
+                        {"id": "n", "word": "BEURTEILUNG"},
+                        {"id": "o", "word": "ENGAGEMENT"}
+                    ],
+                    "options": [
+                        {"question_num": 31, "correct_answer": "a"},
+                        {"question_num": 32, "correct_answer": "b"},
+                        {"question_num": 33, "correct_answer": "c"},
+                        {"question_num": 34, "correct_answer": "d"},
+                        {"question_num": 35, "correct_answer": "e"},
+                        {"question_num": 36, "correct_answer": "f"},
+                        {"question_num": 37, "correct_answer": "g"},
+                        {"question_num": 38, "correct_answer": "h"},
+                        {"question_num": 39, "correct_answer": "i"},
+                        {"question_num": 40, "correct_answer": "j"}
+                    ]
+                }
+            ]
+        },
+        "schreiben": {
+            "total_time_minutes": 45,
+            "aufgaben": [{
+                "aufgabe_num": 1,
+                "aufgabe_typ": "erorterung",
+                "aufgabe": "In vielen Ländern wird diskutiert, ob soziale Netzwerke für Jugendliche unter 16 Jahren verboten werden sollten. Australien hat ein solches Verbot 2024 eingeführt.\n\nSchreiben Sie einen argumentativen Aufsatz. Berücksichtigen Sie:\n• Argumente für ein Mindestalter bei sozialen Netzwerken\n• Argumente dagegen\n• Ihre eigene Position mit Begründung\n\nSchreiben Sie ca. 200 Wörter.",
+                "min_words": 180,
+                "max_words": 250
+            }]
+        },
+        "sprechen": {
+            "total_time_minutes": 15,
+            "teile": [
+                {
+                    "teil_num": 1,
+                    "titel": "Persönliche Mediennutzung",
+                    "instructions": "Beschreiben Sie Ihre eigene Nutzung sozialer Medien.",
+                    "fragen": [
+                        {"frage_num": 1, "frage_text": "[professionell] Guten Tag, herzlich willkommen zur Prüfung. Bitte stellen Sie sich kurz vor und beschreiben Sie, welche sozialen Netzwerke Sie nutzen und warum.", "needs_audio": True},
+                        {"frage_num": 2, "frage_text": "Haben Sie schon einmal bewusst versucht, Ihre Social-Media-Nutzung zu reduzieren? Was hat Sie dazu bewogen und wie haben Sie das erlebt?", "needs_audio": True},
+                        {"frage_num": 3, "frage_text": "Glauben Sie, dass soziale Medien einen positiven oder negativen Einfluss auf Ihre Informationsgewohnheiten haben?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "teil_num": 2,
+                    "titel": "Diskussion: Fake News und gesellschaftliche Verantwortung",
+                    "instructions": "Diskutieren Sie das folgende Thema mit dem Prüfer.",
+                    "fragen": [
+                        {"frage_num": 4, "frage_text": "Wer trägt Ihrer Meinung nach die größte Verantwortung für die Verbreitung von Falschinformationen: die Nutzer, die Plattformen oder der Staat?", "needs_audio": True},
+                        {"frage_num": 5, "frage_text": "Sollten Plattformen Inhalte aktiv moderieren, auch wenn dabei das Risiko besteht, legitime Meinungen zu zensieren?", "needs_audio": True},
+                        {"frage_num": 6, "frage_text": "Was halten Sie von der Idee, dass Nutzer für das Teilen von nachweislich falschen Informationen haftbar gemacht werden sollten?", "needs_audio": True}
+                    ]
+                },
+                {
+                    "teil_num": 3,
+                    "titel": "Problemlösung: Schulen und Smartphones",
+                    "instructions": "Lösen Sie gemeinsam mit dem Prüfer ein Problem.",
+                    "aufgabe": "Eine Schule überlegt, ob Smartphones während des Unterrichts vollständig verboten werden sollen. Diskutieren Sie Vor- und Nachteile und entwickeln Sie einen Kompromissvorschlag.",
+                    "fragen": [
+                        {"frage_num": 7, "frage_text": "Stellen Sie sich vor, Sie sind Schulleiter. Welche Argumente sprechen für und gegen ein vollständiges Smartphone-Verbot im Unterricht?", "needs_audio": True},
+                        {"frage_num": 8, "frage_text": "Wie könnte ein ausgewogener Kompromiss aussehen, der sowohl die pädagogischen Ziele als auch die Medienkompetenzvermittlung berücksichtigt?", "needs_audio": True}
+                    ]
+                }
+            ]
+        }
+    }
+
+
 @app.on_event("startup")
 async def startup():
     existing = await db.exams.find_one({"exam_id": "exam_academic_001"}, {"_id": 0})
@@ -2629,6 +3986,18 @@ async def startup():
     if not await db.exams.find_one({"exam_id": "exam_telc_b2_001"}):
         await db.exams.insert_one(get_telc_b2_seed())
         logger.info("Seeded exam_telc_b2_001")
+
+    if not await db.exams.find_one({"exam_id": "exam_telc_b2_002"}):
+        await db.exams.insert_one(get_telc_b2_seed_002())
+        logger.info("Seeded exam_telc_b2_002")
+
+    if not await db.exams.find_one({"exam_id": "exam_telc_b2_003"}):
+        await db.exams.insert_one(get_telc_b2_seed_003())
+        logger.info("Seeded exam_telc_b2_003")
+
+    if not await db.exams.find_one({"exam_id": "exam_telc_b2_004"}):
+        await db.exams.insert_one(get_telc_b2_seed_004())
+        logger.info("Seeded exam_telc_b2_004")
 
 # ==========================================
 # STRIPE SUBSCRIPTIONS
