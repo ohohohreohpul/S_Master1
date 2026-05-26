@@ -3953,6 +3953,15 @@ def get_telc_b2_seed_004():
 
 @app.on_event("startup")
 async def startup():
+    # Ensure guest user row exists (needed for FK constraint on attempts table)
+    if not await db.users.find_one({"user_id": "guest"}):
+        await db.users.insert_one({
+            "user_id": "guest", "email": "guest@example.com",
+            "name": "Guest", "picture": "",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+        logger.info("Seeded guest user")
+
     existing = await db.exams.find_one({"exam_id": "exam_academic_001"}, {"_id": 0})
     if not existing:
         seed = get_seed_exam()

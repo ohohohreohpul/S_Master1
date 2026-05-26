@@ -334,7 +334,8 @@ export default function ExamPage() {
         });
       }, 1000);
     } catch (e) {
-      setError("Failed to start exam");
+      setError(e.message || "Failed to start exam. Please try again.");
+      setPhase("error");
     }
   };
 
