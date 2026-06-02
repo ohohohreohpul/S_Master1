@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { API, useAuth } from "@/App";
-import { Headphones, BookOpen, Pen, Mic, Clock, Flag, ArrowLeft, ArrowRight, Send, AlertCircle, PencilLine, X, CheckCircle } from "lucide-react";
+import { apiFetch } from "@/lib/apiFetch";
+import { Headphones, BookOpen, Pen, Mic, Clock, Flag, ArrowLeft, ArrowRight, Send, CircleAlert as AlertCircle, PencilLine, X, CircleCheck as CheckCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import ListeningModule from "@/components/exam/ListeningModule";
@@ -181,7 +182,7 @@ export default function ExamPage() {
     const controller = new AbortController();
     (async () => {
       try {
-        const res = await fetch(`${API}/exams/${examId}`, { credentials: "include", signal: controller.signal });
+        const res = await apiFetch(`${API}/exams/${examId}`, { signal: controller.signal });
         if (!res.ok) throw new Error("Failed to load exam");
         const data = await res.json();
         setExam(data);
@@ -210,15 +211,15 @@ export default function ExamPage() {
 
   const triggerAudioGeneration = async () => {
     try {
-      await fetch(`${API}/exams/${examId}/prepare`, { method: "POST", credentials: "include" });
+      await apiFetch(`${API}/exams/${examId}/prepare`, { method: "POST" });
       const interval = setInterval(async () => {
-        const res = await fetch(`${API}/exams/${examId}/status`, { credentials: "include" });
+        const res = await apiFetch(`${API}/exams/${examId}/status`);
         const status = await res.json();
         setAudioProgress(status.audio_progress || 0);
 
         if (status.status === "ready") {
           clearInterval(interval);
-          const examRes = await fetch(`${API}/exams/${examId}`, { credentials: "include" });
+          const examRes = await apiFetch(`${API}/exams/${examId}`);
           const examData = await examRes.json();
           setExam(examData);
           setPhase("preloading");
@@ -302,8 +303,8 @@ export default function ExamPage() {
     try {
       if (fullTestMode) {
         // Create full test attempt
-        const res = await fetch(`${API}/attempts/full-test`, {
-          method: "POST", credentials: "include",
+        const res = await apiFetch(`${API}/attempts/full-test`, {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ exam_id: examId })
         });
@@ -311,8 +312,8 @@ export default function ExamPage() {
         setFullTestAttemptId(data.attempt_id);
         setAttemptId(data.attempt_id);
       } else {
-        const res = await fetch(`${API}/attempts`, {
-          method: "POST", credentials: "include",
+        const res = await apiFetch(`${API}/attempts`, {
+          method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ exam_id: examId, module })
         });
@@ -363,24 +364,24 @@ export default function ExamPage() {
       const body = isTelc
         ? { aufgabe_1: answers.task_1 || "" }
         : { task_1: answers.task_1 || "", task_2: answers.task_2 || "" };
-      const res = await fetch(endpoint, {
-        method: "POST", credentials: "include",
+      const res = await apiFetch(endpoint, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body)
       });
       const data = await res.json();
       navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
     } else if (module === "speaking") {
-      const res = await fetch(`${API}/attempts/${attemptId}/score-speaking`, {
-        method: "POST", credentials: "include",
+      const res = await apiFetch(`${API}/attempts/${attemptId}/score-speaking`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcriptions: answers })
       });
       const data = await res.json();
       navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
     } else {
-      const res = await fetch(`${API}/attempts/${attemptId}/submit`, {
-        method: "PUT", credentials: "include",
+      const res = await apiFetch(`${API}/attempts/${attemptId}/submit`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ answers })
       });
@@ -396,24 +397,24 @@ export default function ExamPage() {
     let scores = null;
 
     if (module === "writing") {
-      const res = await fetch(`${API}/attempts/${currentAttemptId}/full-test/score-writing`, {
-        method: "POST", credentials: "include",
+      const res = await apiFetch(`${API}/attempts/${currentAttemptId}/full-test/score-writing`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ task_1: answers.task_1 || "", task_2: answers.task_2 || "" })
       });
       const data = await res.json();
       scores = data.scores;
       // After writing, next is speaking
-      const moduleRes = await fetch(`${API}/attempts/${currentAttemptId}/full-test/module`, {
-        method: "PUT", credentials: "include",
+      const moduleRes = await apiFetch(`${API}/attempts/${currentAttemptId}/full-test/module`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ module, answers })
       });
       const moduleData = await moduleRes.json();
       nextModule = moduleData.next_module;
     } else if (module === "speaking") {
-      const res = await fetch(`${API}/attempts/${currentAttemptId}/full-test/score-speaking`, {
-        method: "POST", credentials: "include",
+      const res = await apiFetch(`${API}/attempts/${currentAttemptId}/full-test/score-speaking`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcriptions: answers })
       });
@@ -421,8 +422,8 @@ export default function ExamPage() {
       scores = data.scores;
       nextModule = null; // Speaking is last
     } else {
-      const res = await fetch(`${API}/attempts/${currentAttemptId}/full-test/module`, {
-        method: "PUT", credentials: "include",
+      const res = await apiFetch(`${API}/attempts/${currentAttemptId}/full-test/module`, {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ module, answers })
       });

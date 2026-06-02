@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, Square, Volume2, Loader2, MessageCircle, User, Bot, Clock, ArrowRight, SkipForward } from "lucide-react";
+import { Mic, Square, Volume2, Loader as Loader2, MessageCircle, User, Bot, Clock, ArrowRight, SkipForward } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 import { API } from "@/App";
+import { apiFetch } from "@/lib/apiFetch";
 
 const fadeIn = { initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.3 } };
 
@@ -38,8 +39,8 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
     setPhase("processing");
     setExchangeCount(0);
     try {
-      const res = await fetch(`${API}/speaking/converse`, {
-        method: "POST", credentials: "include",
+      const res = await apiFetch(`${API}/speaking/converse`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           part_num: currentPart, action: "start",
@@ -134,8 +135,8 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
     try {
       const formData = new FormData();
       formData.append("audio_file", blob, "recording.webm");
-      const sttRes = await fetch(`${API}/speaking/transcribe`, {
-        method: "POST", credentials: "include", body: formData
+      const sttRes = await apiFetch(`${API}/speaking/transcribe`, {
+        method: "POST", body: formData
       });
       if (sttRes.ok) {
         const sttData = await sttRes.json();
@@ -163,8 +164,8 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
 
     // Step 2: Get examiner follow-up via conversational AI
     try {
-      const res = await fetch(`${API}/speaking/converse`, {
-        method: "POST", credentials: "include",
+      const res = await apiFetch(`${API}/speaking/converse`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           part_num: currentPart, user_transcription: userText,

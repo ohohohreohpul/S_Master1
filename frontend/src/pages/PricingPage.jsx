@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, API } from "@/App";
+import { apiFetch } from "@/lib/apiFetch";
 import { Check, Zap, Lock, BookOpen, Headphones, Pen, Mic, ArrowRight, CreditCard, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -16,15 +17,13 @@ export default function PricingPage() {
 
   const handleGetPro = async () => {
     if (!user) {
-      const redirectUrl = window.location.origin + "/dashboard";
-      window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
+      navigate("/");
       return;
     }
     setLoading(true);
     try {
-      const res = await fetch(`${API}/stripe/checkout`, {
+      const res = await apiFetch(`${API}/stripe/checkout`, {
         method: "POST",
-        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ plan: billing })
       });
@@ -42,7 +41,7 @@ export default function PricingPage() {
   const handleManageSubscription = async () => {
     setPortalLoading(true);
     try {
-      const res = await fetch(`${API}/stripe/portal`, { credentials: "include" });
+      const res = await apiFetch(`${API}/stripe/portal`);
       if (res.ok) {
         const data = await res.json();
         window.location.href = data.url;
@@ -92,10 +91,7 @@ export default function PricingPage() {
               Dashboard
             </button>
           ) : (
-            <button onClick={() => {
-              const redirectUrl = window.location.origin + "/dashboard";
-              window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
-            }} className="btn-ps btn-ps-primary" style={{ padding: "8px 20px", fontSize: "0.875rem" }}>
+            <button onClick={() => navigate("/")} className="btn-ps btn-ps-primary" style={{ padding: "8px 20px", fontSize: "0.875rem" }}>
               Sign in
             </button>
           )}

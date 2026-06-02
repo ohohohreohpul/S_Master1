@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, API } from "@/App";
-import {
-  BookOpen, Headphones, Pen, Mic, ArrowRight, LogOut, Play, Plus,
-  Clock, Target, Settings, TrendingUp, Lock, Crown, ChevronDown,
-  Languages, CheckCircle2, Trash2, AlertCircle, RotateCcw,
-} from "lucide-react";
+import { apiFetch } from "@/lib/apiFetch";
+import { BookOpen, Headphones, Pen, Mic, ArrowRight, LogOut, Play, Plus, Clock, Target, Settings, TrendingUp, Lock, Crown, ChevronDown, Languages, CircleCheck as CheckCircle2, Trash2, CircleAlert as AlertCircle, RotateCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
@@ -325,9 +322,9 @@ export default function Dashboard() {
     const safe = (r) => r.ok ? r.json() : null;
 
     Promise.all([
-      fetch(`${API}/exams`, { credentials: "include", signal }).then(r => r.json()),
-      fetch(`${API}/progress`, { credentials: "include", signal }).then(safe).catch(() => null),
-      fetch(`${API}/subscription/status`, { credentials: "include", signal }).then(safe).catch(() => null),
+      apiFetch(`${API}/exams`, { signal }).then(r => r.json()),
+      apiFetch(`${API}/progress`, { signal }).then(safe).catch(() => null),
+      apiFetch(`${API}/subscription/status`, { signal }).then(safe).catch(() => null),
     ]).then(([examsData, progressData, subData]) => {
       setExams(Array.isArray(examsData) ? examsData : []);
       setProgress(progressData);
@@ -343,16 +340,16 @@ export default function Dashboard() {
   const generateExam = async () => {
     setGenerating(true);
     try {
-      const res = await fetch(`${API}/exams/generate`, { method: "POST", credentials: "include" });
+      const res = await apiFetch(`${API}/exams/generate`, { method: "POST" });
       if (res.ok) {
         const data = await res.json();
         const interval = setInterval(async () => {
-          const statusRes = await fetch(`${API}/exams/${data.exam_id}/status`, { credentials: "include" });
+          const statusRes = await apiFetch(`${API}/exams/${data.exam_id}/status`);
           const status = await statusRes.json();
           if (["ready", "error", "audio_error"].includes(status.status)) {
             clearInterval(interval);
             setGenerating(false);
-            fetch(`${API}/exams`, { credentials: "include" }).then(r => r.json()).then(setExams);
+            apiFetch(`${API}/exams`).then(r => r.json()).then(setExams);
           }
         }, 5000);
       } else {
@@ -365,20 +362,20 @@ export default function Dashboard() {
     setGeneratingTelc(true);
     setShowTelcDropdown(false);
     try {
-      const res = await fetch(`${API}/exams/generate-telc`, {
-        method: "POST", credentials: "include",
+      const res = await apiFetch(`${API}/exams/generate-telc`, {
+        method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ level }),
       });
       if (res.ok) {
         const data = await res.json();
         const interval = setInterval(async () => {
-          const statusRes = await fetch(`${API}/exams/${data.exam_id}/status`, { credentials: "include" });
+          const statusRes = await apiFetch(`${API}/exams/${data.exam_id}/status`);
           const status = await statusRes.json();
           if (["ready", "error", "audio_error"].includes(status.status)) {
             clearInterval(interval);
             setGeneratingTelc(false);
-            fetch(`${API}/exams`, { credentials: "include" }).then(r => r.json()).then(setExams);
+            apiFetch(`${API}/exams`).then(r => r.json()).then(setExams);
           }
         }, 5000);
       } else {
@@ -633,7 +630,7 @@ export default function Dashboard() {
                       isPro={isPro}
                       onNavigate={navigate}
                       onDelete={async (examId) => {
-                        await fetch(`${API}/admin/exams/${examId}`, { method: "DELETE", credentials: "include" });
+                        await apiFetch(`${API}/admin/exams/${examId}`, { method: "DELETE" });
                         setExams(prev => prev.filter(e => e.exam_id !== examId));
                       }}
                     />
