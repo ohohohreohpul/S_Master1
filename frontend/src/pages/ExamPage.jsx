@@ -10,7 +10,8 @@ import WritingModule from "@/components/exam/WritingModule";
 import SpeakingModule from "@/components/exam/SpeakingModule";
 import SprachbausteineModule from "@/components/exam/SprachbausteineModule";
 
-const FULL_TEST_STEPS = ["listening", "reading", "writing", "speaking"];
+const IELTS_STEPS = ["listening", "reading", "writing", "speaking"];
+const TELC_STEPS  = ["listening", "reading", "sprachbausteine", "writing", "speaking"];
 
 export default function ExamPage() {
   const { examId } = useParams();
@@ -30,6 +31,7 @@ export default function ExamPage() {
   const [attemptId, setAttemptId] = useState(null);
   const [timeLeft, setTimeLeft] = useState(0);
   const timerRef = useRef(null);
+  const audioPollingRef = useRef(null);
   const [error, setError] = useState(null);
 
   // Full test state
@@ -46,6 +48,7 @@ export default function ExamPage() {
   const [reviewOpen, setReviewOpen] = useState(false);
 
   const isTelc = exam?.exam_type === "telc";
+  const FULL_TEST_STEPS_CURRENT = isTelc ? TELC_STEPS : IELTS_STEPS;
 
   // ── TELC normalisation ───────────────────────────────────────────────────────
   // All modules read English keys (listening/reading/writing/speaking).
@@ -211,24 +214,36 @@ export default function ExamPage() {
   const triggerAudioGeneration = async () => {
     try {
       await fetch(`${API}/exams/${examId}/prepare`, { method: "POST", credentials: "include" });
-      const interval = setInterval(async () => {
-        const res = await fetch(`${API}/exams/${examId}/status`, { credentials: "include" });
-        const status = await res.json();
-        setAudioProgress(status.audio_progress || 0);
-
-        if (status.status === "ready") {
-          clearInterval(interval);
-          const examRes = await fetch(`${API}/exams/${examId}`, { credentials: "include" });
-          const examData = await examRes.json();
-          setExam(examData);
-          setPhase("preloading");
-          await preloadAudio(examData);
-        } else if (status.status === "audio_error" || status.status === "error") {
-          clearInterval(interval);
-          setError(status.error_message || "Audio generation failed");
+      const POLL_MS = 8000;
+      const MAX_POLLS = 120; // 16 min timeout
+      let polls = 0;
+      audioPollingRef.current = setInterval(async () => {
+        polls++;
+        if (polls > MAX_POLLS) {
+          clearInterval(audioPollingRef.current);
+          setError("Audio generation timed out. Please try again.");
           setPhase("error");
+          return;
         }
-      }, 3000);
+        try {
+          const res = await fetch(`${API}/exams/${examId}/status`, { credentials: "include" });
+          if (!res.ok) return; // transient backend error — keep polling
+          const status = await res.json();
+          setAudioProgress(status.audio_progress || 0);
+          if (status.status === "ready") {
+            clearInterval(audioPollingRef.current);
+            const examRes = await fetch(`${API}/exams/${examId}`, { credentials: "include" });
+            const examData = await examRes.json();
+            setExam(examData);
+            setPhase("preloading");
+            await preloadAudio(examData);
+          } else if (status.status === "audio_error" || status.status === "error") {
+            clearInterval(audioPollingRef.current);
+            setError(status.error_message || "Audio generation failed");
+            setPhase("error");
+          }
+        } catch (_) { /* network blip — keep polling */ }
+      }, POLL_MS);
     } catch (e) {
       setError(e.message);
       setPhase("error");
@@ -301,12 +316,12 @@ export default function ExamPage() {
   const startExam = async () => {
     try {
       if (fullTestMode) {
-        // Create full test attempt
         const res = await fetch(`${API}/attempts/full-test`, {
           method: "POST", credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ exam_id: examId })
         });
+        if (!res.ok) throw new Error(`Could not start exam (${res.status})`);
         const data = await res.json();
         setFullTestAttemptId(data.attempt_id);
         setAttemptId(data.attempt_id);
@@ -316,6 +331,7 @@ export default function ExamPage() {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ exam_id: examId, module })
         });
+        if (!res.ok) throw new Error(`Could not start exam (${res.status})`);
         const data = await res.json();
         setAttemptId(data.attempt_id);
       }
@@ -458,7 +474,7 @@ export default function ExamPage() {
     setFullTestStepTransition(null);
     setAnswers({});
     setFlagged(new Set());
-    const stepIdx = FULL_TEST_STEPS.indexOf(nextMod);
+    const stepIdx = FULL_TEST_STEPS_CURRENT.indexOf(nextMod);
     setFullTestCurrentStep(stepIdx);
     setModule(nextMod);
 
@@ -497,17 +513,18 @@ export default function ExamPage() {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
       if (transitionTimerRef.current) clearInterval(transitionTimerRef.current);
+      if (audioPollingRef.current) clearInterval(audioPollingRef.current);
     };
   }, []);
 
   // Full test step stepper
   const FullTestStepper = () => (
     <div className="flex items-center justify-center gap-0 px-4 py-2 bg-[var(--ps-black)]" data-testid="full-test-stepper">
-      {FULL_TEST_STEPS.map((step, idx) => {
+      {FULL_TEST_STEPS_CURRENT.map((step, idx) => {
         const cfg = moduleConfig[step];
         const Icon = cfg?.icon;
         const isActive = step === module;
-        const isDone = FULL_TEST_STEPS.indexOf(module) > idx;
+        const isDone = FULL_TEST_STEPS_CURRENT.indexOf(module) > idx;
         return (
           <div key={step} className="flex items-center">
             <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all ${
@@ -520,7 +537,7 @@ export default function ExamPage() {
               {isDone ? <CheckCircle size={12} /> : Icon ? <Icon size={12} /> : null}
               {cfg?.label}
             </div>
-            {idx < FULL_TEST_STEPS.length - 1 && (
+            {idx < FULL_TEST_STEPS_CURRENT.length - 1 && (
               <div className={`w-8 h-px mx-1 ${isDone ? "bg-emerald-500/40" : "bg-gray-600"}`} />
             )}
           </div>
@@ -627,7 +644,7 @@ export default function ExamPage() {
           <p className="text-[var(--ps-body-gray)] mb-2">{exam?.title}</p>
           {fullTestMode && (
             <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-[var(--ps-blue)]/10 text-[var(--ps-blue)] mb-4">
-              Full Test Mode — Step {FULL_TEST_STEPS.indexOf(module) + 1} of 4
+              Full Test Mode — Step {FULL_TEST_STEPS_CURRENT.indexOf(module) + 1} of {FULL_TEST_STEPS_CURRENT.length}
             </span>
           )}
           <div className="flex items-center justify-center gap-4 text-sm text-[var(--ps-body-gray)] mb-8">
@@ -638,11 +655,23 @@ export default function ExamPage() {
             <div className="bg-[var(--ps-ice)] rounded-xl p-4 mb-8 text-left">
               <p className="text-sm font-medium mb-2" style={{ color: "var(--ps-charcoal)" }}>Instructions:</p>
               <ul className="text-xs text-[var(--ps-body-gray)] space-y-1">
-                <li>- Audio will play automatically for each section</li>
-                <li>- Audio plays once only (no replay)</li>
-                <li>- All questions are visible immediately</li>
-                <li>- Answer questions while you listen</li>
-                <li>- All audio has been pre-loaded for seamless playback</li>
+                {isTelc ? (
+                  <>
+                    <li>- Lesen Sie die Aufgaben, bevor das Audio startet</li>
+                    <li>- Teil 1 wird einmal gehört — keine Wiederholung</li>
+                    <li>- Teil 2 und 3 werden jeweils zweimal gehört</li>
+                    <li>- Alle Fragen sind sofort sichtbar</li>
+                    <li>- Das Audio wurde vorgeladen — kein Warten</li>
+                  </>
+                ) : (
+                  <>
+                    <li>- Audio will play automatically for each section</li>
+                    <li>- Audio plays once only (no replay)</li>
+                    <li>- All questions are visible immediately</li>
+                    <li>- Answer questions while you listen</li>
+                    <li>- All audio has been pre-loaded for seamless playback</li>
+                  </>
+                )}
               </ul>
             </div>
           )}

@@ -1,7 +1,7 @@
 """
-IELTS Mock Exam Platform - Backend Server
-==========================================
-Supabase + Replicate Gemini TTS + OpenRouter AI + Emergent Google Auth
+TELC Deutsch Mock Exam Platform - Backend Server
+=================================================
+InsForge (DB + Storage) + Replicate Gemini TTS + OpenRouter AI + Emergent Google Auth
 """
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, BackgroundTasks, UploadFile, File
 from dotenv import load_dotenv
@@ -590,24 +590,48 @@ async def list_exams(exam_type: str = None):
     exams = await db.exams.find(query, {"_id": 0, "exam_id": 1, "title": 1, "pathway": 1, "exam_type": 1, "telc_level": 1, "status": 1, "created_at": 1}).to_list(100)
     return exams
 
-@api_router.get("/exams/{exam_id}")
-async def get_exam(exam_id: str):
-    exam = await db.exams.find_one({"exam_id": exam_id}, {"_id": 0})
-    if not exam:
-        raise HTTPException(404, "Exam not found")
-    exam_copy = json.loads(json.dumps(exam))
+def _strip_correct_answers(exam_copy: dict) -> dict:
+    """Remove correct_answer from all question structures before sending to client."""
+    # IELTS: listening sections + reading passages
     for section in exam_copy.get("listening", {}).get("sections", []):
         for q in section.get("questions", []):
             q.pop("correct_answer", None)
     for passage in exam_copy.get("reading", {}).get("passages", []):
         for q in passage.get("questions", []):
             q.pop("correct_answer", None)
+    # TELC: hoeren (conversations + direct questions + ansagen)
+    for aufgabe in exam_copy.get("hoeren", {}).get("aufgaben", []):
+        for q in aufgabe.get("questions", []):
+            q.pop("correct_answer", None)
+        for conv in aufgabe.get("conversations", []):
+            for q in conv.get("questions", []):
+                q.pop("correct_answer", None)
+        for ansage in aufgabe.get("ansagen", []):
+            ansage.pop("correct_answer", None)
+    # TELC: lesen
+    for aufgabe in exam_copy.get("lesen", {}).get("aufgaben", []):
+        for q in aufgabe.get("questions", []):
+            q.pop("correct_answer", None)
+    # TELC: sprachbausteine (MC options + wortbank options)
+    for aufgabe in exam_copy.get("sprachbausteine", {}).get("aufgaben", []):
+        for opt in aufgabe.get("options", []):
+            opt.pop("correct_answer", None)
     return exam_copy
+
+
+@api_router.get("/exams/{exam_id}")
+async def get_exam(exam_id: str):
+    exam = await db.exams.find_one({"exam_id": exam_id}, {"_id": 0})
+    if not exam:
+        raise HTTPException(404, "Exam not found")
+    return _strip_correct_answers(json.loads(json.dumps(exam)))
+
 
 @api_router.get("/exams/{exam_id}/full")
 async def get_exam_full(exam_id: str, request: Request):
-    """Get exam with answers (for internal scoring only)"""
-    await get_current_user(request)
+    """Get exam with answers — admin only."""
+    user = await get_current_user(request)
+    require_admin(user)
     exam = await db.exams.find_one({"exam_id": exam_id}, {"_id": 0})
     if not exam:
         raise HTTPException(404, "Exam not found")
@@ -999,9 +1023,14 @@ async def submit_full_test_module(attempt_id: str, data: FullTestModuleSubmit, r
     if module not in modules_completed:
         modules_completed.append(module)
 
-    module_order = ["listening", "reading", "writing", "speaking"]
-    current_idx = module_order.index(module)
-    next_module = module_order[current_idx + 1] if current_idx + 1 < len(module_order) else None
+    is_telc = exam.get("exam_type") == "telc"
+    module_order = (
+        ["listening", "reading", "sprachbausteine", "writing", "speaking"]
+        if is_telc
+        else ["listening", "reading", "writing", "speaking"]
+    )
+    current_idx = module_order.index(module) if module in module_order else -1
+    next_module = module_order[current_idx + 1] if 0 <= current_idx + 1 < len(module_order) else None
 
     update = {
         f"module_answers.{module}": data.answers,
@@ -1588,24 +1617,50 @@ Return JSON:
         ])
         sprachbausteine_data = json.loads(sprachbausteine_raw)
         sprachbausteine_data["total_questions"] = 20
-        sprachbausteine_data["duration_minutes"] = 90
+        sprachbausteine_data["duration_minutes"] = 30
 
         # ── SCHRIFTLICHER AUSDRUCK ────────────────────────────────────────────
-        writing_topics = {"B1": "Umzug, Reise oder Freizeitaktivität", "B2": "Beruf, Weiterbildung oder gesellschaftliches Thema"}
+        writing_topics = {
+            "B1": "Umzug, Reise oder Freizeitaktivität",
+            "B2": "Beruf, Weiterbildung oder gesellschaftliches Thema",
+            "C1": "Wissenschaft, Ethik oder gesellschaftliche Entwicklung",
+        }
+        writing_formats = {
+            "B1": ("brief_email", "ca. 100 Wörter", 80, 130,
+                   "Sie haben eine E-Mail von Ihrer Freundin / Ihrem Freund bekommen. "
+                   "Sie/Er bittet Sie um Hilfe oder Rat zu einem alltäglichen Thema "
+                   f"({writing_topics[level]}). Schreiben Sie eine Antwort-E-Mail.\n"
+                   "Schreiben Sie zu allen drei Punkten:\n"
+                   "- ob und wie Sie helfen können\n- wann Sie Zeit haben\n- ein konkreter Vorschlag"),
+            "B2": ("erörterung", "ca. 200 Wörter", 180, 250,
+                   f"Schreiben Sie einen argumentativen Aufsatz zum Thema '{writing_topics['B2']}'.\n"
+                   "Gehen Sie dabei auf folgende Punkte ein:\n"
+                   "- Vorteile und Chancen\n- Nachteile und Risiken\n- Ihre eigene Position mit Begründung"),
+            "C1": ("erörterung", "ca. 250 Wörter", 220, 300,
+                   f"Schreiben Sie einen differenzierten Aufsatz zum Thema '{writing_topics['C1']}'.\n"
+                   "Analysieren Sie verschiedene Perspektiven, beziehen Sie sich auf gesellschaftliche "
+                   "Zusammenhänge und vertreten Sie eine begründete eigene Position."),
+        }
+        w_typ, w_hint, w_min, w_max, w_prompt = writing_formats.get(
+            level, writing_formats["B2"]
+        )
         schreiben = {
             "total_time_minutes": 30,
             "aufgaben": [{
                 "aufgabe_num": 1,
-                "aufgabe_typ": "brief_email",
-                "aufgabe": f"Sie haben eine E-Mail von Ihrer Freundin / Ihrem Freund bekommen. Sie/Er bittet Sie um Hilfe oder Rat zu einem alltäglichen Thema ({writing_topics.get(level, '')})."
-                          f" Schreiben Sie eine Antwort-E-Mail (ca. 100 Wörter). Schreiben Sie zu allen drei Punkten:\n"
-                          f"- ob und wie Sie helfen können\n- wann Sie Zeit haben\n- ein konkreter Vorschlag",
-                "min_words": 80, "max_words": 130
+                "aufgabe_typ": w_typ,
+                "aufgabe": w_prompt,
+                "min_words": w_min, "max_words": w_max,
             }]
         }
 
         # ── MÜNDLICHER AUSDRUCK ───────────────────────────────────────────────
-        topic = "Homeoffice" if level == "B1" else "Nachhaltigkeit im Alltag"
+        speaking_topics = {
+            "B1": "Homeoffice",
+            "B2": "Nachhaltigkeit im Alltag",
+            "C1": "KI und die Zukunft der Arbeit",
+        }
+        topic = speaking_topics.get(level, "Nachhaltigkeit im Alltag")
         sprechen = {
             "total_time_minutes": 15,
             "vorbereitungszeit_minutes": 20,
@@ -4185,4 +4240,4 @@ app.add_middleware(
 
 @app.on_event("shutdown")
 async def shutdown():
-    pass  # Supabase client uses connection pooling; nothing to close
+    pass  # InsForge REST client is stateless; nothing to close

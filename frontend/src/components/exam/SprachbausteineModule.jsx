@@ -61,7 +61,16 @@ function AufgabeMC({ aufgabe, answers, updateAnswer, flagged, toggleFlag }) {
       <div className="exam-left">
         <div className="mb-4 pb-3 border-b border-[var(--ps-divider)]">
           <h3 className="font-bold text-base text-[var(--ps-charcoal)]">Aufgabe 1</h3>
-          <p className="text-xs text-[var(--ps-mute)] mt-1">Wählen Sie für jede Lücke (21–30) a, b oder c.</p>
+          <p className="text-xs text-[var(--ps-mute)] mt-1">
+            {(() => {
+              const nums = (aufgabe.options || []).map(o => o.question_num).filter(Boolean);
+              const first = nums.length ? Math.min(...nums) : null;
+              const last  = nums.length ? Math.max(...nums) : null;
+              return first && last
+                ? `Wählen Sie für jede Lücke (${first}–${last}) a, b oder c.`
+                : "Wählen Sie für jede Lücke a, b oder c.";
+            })()}
+          </p>
         </div>
         <div className="text-sm leading-[1.9] text-[var(--ps-charcoal)]">
           {splitTextByGaps(normText || "").map((part, i) => {

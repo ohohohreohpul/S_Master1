@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth, API } from "@/App";
 import {
@@ -318,6 +318,8 @@ export default function Dashboard() {
   const [generating, setGenerating] = useState(false);
   const [generatingTelc, setGeneratingTelc] = useState(false);
   const [showTelcDropdown, setShowTelcDropdown] = useState(false);
+  const genPollingRef = useRef(null);
+  const telcPollingRef = useRef(null);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -340,21 +342,40 @@ export default function Dashboard() {
     return () => controller.abort();
   }, []);
 
+  // Clean up polling on unmount
+  useEffect(() => () => {
+    clearInterval(genPollingRef.current);
+    clearInterval(telcPollingRef.current);
+  }, []);
+
+  const startPolling = (examId, intervalRef, onDone) => {
+    const POLL_MS = 8000;
+    const MAX_POLLS = 120; // 16 min timeout
+    let polls = 0;
+    intervalRef.current = setInterval(async () => {
+      polls++;
+      if (polls > MAX_POLLS) { clearInterval(intervalRef.current); onDone(); return; }
+      try {
+        const r = await fetch(`${API}/exams/${examId}/status`, { credentials: "include" });
+        if (!r.ok) return; // transient error — keep polling
+        const s = await r.json();
+        if (["ready", "error", "audio_error"].includes(s.status)) {
+          clearInterval(intervalRef.current);
+          onDone();
+          const examsRes = await fetch(`${API}/exams`, { credentials: "include" });
+          if (examsRes.ok) setExams(await examsRes.json());
+        }
+      } catch { /* network blip — keep polling */ }
+    }, POLL_MS);
+  };
+
   const generateExam = async () => {
     setGenerating(true);
     try {
       const res = await fetch(`${API}/exams/generate`, { method: "POST", credentials: "include" });
       if (res.ok) {
         const data = await res.json();
-        const interval = setInterval(async () => {
-          const statusRes = await fetch(`${API}/exams/${data.exam_id}/status`, { credentials: "include" });
-          const status = await statusRes.json();
-          if (["ready", "error", "audio_error"].includes(status.status)) {
-            clearInterval(interval);
-            setGenerating(false);
-            fetch(`${API}/exams`, { credentials: "include" }).then(r => r.json()).then(setExams);
-          }
-        }, 5000);
+        startPolling(data.exam_id, genPollingRef, () => setGenerating(false));
       } else {
         setGenerating(false);
       }
@@ -372,15 +393,7 @@ export default function Dashboard() {
       });
       if (res.ok) {
         const data = await res.json();
-        const interval = setInterval(async () => {
-          const statusRes = await fetch(`${API}/exams/${data.exam_id}/status`, { credentials: "include" });
-          const status = await statusRes.json();
-          if (["ready", "error", "audio_error"].includes(status.status)) {
-            clearInterval(interval);
-            setGeneratingTelc(false);
-            fetch(`${API}/exams`, { credentials: "include" }).then(r => r.json()).then(setExams);
-          }
-        }, 5000);
+        startPolling(data.exam_id, telcPollingRef, () => setGeneratingTelc(false));
       } else {
         setGeneratingTelc(false);
       }
@@ -417,7 +430,7 @@ export default function Dashboard() {
           <div className="w-8 h-8 rounded-full bg-[var(--ps-blue)] flex items-center justify-center">
             <BookOpen size={16} className="text-white" />
           </div>
-          <span className="font-semibold text-base">IELTS Pro</span>
+          <span className="font-semibold text-base">TELC Prüfung</span>
         </div>
         <div className="flex items-center gap-4">
           {user?.is_admin && (
