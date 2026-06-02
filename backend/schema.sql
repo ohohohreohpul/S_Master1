@@ -42,6 +42,7 @@ CREATE TABLE IF NOT EXISTS exams (
     lesen          JSONB NOT NULL DEFAULT '{}'::jsonb,
     schreiben      JSONB NOT NULL DEFAULT '{}'::jsonb,
     sprechen       JSONB NOT NULL DEFAULT '{}'::jsonb,
+    sprachbausteine JSONB,
     created_at     TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 CREATE INDEX IF NOT EXISTS idx_exams_type   ON exams(exam_type);
