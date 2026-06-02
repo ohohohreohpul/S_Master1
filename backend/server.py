@@ -591,16 +591,18 @@ async def list_exams(exam_type: str = None):
     return exams
 
 def _strip_correct_answers(exam_copy: dict) -> dict:
-    """Remove correct_answer from all question structures before sending to client."""
+    """Remove correct_answer from all question structures before sending to client.
+    Uses (field or {}) to safely handle NULL/None values stored in the DB.
+    """
     # IELTS: listening sections + reading passages
-    for section in exam_copy.get("listening", {}).get("sections", []):
+    for section in (exam_copy.get("listening") or {}).get("sections", []):
         for q in section.get("questions", []):
             q.pop("correct_answer", None)
-    for passage in exam_copy.get("reading", {}).get("passages", []):
+    for passage in (exam_copy.get("reading") or {}).get("passages", []):
         for q in passage.get("questions", []):
             q.pop("correct_answer", None)
     # TELC: hoeren (conversations + direct questions + ansagen)
-    for aufgabe in exam_copy.get("hoeren", {}).get("aufgaben", []):
+    for aufgabe in (exam_copy.get("hoeren") or {}).get("aufgaben", []):
         for q in aufgabe.get("questions", []):
             q.pop("correct_answer", None)
         for conv in aufgabe.get("conversations", []):
@@ -609,11 +611,11 @@ def _strip_correct_answers(exam_copy: dict) -> dict:
         for ansage in aufgabe.get("ansagen", []):
             ansage.pop("correct_answer", None)
     # TELC: lesen
-    for aufgabe in exam_copy.get("lesen", {}).get("aufgaben", []):
+    for aufgabe in (exam_copy.get("lesen") or {}).get("aufgaben", []):
         for q in aufgabe.get("questions", []):
             q.pop("correct_answer", None)
     # TELC: sprachbausteine (MC options + wortbank options)
-    for aufgabe in exam_copy.get("sprachbausteine", {}).get("aufgaben", []):
+    for aufgabe in (exam_copy.get("sprachbausteine") or {}).get("aufgaben", []):
         for opt in aufgabe.get("options", []):
             opt.pop("correct_answer", None)
     return exam_copy
