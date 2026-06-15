@@ -6,7 +6,7 @@ WORKDIR /app
 COPY requirements.prod.txt .
 RUN pip install --no-cache-dir -r requirements.prod.txt
 
-COPY server.py database.py ./
+COPY server.py database.py telc_seeds.py ./
 
 EXPOSE 8000
 

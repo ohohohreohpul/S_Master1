@@ -6,13 +6,17 @@ InsForge (DB + Storage) + Replicate Gemini TTS + OpenRouter AI + Emergent Google
 from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, BackgroundTasks, UploadFile, File
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-import os, logging, json, base64, uuid, httpx, asyncio, io
+import os, re, logging, json, base64, uuid, httpx, asyncio, io
 from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone, timedelta
 import replicate
 import database
+try:
+    import telc_seeds as _telc_seeds
+except ImportError:
+    _telc_seeds = None
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -487,7 +491,40 @@ async def _generate_telc_audio(exam_id: str, exam: dict):
 # ==========================================
 # OPENROUTER AI
 # ==========================================
-async def call_openrouter(messages: list, model: str = "google/gemini-2.0-flash-001", json_mode: bool = True, retries: int = 2) -> str:
+def _extract_json(content: str) -> str:
+    """Extract the outermost JSON object from a model response that may include markdown or trailing text."""
+    # Strip markdown fences first
+    text = re.sub(r"^```(?:json)?\s*", "", content.strip(), flags=re.IGNORECASE)
+    text = re.sub(r"\s*```\s*$", "", text.strip())
+    # Find first '{' and balance braces to find the end of the JSON object
+    start = text.find("{")
+    if start == -1:
+        return text
+    depth = 0
+    in_str = False
+    escape = False
+    for i, ch in enumerate(text[start:], start):
+        if escape:
+            escape = False
+            continue
+        if ch == "\\" and in_str:
+            escape = True
+            continue
+        if ch == '"':
+            in_str = not in_str
+            continue
+        if in_str:
+            continue
+        if ch == "{":
+            depth += 1
+        elif ch == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start:i + 1]
+    return text[start:]
+
+
+async def call_openrouter(messages: list, model: str = "google/gemini-3.5-flash", json_mode: bool = True, retries: int = 2) -> str:
     """Call OpenRouter with automatic retry on 429/504/connection errors."""
     last_error = None
     for attempt in range(retries + 1):
@@ -510,7 +547,10 @@ async def call_openrouter(messages: list, model: str = "google/gemini-2.0-flash-
                 if r.status_code != 200:
                     logger.error(f"OpenRouter error: {r.status_code} - {r.text}")
                     raise HTTPException(500, "AI service error")
-                return r.json()["choices"][0]["message"]["content"]
+                content = r.json()["choices"][0]["message"]["content"]
+                if json_mode:
+                    content = _extract_json(content)
+                return content
         except (httpx.TimeoutException, httpx.ConnectError, httpx.RemoteProtocolError) as e:
             last_error = str(e)
             if attempt < retries:
@@ -4168,6 +4208,19 @@ async def _startup_inner():
     if not await db.exams.find_one({"exam_id": "exam_telc_b2_004"}):
         await db.exams.insert_one(get_telc_b2_seed_004())
         logger.info("Seeded exam_telc_b2_004")
+
+    # Seed AI-generated exams (A1, A2, improved B1/B2) from telc_seeds.py
+    if _telc_seeds:
+        for level, fn_name, exam_id in [
+            ("A1", "get_telc_a1_ai_seed", "exam_telc_a1_001"),
+            ("A2", "get_telc_a2_ai_seed", "exam_telc_a2_001"),
+        ]:
+            fn = getattr(_telc_seeds, fn_name, None)
+            if fn and not await db.exams.find_one({"exam_id": exam_id}):
+                seed = fn()
+                seed["status"] = "pending_audio"
+                await db.exams.insert_one(seed)
+                logger.info(f"Seeded {exam_id} (TELC {level})")
 
 # ==========================================
 # STRIPE SUBSCRIPTIONS
