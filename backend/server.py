@@ -1303,55 +1303,112 @@ async def generate_telc_endpoint(background_tasks: BackgroundTasks, request: Req
 
 def _telc_level_spec(level: str) -> str:
     """Return explicit CEFR level specification to inject into every generation prompt."""
-    if level == "B1":
+    if level == "A1":
+        return """CEFR A1 LEVEL REQUIREMENTS — apply with absolute strictness:
+REFERENCE STANDARD: telc Deutsch A1 / Goethe-Zertifikat A1 / Start Deutsch 1.
+TOPICS: ONLY the most concrete everyday situations: greetings, numbers, dates, times, family members, colours, simple food/drink, basic shopping (price, size), one's own name/address/country, very simple weather, basic body parts. NO workplaces, NO abstract concepts whatsoever.
+VOCABULARY: Only the 800 most common German words. Calibration examples of ALLOWED words: kommen, heißen, wohnen, Brot, kaufen, Uhr, Montag, rot, groß, Familie, Hund, Haus, ja, nein, bitte, danke. FORBIDDEN words (too advanced): trotzdem, obwohl, eigentlich, wahrscheinlich, Veranstaltung, Umgebung.
+GRAMMAR: ONLY Präsens of sein/haben/regular verbs/basic modals (können, müssen, möchten). Single main clause only. NO subordinate clauses, NO Perfekt in questions, NO Dativ plurals with adjective endings, NO Konjunktiv of any kind.
+SENTENCE STYLE: Maximum 8 words per sentence. "Ich heiße Maria. Ich komme aus Spanien. Ich wohne in Berlin." — this is the target complexity. WRONG LEVEL: "Obwohl ich müde bin, gehe ich zum Supermarkt."
+LISTENING SCRIPTS: Very slow, very clear, pauses between sentences. Speakers introduce themselves, ask for prices, say times, spell their name.
+QUESTIONS: Only test whether an explicitly stated fact was heard/read. One unambiguous correct answer. Distractors must use the same vocabulary but wrong values (wrong number, wrong day, wrong name).
+ANTI-PATTERNS — if your output contains any of these it is WRONG: subordinate clauses, Konjunktiv II, abstract nouns, sentences longer than 12 words, topics like "society" or "technology" or "environment"."""
+    elif level == "A2":
+        return """CEFR A2 LEVEL REQUIREMENTS — apply with absolute strictness:
+REFERENCE STANDARD: telc Deutsch A2 / Goethe-Zertifikat A2 / Start Deutsch 2.
+TOPICS: Extended everyday contexts — neighbourhood, simple workplace routines, public transport, leisure activities (sport, cinema, café), simple health (doctor visit, pharmacy), simple letters/messages. Still concrete and familiar. NO abstract debates.
+VOCABULARY: ~1,500 most common German words. ALLOWED: Termin, Arzt, Bushaltestelle, Einkaufszentrum, Öffnungszeiten, Freizeit, Kollege, meistens, manchmal. FORBIDDEN (too advanced): gesellschaftlich, Nachhaltigkeit, Fachkräftemangel, analysieren, Konjunktiv.
+GRAMMAR: Präsens, Perfekt (regular + haben/sein), simple Präteritum (war, hatte), basic modal verbs, basic dative case, simple subordinate clauses with weil/dass/wenn. NO Konjunktiv II, NO complex passive, NO participial constructions, NO Genitiv case.
+SENTENCE STYLE: Short sentences, max 15 words. "Ich war gestern beim Arzt, weil ich Halsschmerzen hatte." — this is the target complexity. WRONG LEVEL: "Die zunehmende Digitalisierung stellt viele Unternehmen vor große Herausforderungen."
+LISTENING SCRIPTS: Slow-to-normal speed. Short conversations in everyday settings: at the doctor, making an appointment, at the supermarket, on the phone with a friend. No expert opinions.
+QUESTIONS: Test explicitly stated facts. At most 1 question per text requires a very simple inference ("She is tired → she did not sleep well"). Distractors are clearly wrong on close reading.
+ANTI-PATTERNS — if your output contains any of these it is WRONG: Konjunktiv II, Genitiv constructions, abstract social topics, expert interviews, academic vocabulary, sentences with 3+ clauses."""
+    elif level == "B1":
         return """CEFR B1 LEVEL REQUIREMENTS — apply strictly:
-TOPICS: Everyday life, work, school, shopping, travel, leisure, family, health (familiar, concrete).
-VOCABULARY: High-frequency everyday words only (~2,000–3,000 word range). NO academic, technical or low-frequency vocabulary.
-GRAMMAR: Present, Perfekt, Präteritum (sein/haben/modals), basic subordinate clauses (weil, dass, wenn). NO Konjunktiv II, NO complex passive, NO participial constructions.
-TEXT COMPLEXITY: Short, clear sentences. Simple paragraph structure. Explicit information — no inference required.
-LISTENING SCRIPTS: Slow-to-normal speed, clear pronunciation, simple colloquial speech. Topics: daily routines, booking appointments, everyday shopping, weather, local events, simple workplace chats.
-QUESTIONS: Test explicit/literal understanding. Correct answer is directly stated in the text. Distractors are plausible but clearly wrong.
-WRONG-LEVEL EXAMPLES TO AVOID: No academic articles, no professional jargon, no abstract social commentary, no complex argumentation."""
+REFERENCE STANDARD: telc Deutsch B1 / Goethe-Zertifikat B1 / Zertifikat Deutsch.
+TOPICS: Familiar and concrete: work routines, school/study life, travel planning, housing/neighbours, health and appointments, hobbies, local events, simple media (newspaper summaries). NOT abstract societal analysis.
+VOCABULARY: ~3,000 most common words. ALLOWED: Erfahrung, Möglichkeit, erledigen, beschreiben, Veranstaltung, Unterschied, Vorschlag. FORBIDDEN (too advanced): Globalisierung, Nachhaltigkeit, Digitalisierung (as abstract topic), Konjunktiv II in tests, nominalisations like "das Gelingen".
+GRAMMAR: Full use of Präsens/Perfekt/Präteritum, modals, subordinate clauses (weil, dass, wenn, obwohl, damit), Komparativ/Superlativ, basic Passiv (wird gemacht). NO Konjunktiv II except in set phrases (könnte/würde), NO complex participial phrases, NO Genitiv attributes.
+SENTENCE STYLE: Clear multi-clause sentences but not complex. "Sie suchen eine Wohnung, weil sie in eine neue Stadt gezogen ist." WRONG LEVEL: "Die zunehmende Urbanisierung führt zu erhöhtem Wohnungsdruck in Ballungsräumen."
+LISTENING SCRIPTS: Normal spoken speed, clear articulation, natural but not fast. Conversations about everyday topics with direct statements. No implicit meaning required.
+QUESTIONS: Primarily test explicit understanding. Max 1–2 questions per section require very simple inference. Correct answer is stated or very directly implied in the text. Distractors are plausible on surface but factually wrong.
+CALIBRATION CHECK: Before finalising, ask yourself — "Could a person who passed the A2 exam and studied German for 1 year understand every sentence in this text?" If yes, level is correct."""
     elif level == "B2":
         return """CEFR B2 LEVEL REQUIREMENTS — apply strictly:
-TOPICS: Abstract and professional: environment, technology, society, culture, health systems, professional development, globalisation, media, science. NOT everyday shopping or simple travel.
-VOCABULARY: Wide range including abstract nouns, academic collocations, topic-specific terminology (e.g. "Nachhaltigkeit", "Globalisierung", "Fachkräftemangel"). Idiomatic expressions.
-GRAMMAR: Konjunktiv II (hypotheticals/indirect speech), Passiv constructions (wird gebaut, wurde entlassen), complex subordinate clauses, participial constructions, nominalisations.
-TEXT COMPLEXITY: Complex multi-paragraph texts with argumentation, counterarguments, implicit meaning. Requires inferencing beyond literal text.
-LISTENING SCRIPTS: Normal/natural speed, complex sentence structures, speaker attitude/opinion must be inferred. Topics: expert interviews, radio discussions, workplace conflicts, academic lectures.
-QUESTIONS: Test ability to infer, identify opinions, understand nuance. Correct answers often require combining two pieces of information or recognising implicit meaning. Distractors are very close to the correct answer."""
+REFERENCE STANDARD: telc Deutsch B2 / Goethe-Zertifikat B2.
+TOPICS: Abstract and professional — digital transformation, environmental policy, workplace culture shifts, intercultural communication, public health debates, media literacy, economic inequality, education reform, urban development. NOT everyday shopping or simple personal routines.
+VOCABULARY: ~6,000 word range. REQUIRED vocabulary types: abstract nouns (Nachhaltigkeit, Digitalisierung, Fachkräftemangel, Herausforderung, Maßnahme), academic collocations (einen Beitrag leisten, im Mittelpunkt stehen, auf dem Vormarsch sein), verbal idioms. AVOID: words a complete beginner knows.
+GRAMMAR: MUST USE: Konjunktiv II (for hypotheticals and reported speech: "Er sagte, er würde gerne..."), Passiv (wird/wurde + Partizip II), complex subordinate clauses (sodass, sofern, während, indem, wobei), participial constructions ("der bereits erschienene Bericht..."), nominalisations (das Scheitern, die Veränderung).
+SENTENCE STYLE: Long, complex, multi-clause. "Obwohl der technologische Fortschritt zweifellos Vorteile mit sich bringt, warnen Experten vor den gesellschaftlichen Risiken der zunehmenden Automatisierung." — this is the target sentence complexity. WRONG LEVEL: "Ich finde Homeoffice gut, weil man flexibler ist."
+LISTENING SCRIPTS: Natural conversational speed, speaker attitudes must be INFERRED not directly stated. Expert opinions, hedged claims, disagreement. At least 40% of content is implicit.
+QUESTIONS: MUST include questions where the answer requires: (a) inferring speaker attitude/opinion, (b) combining two pieces of information, (c) recognising what is NOT said. Distractors must be very close — often containing a correct word from the text but applying it wrongly.
+CALIBRATION CHECK: Before finalising, ask yourself — "Would a B1 student struggle with this text?" If they would not struggle, the text is NOT B2 level. Raise the vocabulary, lengthen the sentences, add complexity."""
     else:  # C1
         return """CEFR C1 LEVEL REQUIREMENTS — apply strictly:
-TOPICS: Specialist and academic: law, ethics, economics, cognitive science, geopolitics, literary criticism, complex social phenomena, philosophy, advanced technology debates.
-VOCABULARY: Near-native range including rare collocations, nominalisations, discipline-specific terminology (e.g. "Regressionsanalyse", "Verfassungswidrigkeit", "kognitive Dissonanz"). Figurative language, irony, hedging expressions.
-GRAMMAR: All B2 structures plus: complex nominalisations, extended participial constructions, elaborate concessive/conditional structures (nicht nur... sondern auch; wenngleich; insofern als), indirect speech with multiple tense shifts, rhetorical devices.
-TEXT COMPLEXITY: Long, nuanced texts with implicit stance, irony, presuppositions and unstated assumptions. Requires critical reading and evaluation of positions.
-LISTENING SCRIPTS: Near-native speed with authentic hesitations, self-corrections, complex subordination, hedged claims. Speakers express nuanced or contradictory positions requiring critical analysis.
-QUESTIONS: Primarily test ability to evaluate arguments, detect implicit stance, distinguish main from subsidiary points, recognise rhetorical strategy. Distractors deliberately misleading — partially correct or plausible but wrong at a nuanced level."""
+REFERENCE STANDARD: telc Deutsch C1 Hochschule / Goethe-Zertifikat C1.
+TOPICS: Specialist and academic — constitutional law debates, cognitive science findings, geopolitical analysis, literary criticism, advanced ethics (Bioethik, KI-Regulierung), complex social phenomena (Polarisierung, Identitätspolitik), economics (Konjunktur, Fiskalstabilität), philosophy of language.
+VOCABULARY: Near-native range. REQUIRED: Nominalisierungen (das Scheitern, die Inanspruchnahme), discipline-specific terms (Regressionsanalyse, Verfassungswidrigkeit, kognitive Dissonanz, Fiskalstabilität), figurative language, hedging expressions (es bleibt fraglich ob, sofern man davon ausgeht dass), irony markers.
+GRAMMAR: Extended participial constructions ("die im Zuge der Reform neu eingeführten Bestimmungen"), elaborate concessive/conditional structures (wenngleich, insofern als, nicht nur... sondern auch), indirect speech with tense shifts across multiple clauses, rhetorical devices (Anapher, Litotes, Ellipse).
+SENTENCE STYLE: Very long, highly subordinated. "Insofern als die jüngsten Studienergebnisse darauf hindeuten, dass kognitive Verzerrungen nicht nur individuelle, sondern auch systemische Entscheidungsfehler begünstigen, stellt sich die Frage, inwieweit institutionelle Strukturen reformiert werden müssten." — this is the target complexity.
+LISTENING SCRIPTS: Near-native speed with authentic hesitations, self-corrections, complex subordination, irony, hedged claims. Speakers take nuanced or seemingly contradictory positions.
+QUESTIONS: Test ability to evaluate arguments, detect implicit rhetorical stance, distinguish main thesis from subsidiary points, recognise irony or presupposition. All distractors are partially correct — wrong only at a subtle nuanced level."""
+
+
+def _lesen_level_hints(level: str) -> dict:
+    """Per-level text/question specs for the Leseverstehen prompt."""
+    if level in ("A1", "A2"):
+        return {
+            "aufgabe1_topics": "A1/A2: Very short everyday notices, opening hours, simple signs, short messages from family/friends.",
+            "aufgabe1_length": "40–70 words each",
+            "aufgabe2_text": "short informational text (150–220 words) on a very concrete everyday topic (buying a train ticket, a library card, a gym membership) — extremely simple sentences, present tense, common vocabulary only.",
+            "aufgabe2_questions": "All 5 correct answers are DIRECTLY stated word-for-word in the text. Zero inference.",
+            "aufgabe3_topics": "A1/A2: Everyday needs like finding a swimming pool, buying food, getting a bus pass, booking a room. Ads are short notices (2–3 sentences).",
+        }
+    elif level == "B1":
+        return {
+            "aufgabe1_topics": "B1: Short articles, notices, brief opinion pieces on familiar topics (travel tips, neighbourhood events, hobby clubs, local job ads).",
+            "aufgabe1_length": "80–120 words each",
+            "aufgabe2_text": "informational text (280–350 words) on a familiar everyday topic — simple paragraphs, concrete situation, clear cause-and-effect. B1 calibration: every sentence should be understandable after 1 year of German study.",
+            "aufgabe2_questions": "Correct answer is directly stated in text. Max 1 question requires a basic inference ('She arrived late → she missed the beginning').",
+            "aufgabe3_topics": "B1: Situations and ads cover everyday needs: language courses, part-time jobs, sports clubs, rental flats, simple services.",
+        }
+    else:  # B2, C1
+        return {
+            "aufgabe1_topics": "B2/C1: Newspaper extracts, opinion pieces, professional announcements, editorial summaries on abstract topics.",
+            "aufgabe1_length": "100–150 words each",
+            "aufgabe2_text": "complex text (430–570 words) on an abstract/professional topic — argumentation, statistics, expert views, counterarguments. Grammar MUST include: Konjunktiv II, Passiv, participial constructions, nominalisations. B2 calibration: a B1 student would NOT understand this text.",
+            "aufgabe2_questions": "At least 3 of 5 questions require inferencing, identifying opinion, or understanding implicit meaning. Distractors contain correct words used incorrectly.",
+            "aufgabe3_topics": "B2/C1: Situations and ads cover professional/specific needs: specialist training with entry conditions, services requiring qualifications, technical requirements, complex scheduling.",
+        }
 
 
 async def ai_generate_telc_exam(exam_id: str, level: str):
-    """Generate a telc Deutsch B1/B2 exam using aufgaben format (matches audio pipeline + seed data)."""
+    """Generate a telc Deutsch exam at the specified CEFR level."""
     level_spec = _telc_level_spec(level)
-    sys_prompt = f"You are a certified telc Deutsch {level} exam author with 15 years experience writing official exams. Return valid JSON only. CRITICAL: {level_spec}"
+    hints = _lesen_level_hints(level)
+    sys_prompt = (
+        f"You are a certified telc Deutsch {level} exam author with 15 years experience "
+        f"writing official exams. Return valid JSON only — no markdown fences, no commentary. "
+        f"CRITICAL LEVEL ENFORCEMENT: {level_spec}"
+    )
 
     try:
         # ── LESEVERSTEHEN ─────────────────────────────────────────────────────
         lesen_prompt = f"""Generate a telc Deutsch {level} Leseverstehen test with exactly 3 Aufgaben.
 
-MANDATORY LEVEL: {level_spec}
+MANDATORY CEFR LEVEL: {level_spec}
 
 Aufgabe 1 (q1-5): Zuordnung
-5 short texts (A-E, 80-120 words each). {"Topics: notices, short articles on everyday topics." if level == "B1" else "Topics: newspaper extracts, opinion pieces, professional announcements."}
+5 short texts (A-E, {hints['aufgabe1_length']}). {hints['aufgabe1_topics']}
 10 headings (a-j); only 5 match the texts.
 correct_answer: heading letter
 
 Aufgabe 2 (q6-10): Multiple Choice
-One {"informational text (280-350 words) on a familiar everyday topic — must be clearly B1: simple language, concrete situation." if level == "B1" else "complex text (400-550 words) on an abstract/professional topic — argumentation, statistics, expert views. Language must be genuinely B2: complex grammar, academic vocabulary."}
-5 questions with options a/b/c. {"Correct answer directly stated in text." if level == "B1" else "At least 2 questions require inferencing or understanding implied meaning."}
+One {hints['aufgabe2_text']}
+5 questions with options a/b/c. {hints['aufgabe2_questions']}
 
 Aufgabe 3 (q11-20): Anzeigen-Zuordnung
-10 situations + 12 short ads/notices (a-l). {"Situations and ads describe everyday needs: courses, jobs, services." if level == "B1" else "Situations and ads cover professional/specific needs: specialist training, services with conditions, technical requirements."}
+10 situations + 12 short ads/notices (a-l). {hints['aufgabe3_topics']}
 2 ads have no matching situation (answer x).
 
 All text and questions in German only.
@@ -1393,23 +1450,51 @@ Return JSON:
         lesen_data["duration_minutes"] = 90
 
         # ── HÖRVERSTEHEN ──────────────────────────────────────────────────────
+        hoeren_topic_ideas = {
+            "A1": "A1 topic ideas: sich vorstellen, Lieblingsessen, Tiere, Wetter, Wochentage — ONLY the simplest personal facts, max 3–4 sentences per monologue, present tense only, common words only",
+            "A2": "A2 topic ideas: Einkaufen im Supermarkt, ein Arzttermin, ein Ausflug am Wochenende, Sport in der Freizeit — short everyday experiences, 4–6 sentences, Perfekt allowed",
+            "B1": "B1 topic ideas: Hausarbeit im Alltag, Haustiere halten, Urlaub planen, Sport und Freizeit — familiar topics, 5–8 sentences, direct personal opinions",
+            "B2": "B2 topic ideas: Homeoffice-Erfahrungen, Klimaschutz im Alltag, soziale Medien und Gesellschaft, Fachkräftemangel — abstract angles, 6–9 sentences, implied attitudes",
+            "C1": "C1 topic ideas: KI und die Zukunft der Arbeit, Bildungsreform aus verschiedenen Perspektiven, Regulierung sozialer Medien — nuanced academic views, hedged claims, irony",
+        }
+        hoeren_gespraech_hints = {
+            "A1": "A1: very simple exchange between 2 people (e.g. at a market, asking for directions) — 6–8 exchanges, present tense, max 1 clause per turn, no opinions",
+            "A2": "A2: simple dialogue (booking an appointment, asking about bus times) — 8–10 exchanges, mostly present tense, simple questions and answers, no abstract content",
+            "B1": "B1: local community topic or everyday theme — 10–12 exchanges, simple language, direct facts, max 1 opinion per speaker",
+            "B2": "B2: expert interview on abstract/professional topic (Umwelt, Technologie, Gesellschaft) — 12–14 exchanges, speaker attitude must be INFERRED, complex sentences",
+            "C1": "C1: specialist debate with complex reasoning, hedged claims, apparent contradictions — 14–16 exchanges, near-native speed implied",
+        }
+        hoeren_ansagen_hints = {
+            "A1": "A1: 2 short sentences max, only explicit facts (time, place, price, name) — train/bus departure, shop opening time, simple phone message",
+            "A2": "A2: 2–3 simple sentences with one specific piece of information to extract — cinema schedule, pharmacy hours, simple event announcement",
+            "B1": "B1: 2–3 sentences, everyday info (departure times, opening hours, event details) — clear and direct",
+            "B2": "B2: 3–4 sentences with conditions or exceptions, semi-official register",
+            "C1": "C1: 4–5 sentences with complex official/legal language, conditions, exceptions",
+        }
+        hoeren_q_hints = {
+            "A1": "A1: question tests ONE explicitly stated fact (a number, a name, a day, a simple yes/no). Correct answer is a word said in the text. Zero inference.",
+            "A2": "A2: question tests an explicitly stated fact. At most 1 question per Aufgabe requires a very simple inference.",
+            "B1": "B1: mostly explicit facts, max 2 questions require basic inference per Aufgabe.",
+            "B2": "B2: at least 4 of 10 Aufgabe-2 questions require inferring speaker attitude or implicit meaning. Distractors use words from the text incorrectly.",
+            "C1": "C1: at least 6 of 10 Aufgabe-2 questions require evaluating implicit stance or detecting nuanced position.",
+        }
+        t1_hint = hoeren_topic_ideas.get(level, hoeren_topic_ideas["B2"])
+        t2_hint = hoeren_gespraech_hints.get(level, hoeren_gespraech_hints["B2"])
+        t3_hint = hoeren_ansagen_hints.get(level, hoeren_ansagen_hints["B2"])
+        q_hint = hoeren_q_hints.get(level, hoeren_q_hints["B2"])
+
         hoeren_prompt = f"""Generate a telc Deutsch {level} Hörverstehen (Listening Comprehension) test with exactly 3 Aufgaben.
 ALL questions use ONLY Richtig/Falsch format — absolutely no multiple-choice options.
 
-MANDATORY LEVEL: {level_spec}
+MANDATORY CEFR LEVEL: {level_spec}
 
 ═══════════════════════════════════════════════════════════════
 AUFGABE 1 — Kurztexte (5 Monologe zum gleichen Thema)
 ═══════════════════════════════════════════════════════════════
 • 5 SHORT MONOLOGUES — each spoken by a DIFFERENT single speaker
 • All 5 texts share ONE common topic — each speaker gives their personal view/experience
-• B1 topic ideas: Hausarbeit im Alltag, Haustiere halten, Urlaub planen, Sport und Freizeit
-• B2 topic ideas: Homeoffice-Erfahrungen, Klimaschutz im Alltag, soziale Medien und Gesellschaft
-• C1 topic ideas: KI und die Zukunft der Arbeit, Bildungsreform aus verschiedenen Perspektiven
-• Each monologue: 5–8 sentences expressing personal opinion or experience on that topic
-• B1: simple sentences, everyday vocabulary, direct statements
-• B2: medium-complex clauses, topic-specific vocabulary, implied attitude
-• C1: hedged statements, irony, nuanced positions, academic register
+• {t1_hint}
+• QUESTION DIFFICULTY: {q_hint}
 • 1 Richtig/Falsch question per monologue (question_num 1–5)
 • heard_times: 1 (heard ONCE only — keine Wiederholung)
 • preparation_seconds: 30
@@ -1419,13 +1504,9 @@ AUFGABE 1 — Kurztexte (5 Monologe zum gleichen Thema)
 AUFGABE 2 — Ein Gespräch / Interview
 ═══════════════════════════════════════════════════════════════
 • 1 radio interview or discussion between 2 speakers (e.g. Moderatorin + Experte/Gast)
-• B1: local community topic or everyday theme, 10–12 exchanges, simple language
-• B2: expert interview on abstract/professional topic (Umwelt, Technologie, Gesellschaft), 12–14 exchanges
-• C1: specialist debate with complex reasoning, hedged claims, 14–16 exchanges
+• {t2_hint}
 • 10 Richtig/Falsch questions (question_num 6–15) — NO options array
-• B1: all questions test explicit stated facts
-• B2: at least 4 questions require inferring speaker attitude or implicit meaning
-• C1: at least 6 questions require evaluating implicit stance or detecting nuanced position
+• QUESTION DIFFICULTY: {q_hint}
 • heard_times: 2 (heard TWICE — zweimal)
 • preparation_seconds: 60
 
@@ -1433,10 +1514,9 @@ AUFGABE 2 — Ein Gespräch / Interview
 AUFGABE 3 — Kurze Ansagen
 ═══════════════════════════════════════════════════════════════
 • 5 independent short announcements (radio, Bahnhof, telephone recording, store intercom)
-• B1: 2–3 simple sentences, everyday info (departure times, opening hours, event details)
-• B2: 3–4 sentences with conditions or exceptions, semi-official register
-• C1: 4–5 sentences with complex official/legal language, conditions, exceptions
+• {t3_hint}
 • 1 Richtig/Falsch per announcement (question_num 16–20)
+• QUESTION DIFFICULTY: {q_hint}
 • heard_times: 2 (heard TWICE each)
 • preparation_seconds: 30
 • Single announcer voice per ansage; use "Ansagerin"/"Ansager" or specific role names
@@ -1575,23 +1655,37 @@ Return valid JSON only — no markdown, no commentary:
                     )
 
         # ── SPRACHBAUSTEINE ───────────────────────────────────────────────────
+        sprach_mc_hints = {
+            "A1": "A very short, simple personal message (80–120 words) — greetings, simple present tense facts, common everyday words. Gaps test: articles (der/die/das/ein/eine), common prepositions (in, auf, mit, zu), basic verb forms (bin, habe, komme).",
+            "A2": "A short personal letter or message (140–180 words) about an everyday topic (a meeting, a visit). Gaps test: common prepositions, Perfekt verb forms (habe ... gemacht), simple conjunctions (und, aber, weil), basic modal verbs.",
+            "B1": "A personal letter or informal email about everyday topic (200-240 words). Gaps test: common prepositions, articles, simple conjunctions, present/past verb forms.",
+            "B2": "A semi-formal letter, report excerpt, or article on a professional/abstract topic (220-260 words). Gaps test: Konjunktiv II, Passiv, complex conjunctions (obwohl, sodass, während), nominalisations, subjunctive indirect speech.",
+            "C1": "A formal academic or professional text (240-280 words). Gaps test: extended participial phrases, complex connectors (wenngleich, insofern als), Genitiv constructions, academic collocations.",
+        }
+        sprach_wb_hints = {
+            "A1": "A very short notice or message (80–120 words). Words are the most common concrete nouns and verbs (Haus, kaufen, groß, kommen, Montag). Distractors are other common words from a completely different semantic field.",
+            "A2": "A short everyday text (140–180 words) — hotel notice, simple letter from a friend. Words are common concrete nouns/verbs. Distractors are plausible-looking but semantically wrong.",
+            "B1": "Everyday letter or notice (hotel, club, neighbourhood), 200-240 words. Words are common, concrete nouns/verbs. Distractors are words from same topic area but wrong meaning.",
+            "B2": "Professional or academic text (company announcement, research summary, news article), 220-260 words. Words include abstract nouns, collocations, technical terms. Distractors semantically close (same field, wrong collocate).",
+            "C1": "Academic or specialist text (scientific summary, legal notice), 240-280 words. Words include nominalisations, rare collocations, academic verbs. Distractors are near-synonyms wrong in context.",
+        }
+        mc_hint = sprach_mc_hints.get(level, sprach_mc_hints["B2"])
+        wb_hint = sprach_wb_hints.get(level, sprach_wb_hints["B2"])
+
         sprachbausteine_prompt = f"""Generate a telc Deutsch {level} Sprachbausteine test with exactly 2 Aufgaben.
 
-MANDATORY LEVEL: {level_spec}
+MANDATORY CEFR LEVEL: {level_spec}
 
 Aufgabe 1 — Lückentext Multiple Choice (q21–30)
-B1: A personal letter or informal email about everyday topic (200-240 words).
-B2: A semi-formal letter, report excerpt, or article on a professional/abstract topic (220-260 words).
+{mc_hint}
 Exactly 10 numbered gaps as {{21}}, {{22}} ... {{30}}.
-3 options per gap (a/b/c). B1: test common prepositions, articles, simple conjunctions, present/past verb forms.
-B2: test Konjunktiv II, Passiv, complex conjunctions (obwohl, sodass, während), nominalisations, subjunctive indirect speech.
+3 options per gap (a/b/c).
 correct_answer: "a", "b", or "c"
 
 Aufgabe 2 — Lückentext Wortschatz (q31–40)
-B1: Everyday letter or notice (hotel, club, neighbourhood), 200-240 words. Words are common, concrete nouns/verbs.
-B2: Professional or academic text (company announcement, research summary, news article), 220-260 words. Words include abstract nouns, collocations, technical terms.
+{wb_hint}
 Exactly 10 gaps as {{31}}, {{32}} ... {{40}}.
-Word bank: 15 CAPITALISED words (a–o), 5 distractors. B2: distractors should be semantically close (same field, wrong collocate).
+Word bank: 15 CAPITALISED words (a–o), 5 distractors.
 correct_answer: bank letter
 
 All in German only.
@@ -1622,24 +1716,27 @@ Return JSON:
         sprachbausteine_data["duration_minutes"] = 30
 
         # ── SCHRIFTLICHER AUSDRUCK ────────────────────────────────────────────
-        writing_topics = {
-            "B1": "Umzug, Reise oder Freizeitaktivität",
-            "B2": "Beruf, Weiterbildung oder gesellschaftliches Thema",
-            "C1": "Wissenschaft, Ethik oder gesellschaftliche Entwicklung",
-        }
         writing_formats = {
+            "A1": ("formular_kurzmitteilung", "ca. 30 Wörter", 20, 45,
+                   "Füllen Sie das Formular aus oder schreiben Sie eine sehr kurze Mitteilung.\n"
+                   "Schreiben Sie: Ihr Name, Ihr Land, Ihre Telefonnummer, und einen einfachen Satz.\n"
+                   "Benutzen Sie nur einfache, bekannte Wörter."),
+            "A2": ("kurze_mitteilung", "ca. 50 Wörter", 40, 65,
+                   "Sie möchten Ihrer Freundin / Ihrem Freund eine kurze Nachricht schreiben.\n"
+                   "Schreiben Sie zu diesen drei Punkten:\n"
+                   "- Wann treffen Sie sich?\n- Wo treffen Sie sich?\n- Was machen Sie zusammen?"),
             "B1": ("brief_email", "ca. 100 Wörter", 80, 130,
                    "Sie haben eine E-Mail von Ihrer Freundin / Ihrem Freund bekommen. "
                    "Sie/Er bittet Sie um Hilfe oder Rat zu einem alltäglichen Thema "
-                   f"({writing_topics[level]}). Schreiben Sie eine Antwort-E-Mail.\n"
+                   "(Umzug, Reise oder Freizeitaktivität). Schreiben Sie eine Antwort-E-Mail.\n"
                    "Schreiben Sie zu allen drei Punkten:\n"
                    "- ob und wie Sie helfen können\n- wann Sie Zeit haben\n- ein konkreter Vorschlag"),
             "B2": ("erörterung", "ca. 200 Wörter", 180, 250,
-                   f"Schreiben Sie einen argumentativen Aufsatz zum Thema '{writing_topics['B2']}'.\n"
+                   "Schreiben Sie einen argumentativen Aufsatz zum Thema 'Beruf, Weiterbildung oder gesellschaftliches Thema'.\n"
                    "Gehen Sie dabei auf folgende Punkte ein:\n"
                    "- Vorteile und Chancen\n- Nachteile und Risiken\n- Ihre eigene Position mit Begründung"),
             "C1": ("erörterung", "ca. 250 Wörter", 220, 300,
-                   f"Schreiben Sie einen differenzierten Aufsatz zum Thema '{writing_topics['C1']}'.\n"
+                   "Schreiben Sie einen differenzierten Aufsatz zum Thema 'Wissenschaft, Ethik oder gesellschaftliche Entwicklung'.\n"
                    "Analysieren Sie verschiedene Perspektiven, beziehen Sie sich auf gesellschaftliche "
                    "Zusammenhänge und vertreten Sie eine begründete eigene Position."),
         }
@@ -1658,6 +1755,8 @@ Return JSON:
 
         # ── MÜNDLICHER AUSDRUCK ───────────────────────────────────────────────
         speaking_topics = {
+            "A1": "Meine Familie",
+            "A2": "Freizeit und Hobbys",
             "B1": "Homeoffice",
             "B2": "Nachhaltigkeit im Alltag",
             "C1": "KI und die Zukunft der Arbeit",
@@ -4008,6 +4107,13 @@ def get_telc_b2_seed_004():
 
 @app.on_event("startup")
 async def startup():
+    try:
+        await _startup_inner()
+    except Exception as e:
+        logger.warning(f"Startup seeding skipped (non-fatal): {e}")
+
+
+async def _startup_inner():
     # Ensure guest user row exists (needed for FK constraint on attempts table)
     if not await db.users.find_one({"user_id": "guest"}):
         await db.users.insert_one({

@@ -26,7 +26,7 @@ const TELC_MODULES = [
   { key: "speaking",        label: "Sprechen",        sub: "~15 min · 3 Teile",   icon: Mic },
 ];
 
-const TELC_LEVELS = ["B1", "B2"];
+const TELC_LEVELS = ["A1", "A2", "B1", "B2"];
 
 function ExamTypeCard({ type, selected, onSelect }) {
   const isIelts = type === "ielts";
