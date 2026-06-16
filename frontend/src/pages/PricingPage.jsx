@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, API } from "@/App";
+import { useAuth } from "@/App";
+import { efetch } from "@/lib/supabase";
 import { Check, Zap, Lock, BookOpen, Headphones, Pen, Mic, ArrowRight, CreditCard, Settings } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -22,16 +23,8 @@ export default function PricingPage() {
     }
     setLoading(true);
     try {
-      const res = await fetch(`${API}/stripe/checkout`, {
-        method: "POST",
-        credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan: billing })
-      });
-      if (res.ok) {
-        const data = await res.json();
-        window.location.href = data.url;
-      }
+      const data = await efetch("stripe", "/checkout", "POST", { plan: billing });
+      if (data?.url) window.location.href = data.url;
     } catch (e) {
       console.error("Checkout error:", e);
     } finally {
@@ -42,11 +35,8 @@ export default function PricingPage() {
   const handleManageSubscription = async () => {
     setPortalLoading(true);
     try {
-      const res = await fetch(`${API}/stripe/portal`, { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        window.location.href = data.url;
-      }
+      const data = await efetch("stripe", "/portal");
+      if (data?.url) window.location.href = data.url;
     } catch (e) {
       console.error("Portal error:", e);
     } finally {

@@ -1,8 +1,8 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Mic, Square, Volume2, Loader2, MessageCircle, User, Bot, Clock, ArrowRight, SkipForward } from "lucide-react";
+import { Mic, Square, Volume2, Loader as Loader2, MessageCircle, User, Bot, Clock, ArrowRight, SkipForward } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
-import { API } from "@/App";
+import { efetch, SUPABASE_URL, SUPABASE_ANON_KEY } from "@/lib/supabase";
 
 const fadeIn = { initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.3 } };
 
@@ -38,20 +38,13 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
     setPhase("processing");
     setExchangeCount(0);
     try {
-      const res = await fetch(`${API}/speaking/converse`, {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          part_num: currentPart, action: "start",
-          conversation_history: [], cue_card: part?.cue_card || ""
-        })
+      const data = await efetch("speaking", "/converse", "POST", {
+        part_num: currentPart, action: "start",
+        conversation_history: [], cue_card: part?.cue_card || ""
       });
-      if (res.ok) {
-        const data = await res.json();
-        setConversationHistory(data.conversation_history);
-        addToTranscript("examiner", data.examiner_text);
-        playExaminerAudio(data.audio_base64);
-      }
+      setConversationHistory(data.conversation_history);
+      addToTranscript("examiner", data.examiner_text);
+      playExaminerAudio(data.audio_base64);
     } catch (e) {
       console.error("Start part error:", e);
       setPhase("user_turn");
@@ -129,13 +122,18 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
   const processRecording = async (blob) => {
     setPhase("processing");
 
-    // Step 1: Transcribe audio
     let userText = "";
     try {
+      const token = localStorage.getItem("session_token");
       const formData = new FormData();
       formData.append("audio_file", blob, "recording.webm");
-      const sttRes = await fetch(`${API}/speaking/transcribe`, {
-        method: "POST", credentials: "include", body: formData
+      const sttRes = await fetch(`${SUPABASE_URL}/functions/v1/speaking/transcribe`, {
+        method: "POST",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : `Bearer ${SUPABASE_ANON_KEY}`,
+          apikey: SUPABASE_ANON_KEY,
+        },
+        body: formData,
       });
       if (sttRes.ok) {
         const sttData = await sttRes.json();
@@ -151,35 +149,23 @@ export default function SpeakingModule({ exam, audioCache, answers, updateAnswer
     const newCount = exchangeCount + 1;
     setExchangeCount(newCount);
 
-    // Check if part should end
     if (newCount >= maxExchanges) {
       addToTranscript("system", `Part ${currentPart} complete.`);
       setPhase("idle");
-      // Store all transcriptions for scoring
       const allUserTexts = transcript.filter(t => t.role === "user").map(t => t.text).join(" ");
       if (userText) updateAnswer(`part_${currentPart}`, allUserTexts + " " + userText);
       return;
     }
 
-    // Step 2: Get examiner follow-up via conversational AI
     try {
-      const res = await fetch(`${API}/speaking/converse`, {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          part_num: currentPart, user_transcription: userText,
-          conversation_history: conversationHistory, cue_card: part?.cue_card || "",
-          action: "respond"
-        })
+      const data = await efetch("speaking", "/converse", "POST", {
+        part_num: currentPart, user_transcription: userText,
+        conversation_history: conversationHistory, cue_card: part?.cue_card || "",
+        action: "respond"
       });
-      if (res.ok) {
-        const data = await res.json();
-        setConversationHistory(data.conversation_history);
-        addToTranscript("examiner", data.examiner_text);
-        playExaminerAudio(data.audio_base64);
-      } else {
-        setPhase("user_turn");
-      }
+      setConversationHistory(data.conversation_history);
+      addToTranscript("examiner", data.examiner_text);
+      playExaminerAudio(data.audio_base64);
     } catch (e) {
       console.error("Converse error:", e);
       setPhase("user_turn");

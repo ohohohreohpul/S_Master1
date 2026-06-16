@@ -10,38 +10,28 @@ import AdminPage from "@/pages/AdminPage";
 import PricingPage from "@/pages/PricingPage";
 import SubscriptionSuccess from "@/pages/SubscriptionSuccess";
 import ProtectedRoute from "@/components/ProtectedRoute";
-
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000";
-const API = `${BACKEND_URL}/api`;
+import { efetch } from "@/lib/supabase";
 
 // Auth Context
 const AuthContext = createContext(null);
 export const useAuth = () => useContext(AuthContext);
-export { API, BACKEND_URL };
 
 function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const checkAuth = useCallback(async () => {
+    const token = localStorage.getItem("session_token");
+    if (!token) { setUser(null); return; }
     try {
-      const res = await fetch(`${API}/auth/me`, { credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data);
-      } else {
-        setUser(null);
-      }
+      const data = await efetch("auth", "/me");
+      setUser(data);
     } catch {
       setUser(null);
-    } finally {
-      setLoading(false);
     }
   }, []);
 
   useEffect(() => {
-    // Open-access mode: always mark loading done immediately.
-    // Auth is optional — signed-in users get their profile; guests get a guest user.
     if (window.location.hash?.includes("session_id=")) {
       setLoading(false);
       return;
@@ -50,7 +40,8 @@ function AuthProvider({ children }) {
   }, [checkAuth]);
 
   const logout = async () => {
-    await fetch(`${API}/auth/logout`, { method: "POST", credentials: "include" });
+    try { await efetch("auth", "/logout", "POST"); } catch { /* ignore */ }
+    localStorage.removeItem("session_token");
     setUser(null);
   };
 
@@ -64,7 +55,6 @@ function AuthProvider({ children }) {
 function AppRouter() {
   const location = useLocation();
 
-  // Check URL fragment for session_id synchronously during render
   // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
   if (location.hash?.includes("session_id=")) {
     return <AuthCallback />;
@@ -74,11 +64,16 @@ function AppRouter() {
     <Routes>
       <Route path="/" element={<LandingPage />} />
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      }
       <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminPage /></ProtectedRoute>} />
+      }
       <Route path="/exam/:examId" element={<ProtectedRoute><ExamPage /></ProtectedRoute>} />
+      }
       <Route path="/results/:attemptId" element={<ProtectedRoute><ResultsPage /></ProtectedRoute>} />
+      }
       <Route path="/pricing" element={<PricingPage />} />
       <Route path="/subscription/success" element={<ProtectedRoute><SubscriptionSuccess /></ProtectedRoute>} />
+      }
     </Routes>
   );
 }

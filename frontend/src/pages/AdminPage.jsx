@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, API } from "@/App";
-import { BookOpen, Plus, Trash2, RefreshCw, BarChart3, Users, Database, Music, ArrowLeft, Loader2, ChevronDown, Crown } from "lucide-react";
+import { useAuth } from "@/App";
+import { efetch } from "@/lib/supabase";
+import { BookOpen, Plus, Trash2, RefreshCw, ChartBar as BarChart3, Users, Database, Music, ArrowLeft, Loader as Loader2, ChevronDown, Crown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 
@@ -22,12 +23,12 @@ export default function AdminPage() {
 
   const fetchData = async () => {
     try {
-      const [examsRes, statsRes] = await Promise.all([
-        fetch(`${API}/admin/exams`, { credentials: "include" }),
-        fetch(`${API}/admin/stats`, { credentials: "include" })
+      const [examsData, statsData] = await Promise.all([
+        efetch("admin", "/exams").catch(() => null),
+        efetch("admin", "/stats").catch(() => null),
       ]);
-      if (examsRes.ok) setExams(await examsRes.json());
-      if (statsRes.ok) setStats(await statsRes.json());
+      if (examsData) setExams(examsData);
+      if (statsData) setStats(statsData);
     } catch (e) { console.error(e); }
     setLoading(false);
   };
@@ -38,19 +39,19 @@ export default function AdminPage() {
     setGenerating(true);
     setGenProgress({ status: "generating_content", progress: 0 });
     try {
-      const res = await fetch(`${API}/exams/generate`, { method: "POST", credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await efetch("exams", "/generate", "POST");
+      if (data?.exam_id) {
         const interval = setInterval(async () => {
-          const statusRes = await fetch(`${API}/exams/${data.exam_id}/status`, { credentials: "include" });
-          const status = await statusRes.json();
-          setGenProgress({ status: status.status, progress: status.audio_progress || 0 });
-          if (status.status === "ready" || status.status === "error" || status.status === "audio_error") {
-            clearInterval(interval);
-            setGenerating(false);
-            setGenProgress(null);
-            fetchData();
-          }
+          try {
+            const status = await efetch("exams", `/${data.exam_id}/status`);
+            setGenProgress({ status: status.status, progress: status.audio_progress || 0 });
+            if (status.status === "ready" || status.status === "error" || status.status === "audio_error") {
+              clearInterval(interval);
+              setGenerating(false);
+              setGenProgress(null);
+              fetchData();
+            }
+          } catch { /* keep polling */ }
         }, 4000);
       }
     } catch { setGenerating(false); setGenProgress(null); }
@@ -61,23 +62,19 @@ export default function AdminPage() {
     setShowTelcDropdown(false);
     setTelcGenProgress({ status: "generating_content", progress: 0, level });
     try {
-      const res = await fetch(`${API}/exams/generate-telc`, {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level })
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await efetch("exams", "/generate-telc", "POST", { level });
+      if (data?.exam_id) {
         const interval = setInterval(async () => {
-          const statusRes = await fetch(`${API}/exams/${data.exam_id}/status`, { credentials: "include" });
-          const status = await statusRes.json();
-          setTelcGenProgress({ status: status.status, progress: status.audio_progress || 0, level });
-          if (status.status === "ready" || status.status === "error" || status.status === "audio_error") {
-            clearInterval(interval);
-            setGeneratingTelc(false);
-            setTelcGenProgress(null);
-            fetchData();
-          }
+          try {
+            const status = await efetch("exams", `/${data.exam_id}/status`);
+            setTelcGenProgress({ status: status.status, progress: status.audio_progress || 0, level });
+            if (status.status === "ready" || status.status === "error" || status.status === "audio_error") {
+              clearInterval(interval);
+              setGeneratingTelc(false);
+              setTelcGenProgress(null);
+              fetchData();
+            }
+          } catch { /* keep polling */ }
         }, 4000);
       }
     } catch { setGeneratingTelc(false); setTelcGenProgress(null); }
@@ -85,12 +82,12 @@ export default function AdminPage() {
 
   const deleteExam = async (examId) => {
     if (!window.confirm(`Delete exam ${examId}? This will also remove all audio files.`)) return;
-    await fetch(`${API}/admin/exams/${examId}`, { method: "DELETE", credentials: "include" });
+    await efetch("admin", `/exams/${examId}`, "DELETE");
     fetchData();
   };
 
   const regenerateAudio = async (examId) => {
-    await fetch(`${API}/admin/exams/${examId}/regenerate-audio`, { method: "POST", credentials: "include" });
+    await efetch("admin", `/exams/${examId}/regenerate-audio`, "POST");
     fetchData();
   };
 

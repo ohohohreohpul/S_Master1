@@ -1,11 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, API } from "@/App";
-import {
-  BookOpen, Headphones, Pen, Mic, ArrowRight, LogOut, Play, Plus,
-  Clock, Target, Settings, TrendingUp, Lock, Crown, ChevronDown,
-  Languages, CheckCircle2, Trash2, AlertCircle, RotateCcw,
-} from "lucide-react";
+import { useAuth } from "@/App";
+import { efetch } from "@/lib/supabase";
+import { BookOpen, Headphones, Pen, Mic, ArrowRight, LogOut, Play, Plus, Clock, Target, Settings, TrendingUp, Lock, Crown, ChevronDown, Languages, CircleCheck as CheckCircle2, Trash2, CircleAlert as AlertCircle, RotateCcw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const fadeUp = { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } };
@@ -323,21 +320,17 @@ export default function Dashboard() {
 
   useEffect(() => {
     const controller = new AbortController();
-    const { signal } = controller;
-    const safe = (r) => r.ok ? r.json() : null;
 
     Promise.all([
-      fetch(`${API}/exams`, { credentials: "include", signal }).then(r => r.json()),
-      fetch(`${API}/progress`, { credentials: "include", signal }).then(safe).catch(() => null),
-      fetch(`${API}/subscription/status`, { credentials: "include", signal }).then(safe).catch(() => null),
+      efetch("exams", "").catch(() => []),
+      efetch("exams", "/progress").catch(() => null),
+      efetch("stripe", "/subscription").catch(() => null),
     ]).then(([examsData, progressData, subData]) => {
       setExams(Array.isArray(examsData) ? examsData : []);
       setProgress(progressData);
       setSubscription(subData);
       setLoading(false);
-    }).catch((err) => {
-      if (err.name !== "AbortError") setLoading(false);
-    });
+    }).catch(() => setLoading(false));
 
     return () => controller.abort();
   }, []);
@@ -350,20 +343,18 @@ export default function Dashboard() {
 
   const startPolling = (examId, intervalRef, onDone) => {
     const POLL_MS = 8000;
-    const MAX_POLLS = 120; // 16 min timeout
+    const MAX_POLLS = 120;
     let polls = 0;
     intervalRef.current = setInterval(async () => {
       polls++;
       if (polls > MAX_POLLS) { clearInterval(intervalRef.current); onDone(); return; }
       try {
-        const r = await fetch(`${API}/exams/${examId}/status`, { credentials: "include" });
-        if (!r.ok) return; // transient error — keep polling
-        const s = await r.json();
+        const s = await efetch("exams", `/${examId}/status`);
         if (["ready", "error", "audio_error"].includes(s.status)) {
           clearInterval(intervalRef.current);
           onDone();
-          const examsRes = await fetch(`${API}/exams`, { credentials: "include" });
-          if (examsRes.ok) setExams(await examsRes.json());
+          const examsData = await efetch("exams", "");
+          setExams(Array.isArray(examsData) ? examsData : []);
         }
       } catch { /* network blip — keep polling */ }
     }, POLL_MS);
@@ -372,9 +363,8 @@ export default function Dashboard() {
   const generateExam = async () => {
     setGenerating(true);
     try {
-      const res = await fetch(`${API}/exams/generate`, { method: "POST", credentials: "include" });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await efetch("exams", "/generate", "POST");
+      if (data?.exam_id) {
         startPolling(data.exam_id, genPollingRef, () => setGenerating(false));
       } else {
         setGenerating(false);
@@ -386,13 +376,8 @@ export default function Dashboard() {
     setGeneratingTelc(true);
     setShowTelcDropdown(false);
     try {
-      const res = await fetch(`${API}/exams/generate-telc`, {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ level }),
-      });
-      if (res.ok) {
-        const data = await res.json();
+      const data = await efetch("exams", "/generate-telc", "POST", { level });
+      if (data?.exam_id) {
         startPolling(data.exam_id, telcPollingRef, () => setGeneratingTelc(false));
       } else {
         setGeneratingTelc(false);
@@ -646,7 +631,7 @@ export default function Dashboard() {
                       isPro={isPro}
                       onNavigate={navigate}
                       onDelete={async (examId) => {
-                        await fetch(`${API}/admin/exams/${examId}`, { method: "DELETE", credentials: "include" });
+                        await efetch("admin", `/exams/${examId}`, "DELETE");
                         setExams(prev => prev.filter(e => e.exam_id !== examId));
                       }}
                     />

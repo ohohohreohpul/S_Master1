@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, useLocation, useNavigate } from "react-router-dom";
-import { API, useAuth } from "@/App";
-import { BookOpen, Headphones, Pen, Mic, ArrowLeft, CheckCircle, XCircle, Target, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
+import { useAuth } from "@/App";
+import { efetch } from "@/lib/supabase";
+import { BookOpen, Headphones, Pen, Mic, ArrowLeft, CircleCheck as CheckCircle, Circle as XCircle, Target, TrendingUp, ChevronDown, ChevronUp } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -24,8 +25,7 @@ export default function ResultsPage() {
       setLoading(false);
       return;
     }
-    fetch(`${API}/attempts/${attemptId}`, { credentials: "include" })
-      .then(r => r.json())
+    efetch("attempts", `/${attemptId}`)
       .then(data => { setAttempt(data); setLoading(false); })
       .catch(() => setLoading(false));
   }, [attemptId, location.state]);

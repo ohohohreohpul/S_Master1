@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
-import { API, useAuth } from "@/App";
+import { useAuth } from "@/App";
+import { efetch, audioUrl } from "@/lib/supabase";
 import { Headphones, BookOpen, Pen, Mic, Clock, Flag, ArrowLeft, ArrowRight, Send, AlertCircle, PencilLine, X, CheckCircle } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { motion, AnimatePresence } from "framer-motion";
@@ -184,9 +185,7 @@ export default function ExamPage() {
     const controller = new AbortController();
     (async () => {
       try {
-        const res = await fetch(`${API}/exams/${examId}`, { credentials: "include", signal: controller.signal });
-        if (!res.ok) throw new Error("Failed to load exam");
-        const data = await res.json();
+        const data = await efetch("exams", `/${examId}`);
         setExam(data);
 
         // For listening/speaking, check if audio needs preparation
@@ -202,7 +201,7 @@ export default function ExamPage() {
           setPhase("ready");
         }
       } catch (e) {
-        if (e.name !== "AbortError") {
+        if (!controller.signal.aborted) {
           setError(e.message);
           setPhase("error");
         }
@@ -213,9 +212,9 @@ export default function ExamPage() {
 
   const triggerAudioGeneration = async () => {
     try {
-      await fetch(`${API}/exams/${examId}/prepare`, { method: "POST", credentials: "include" });
+      await efetch("exams", `/${examId}/prepare`, "POST");
       const POLL_MS = 8000;
-      const MAX_POLLS = 120; // 16 min timeout
+      const MAX_POLLS = 120;
       let polls = 0;
       audioPollingRef.current = setInterval(async () => {
         polls++;
@@ -226,14 +225,11 @@ export default function ExamPage() {
           return;
         }
         try {
-          const res = await fetch(`${API}/exams/${examId}/status`, { credentials: "include" });
-          if (!res.ok) return; // transient backend error — keep polling
-          const status = await res.json();
+          const status = await efetch("exams", `/${examId}/status`);
           setAudioProgress(status.audio_progress || 0);
           if (status.status === "ready") {
             clearInterval(audioPollingRef.current);
-            const examRes = await fetch(`${API}/exams/${examId}`, { credentials: "include" });
-            const examData = await examRes.json();
+            const examData = await efetch("exams", `/${examId}`);
             setExam(examData);
             setPhase("preloading");
             await preloadAudio(examData);
@@ -242,7 +238,7 @@ export default function ExamPage() {
             setError(status.error_message || "Audio generation failed");
             setPhase("error");
           }
-        } catch (_) { /* network blip — keep polling */ }
+        } catch { /* network blip — keep polling */ }
       }, POLL_MS);
     } catch (e) {
       setError(e.message);
@@ -254,7 +250,6 @@ export default function ExamPage() {
     const cache = {};
     try {
       if (module === "listening") {
-        // Normalise TELC hoeren → IELTS-compatible sections for preloading
         const sections = examData?.exam_type === "telc"
           ? normalizeTelcSections(examData)
           : (examData?.listening?.sections || []);
@@ -270,7 +265,8 @@ export default function ExamPage() {
           const sectionAudios = [];
           if (section.instruction_audio_id) {
             try {
-              const res = await fetch(`${API}/audio/${section.instruction_audio_id}`);
+              const url = audioUrl(section.instruction_audio_id);
+              const res = await fetch(url);
               const blob = await res.blob();
               cache[`instruction_${section.section_num}`] = URL.createObjectURL(blob);
               loaded++;
@@ -280,10 +276,10 @@ export default function ExamPage() {
           for (const seg of (section.script_segments || [])) {
             if (seg.audio_id) {
               try {
-                const res = await fetch(`${API}/audio/${seg.audio_id}`);
+                const url = audioUrl(seg.audio_id);
+                const res = await fetch(url);
                 const blob = await res.blob();
-                const url = URL.createObjectURL(blob);
-                sectionAudios.push(url);
+                sectionAudios.push(URL.createObjectURL(blob));
                 loaded++;
                 setAudioProgress(Math.round((loaded / totalAudios) * 100));
               } catch { sectionAudios.push(null); }
@@ -297,7 +293,8 @@ export default function ExamPage() {
           for (const q of (part.questions || [])) {
             if (q.audio_id) {
               try {
-                const res = await fetch(`${API}/audio/${q.audio_id}`);
+                const url = audioUrl(q.audio_id);
+                const res = await fetch(url);
                 const blob = await res.blob();
                 cache[`speaking_${q.question_num}`] = URL.createObjectURL(blob);
               } catch { /* skip */ }
@@ -307,7 +304,7 @@ export default function ExamPage() {
       }
       setAudioCache(cache);
       setPhase("ready");
-    } catch (e) {
+    } catch {
       setError("Failed to preload audio");
       setPhase("error");
     }
@@ -316,23 +313,11 @@ export default function ExamPage() {
   const startExam = async () => {
     try {
       if (fullTestMode) {
-        const res = await fetch(`${API}/attempts/full-test`, {
-          method: "POST", credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ exam_id: examId })
-        });
-        if (!res.ok) throw new Error(`Could not start exam (${res.status})`);
-        const data = await res.json();
+        const data = await efetch("attempts", "/full-test", "POST", { exam_id: examId });
         setFullTestAttemptId(data.attempt_id);
         setAttemptId(data.attempt_id);
       } else {
-        const res = await fetch(`${API}/attempts`, {
-          method: "POST", credentials: "include",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ exam_id: examId, module })
-        });
-        if (!res.ok) throw new Error(`Could not start exam (${res.status})`);
-        const data = await res.json();
+        const data = await efetch("attempts", "", "POST", { exam_id: examId, module });
         setAttemptId(data.attempt_id);
       }
 
@@ -374,33 +359,18 @@ export default function ExamPage() {
   const submitSingleModule = async () => {
     if (module === "writing") {
       const endpoint = isTelc
-        ? `${API}/attempts/${attemptId}/score-telc-writing`
-        : `${API}/attempts/${attemptId}/score-writing`;
+        ? `/${attemptId}/score-telc-writing`
+        : `/${attemptId}/score-writing`;
       const body = isTelc
         ? { aufgabe_1: answers.task_1 || "" }
         : { task_1: answers.task_1 || "", task_2: answers.task_2 || "" };
-      const res = await fetch(endpoint, {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
+      const data = await efetch("attempts", endpoint, "POST", body);
       navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
     } else if (module === "speaking") {
-      const res = await fetch(`${API}/attempts/${attemptId}/score-speaking`, {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcriptions: answers })
-      });
-      const data = await res.json();
+      const data = await efetch("attempts", `/${attemptId}/score-speaking`, "POST", { transcriptions: answers });
       navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
     } else {
-      const res = await fetch(`${API}/attempts/${attemptId}/submit`, {
-        method: "PUT", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers })
-      });
-      const data = await res.json();
+      const data = await efetch("attempts", `/${attemptId}/submit`, "PUT", { answers });
       navigate(`/results/${attemptId}`, { state: { scores: data.scores, module, exam } });
     }
   };
@@ -412,48 +382,27 @@ export default function ExamPage() {
     let scores = null;
 
     if (module === "writing") {
-      const res = await fetch(`${API}/attempts/${currentAttemptId}/full-test/score-writing`, {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ task_1: answers.task_1 || "", task_2: answers.task_2 || "" })
-      });
-      const data = await res.json();
+      const data = await efetch("attempts", `/${currentAttemptId}/full-test/score-writing`, "POST",
+        { task_1: answers.task_1 || "", task_2: answers.task_2 || "" });
       scores = data.scores;
-      // After writing, next is speaking
-      const moduleRes = await fetch(`${API}/attempts/${currentAttemptId}/full-test/module`, {
-        method: "PUT", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ module, answers })
-      });
-      const moduleData = await moduleRes.json();
+      const moduleData = await efetch("attempts", `/${currentAttemptId}/full-test/module`, "PUT", { module, answers });
       nextModule = moduleData.next_module;
     } else if (module === "speaking") {
-      const res = await fetch(`${API}/attempts/${currentAttemptId}/full-test/score-speaking`, {
-        method: "POST", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ transcriptions: answers })
-      });
-      const data = await res.json();
+      const data = await efetch("attempts", `/${currentAttemptId}/full-test/score-speaking`, "POST",
+        { transcriptions: answers });
       scores = data.scores;
-      nextModule = null; // Speaking is last
+      nextModule = null;
     } else {
-      const res = await fetch(`${API}/attempts/${currentAttemptId}/full-test/module`, {
-        method: "PUT", credentials: "include",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ module, answers })
-      });
-      const data = await res.json();
+      const data = await efetch("attempts", `/${currentAttemptId}/full-test/module`, "PUT", { module, answers });
       nextModule = data.next_module;
       scores = data.scores;
     }
 
     if (!nextModule || module === "speaking") {
-      // Full test complete
       navigate(`/results/${currentAttemptId}`, { state: { mode: "full_test", exam } });
       return;
     }
 
-    // Show transition screen
     const completedLabel = moduleConfig[module]?.label || module;
     const nextLabel = moduleConfig[nextModule]?.label || nextModule;
     setFullTestStepTransition({ completedModule: module, completedLabel, nextModule, nextLabel, countdown: 3 });

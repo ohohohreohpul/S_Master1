@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth, API } from "@/App";
+import { useAuth } from "@/App";
+import { efetch } from "@/lib/supabase";
 
 export default function AuthCallback() {
   const hasProcessed = useRef(false);
@@ -21,14 +22,9 @@ export default function AuthCallback() {
 
     (async () => {
       try {
-        const res = await fetch(`${API}/auth/session`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ session_id: sessionId }),
-        });
-        if (res.ok) {
-          const user = await res.json();
+        const user = await efetch("auth", "/session", "POST", { session_id: sessionId }, null);
+        if (user?.session_token) {
+          localStorage.setItem("session_token", user.session_token);
           setUser(user);
           navigate("/dashboard", { state: { user }, replace: true });
         } else {
@@ -46,3 +42,4 @@ export default function AuthCallback() {
     </div>
   );
 }
+
