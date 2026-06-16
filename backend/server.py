@@ -20,6 +20,7 @@ except ImportError:
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+load_dotenv(ROOT_DIR.parent / '.env', override=False)  # project root .env (VITE_ vars etc.)
 
 import stripe
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', '')

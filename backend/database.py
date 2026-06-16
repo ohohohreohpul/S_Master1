@@ -1,11 +1,12 @@
 """
-InsForge database layer — MongoDB-compatible shim.
+Supabase PostgREST database layer.
 
-Uses the InsForge REST API (/api/database/records/{table}) instead of the
-Supabase Python SDK (which requires PostgREST at /rest/v1/ — not available on
-InsForge). Provides the same async API as before so server.py is unchanged.
+Talks directly to Supabase PostgREST (/rest/v1/{table}) using the service
+role key, which bypasses RLS.  Audio files are stored in Supabase Storage
+(/storage/v1/object/{bucket}/{path}).
 
-Audio files go through the InsForge Storage API (/api/storage/buckets/).
+The public Collection / DB / FindQuery interface is unchanged so server.py
+needs no modifications.
 """
 from __future__ import annotations
 
@@ -21,43 +22,47 @@ logger = logging.getLogger(__name__)
 
 # ── Config ─────────────────────────────────────────────────────────────────────
 _BASE_URL: str = (
-    os.environ.get("INSFORGE_URL")
-    or os.environ.get("SUPABASE_URL")
+    os.environ.get("SUPABASE_URL")
+    or os.environ.get("INSFORGE_URL")
     or ""
-)
+).rstrip("/")
+
 _API_KEY: str = (
-    os.environ.get("INSFORGE_API_KEY")
+    os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
     or os.environ.get("SUPABASE_SERVICE_KEY")
+    or os.environ.get("INSFORGE_API_KEY")
     or ""
 )
+
 AUDIO_BUCKET: str = (
-    os.environ.get("INSFORGE_AUDIO_BUCKET")
-    or os.environ.get("SUPABASE_AUDIO_BUCKET")
+    os.environ.get("SUPABASE_AUDIO_BUCKET")
+    or os.environ.get("INSFORGE_AUDIO_BUCKET")
     or "audio-files"
 )
 
 _HEADERS = {
     "Authorization": f"Bearer {_API_KEY}",
+    "apikey": _API_KEY,
     "Content-Type": "application/json",
 }
 
 
 def _records_url(table: str) -> str:
-    return f"{_BASE_URL}/api/database/records/{table}"
+    return f"{_BASE_URL}/rest/v1/{table}"
 
 
 def _storage_url(path: str = "") -> str:
-    return f"{_BASE_URL}/api/storage{path}"
+    return f"{_BASE_URL}/storage/v1{path}"
 
 
 # ── Filter builder ─────────────────────────────────────────────────────────────
 
 def _build_params(filter_dict: dict) -> dict:
-    """Convert a MongoDB-style filter dict to InsForge query params."""
+    """Convert a MongoDB-style filter dict to PostgREST query params."""
     params: dict = {}
     for k, v in (filter_dict or {}).items():
         if k.startswith("$"):
-            continue  # skip top-level operators ($or etc — not used here)
+            continue
         if isinstance(v, dict):
             for op, val in v.items():
                 if op == "$eq":
@@ -129,7 +134,8 @@ async def _get(table: str, params: dict) -> list:
     async with httpx.AsyncClient(timeout=30) as c:
         r = await c.get(_records_url(table), headers=_HEADERS, params=params)
         r.raise_for_status()
-        return r.json() or []
+        data = r.json()
+        return data if isinstance(data, list) else []
 
 
 async def _post(table: str, body: list, prefer: str = "") -> list:
@@ -139,7 +145,10 @@ async def _post(table: str, body: list, prefer: str = "") -> list:
     async with httpx.AsyncClient(timeout=30) as c:
         r = await c.post(_records_url(table), headers=headers, json=body)
         r.raise_for_status()
-        return r.json() or []
+        if r.status_code == 204:
+            return body
+        data = r.json()
+        return data if isinstance(data, list) else (body if not data else [data])
 
 
 async def _patch(table: str, params: dict, body: dict, prefer: str = "return=representation") -> list:
@@ -147,7 +156,10 @@ async def _patch(table: str, params: dict, body: dict, prefer: str = "return=rep
     async with httpx.AsyncClient(timeout=30) as c:
         r = await c.patch(_records_url(table), headers=headers, params=params, json=body)
         r.raise_for_status()
-        return r.json() or []
+        if r.status_code == 204:
+            return [body]
+        data = r.json()
+        return data if isinstance(data, list) else [data]
 
 
 async def _delete(table: str, params: dict) -> None:
@@ -159,10 +171,19 @@ async def _delete(table: str, params: dict) -> None:
 async def _count(table: str, params: dict) -> int:
     headers = {**_HEADERS, "Prefer": "count=exact"}
     async with httpx.AsyncClient(timeout=30) as c:
-        r = await c.get(_records_url(table), headers=headers, params={**params, "limit": "0"})
+        r = await c.get(
+            _records_url(table),
+            headers=headers,
+            params={**params, "limit": "0"},
+        )
         r.raise_for_status()
-        total = r.headers.get("X-Total-Count", "0")
-        return int(total)
+        # PostgREST returns Content-Range: 0-9/42  (or */42 when limit=0)
+        cr = r.headers.get("Content-Range", "")
+        if "/" in cr:
+            total_str = cr.split("/")[-1]
+            if total_str.isdigit():
+                return int(total_str)
+        return 0
 
 
 # ── Collection interface ───────────────────────────────────────────────────────
@@ -191,8 +212,7 @@ class FindQuery:
             params["order"] = f"{self._sort_field}.{self._sort_dir}"
         cap = length or self._limit_val or 1000
         params["limit"] = str(cap)
-        rows = await _get(self._table, params)
-        return rows
+        return await _get(self._table, params)
 
 
 class Collection:
@@ -215,8 +235,8 @@ class Collection:
 
     async def update_one(self, filter_dict: dict, update: dict) -> None:
         """
-        Applies $set / $unset operators by fetching the existing doc,
-        merging changes, and PATCHing it back — required for JSONB columns.
+        Fetch-merge-patch: required for nested JSONB column updates.
+        Supports $set and $unset operators.
         """
         existing = await self.find_one(filter_dict)
         if existing is None:
@@ -228,9 +248,6 @@ class Collection:
         if "$unset" in update:
             result = _apply_unset(result, update["$unset"])
 
-        # Remove internal InsForge meta-fields that can't be patched
-        result.pop("_id", None)
-
         params = _build_params(filter_dict)
         await _patch(self._table, params, result)
 
@@ -238,7 +255,6 @@ class Collection:
         row = await self.find_one(filter_dict)
         if row is None:
             return
-        # Build params from original filter — limit to 1 via a unique field if possible
         params = _build_params(filter_dict)
         params["limit"] = "1"
         await _delete(self._table, params)
@@ -262,53 +278,24 @@ class DB:
 # ── Audio / Storage helpers ────────────────────────────────────────────────────
 
 async def insert_audio_file(audio_id: str, exam_id: str, audio_bytes: bytes, metadata: dict) -> None:
-    """Upload audio bytes to InsForge Storage and record the reference in audio_files."""
-    filename = f"{audio_id}.mp3"
-    size = len(audio_bytes)
+    """Upload audio bytes to Supabase Storage and record metadata in audio_files."""
+    object_key = f"{audio_id}.mp3"
+
+    upload_headers = {
+        "Authorization": f"Bearer {_API_KEY}",
+        "apikey": _API_KEY,
+        "Content-Type": "audio/mpeg",
+        "x-upsert": "true",
+    }
 
     async with httpx.AsyncClient(timeout=60) as c:
-        # Step 1: get upload strategy
-        strat_r = await c.post(
-            _storage_url(f"/buckets/{AUDIO_BUCKET}/upload-strategy"),
-            headers=_HEADERS,
-            json={"filename": filename, "contentType": "audio/mpeg", "size": size},
+        r = await c.post(
+            _storage_url(f"/object/{AUDIO_BUCKET}/{object_key}"),
+            content=audio_bytes,
+            headers=upload_headers,
         )
-        strat_r.raise_for_status()
-        strat = strat_r.json()
+        r.raise_for_status()
 
-        method = strat.get("method", "direct")
-        object_key: str = strat.get("key", filename)
-
-        if method == "presigned":
-            # S3 presigned multipart POST — fields must come before file
-            upload_url = strat["uploadUrl"]
-            fields = strat.get("fields", {})
-            form = {k: (None, v) for k, v in fields.items()}
-            form["file"] = (filename, audio_bytes, "audio/mpeg")
-            r = await c.post(upload_url, files=form, timeout=60)
-            if r.status_code not in (200, 204):
-                r.raise_for_status()
-
-            # Step 2: confirm (if required) — must pass size
-            if strat.get("confirmRequired"):
-                confirm_path = strat["confirmUrl"]  # relative, e.g. /api/storage/buckets/…
-                conf_r = await c.post(
-                    f"{_BASE_URL}{confirm_path}",
-                    headers=_HEADERS,
-                    json={"size": size},
-                )
-                conf_r.raise_for_status()
-        else:
-            # Direct upload
-            upload_url = strat.get("uploadUrl", _storage_url(f"/buckets/{AUDIO_BUCKET}/objects/{filename}"))
-            r = await c.put(
-                upload_url,
-                content=audio_bytes,
-                headers={**_HEADERS, "Content-Type": "audio/mpeg"},
-            )
-            r.raise_for_status()
-
-    # Record in audio_files table (column is storage_path, not file_path)
     await _post("audio_files", [{
         "audio_id": audio_id,
         "exam_id": exam_id,
@@ -325,5 +312,5 @@ async def get_audio_path(audio_id: str) -> str | None:
 
 
 def get_audio_public_url(storage_path: str) -> str:
-    """Construct public URL from a storage_path (key within the bucket)."""
-    return f"{_BASE_URL}/api/storage/buckets/{AUDIO_BUCKET}/objects/{storage_path}"
+    """Construct public URL for an object in the audio-files bucket."""
+    return f"{_BASE_URL}/storage/v1/object/public/{AUDIO_BUCKET}/{storage_path}"
