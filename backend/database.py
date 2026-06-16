@@ -23,6 +23,7 @@ logger = logging.getLogger(__name__)
 # ── Config ─────────────────────────────────────────────────────────────────────
 _BASE_URL: str = (
     os.environ.get("SUPABASE_URL")
+    or os.environ.get("VITE_SUPABASE_URL")   # Bolt root .env uses VITE_ prefix
     or os.environ.get("INSFORGE_URL")
     or ""
 ).rstrip("/")
