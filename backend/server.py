@@ -3,11 +3,17 @@ TELC Deutsch Mock Exam Platform - Backend Server
 =================================================
 InsForge (DB + Storage) + Replicate Gemini TTS + OpenRouter AI + Emergent Google Auth
 """
-from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, BackgroundTasks, UploadFile, File
+from pathlib import Path
 from dotenv import load_dotenv
+
+# Load env files BEFORE any module that reads os.environ at import time
+_ROOT_DIR = Path(__file__).parent
+load_dotenv(_ROOT_DIR / '.env')
+load_dotenv(_ROOT_DIR.parent / '.env', override=False)  # root .env (VITE_ vars)
+
+from fastapi import FastAPI, APIRouter, HTTPException, Request, Response, BackgroundTasks, UploadFile, File
 from starlette.middleware.cors import CORSMiddleware
 import os, re, logging, json, base64, uuid, httpx, asyncio, io
-from pathlib import Path
 from pydantic import BaseModel, Field
 from typing import List, Optional, Dict, Any
 from datetime import datetime, timezone, timedelta
@@ -18,9 +24,7 @@ try:
 except ImportError:
     _telc_seeds = None
 
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
-load_dotenv(ROOT_DIR.parent / '.env', override=False)  # project root .env (VITE_ vars etc.)
+ROOT_DIR = _ROOT_DIR
 
 import stripe
 stripe.api_key = os.environ.get('STRIPE_SECRET_KEY', '')

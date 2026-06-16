@@ -5,55 +5,72 @@ Talks directly to Supabase PostgREST (/rest/v1/{table}) using the service
 role key, which bypasses RLS.  Audio files are stored in Supabase Storage
 (/storage/v1/object/{bucket}/{path}).
 
+Config is resolved lazily at call time (not at import) so it works correctly
+regardless of when load_dotenv runs relative to this import.
+
 The public Collection / DB / FindQuery interface is unchanged so server.py
 needs no modifications.
 """
 from __future__ import annotations
 
-import asyncio
 import copy
 import logging
 import os
-from typing import Any
 
 import httpx
 
 logger = logging.getLogger(__name__)
 
-# ── Config ─────────────────────────────────────────────────────────────────────
-_BASE_URL: str = (
-    os.environ.get("SUPABASE_URL")
-    or os.environ.get("VITE_SUPABASE_URL")   # Bolt root .env uses VITE_ prefix
-    or os.environ.get("INSFORGE_URL")
-    or ""
-).rstrip("/")
 
-_API_KEY: str = (
-    os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
-    or os.environ.get("SUPABASE_SERVICE_KEY")
-    or os.environ.get("INSFORGE_API_KEY")
-    or ""
-)
+# ── Lazy config ────────────────────────────────────────────────────────────────
 
-AUDIO_BUCKET: str = (
-    os.environ.get("SUPABASE_AUDIO_BUCKET")
-    or os.environ.get("INSFORGE_AUDIO_BUCKET")
-    or "audio-files"
-)
+def _base_url() -> str:
+    return (
+        os.environ.get("SUPABASE_URL")
+        or os.environ.get("VITE_SUPABASE_URL")   # Bolt root .env uses VITE_ prefix
+        or os.environ.get("INSFORGE_URL")
+        or ""
+    ).rstrip("/")
 
-_HEADERS = {
-    "Authorization": f"Bearer {_API_KEY}",
-    "apikey": _API_KEY,
-    "Content-Type": "application/json",
-}
+
+def _api_key() -> str:
+    return (
+        os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+        or os.environ.get("SUPABASE_SERVICE_KEY")
+        or os.environ.get("INSFORGE_API_KEY")
+        or ""
+    )
+
+
+def _audio_bucket() -> str:
+    return (
+        os.environ.get("SUPABASE_AUDIO_BUCKET")
+        or os.environ.get("INSFORGE_AUDIO_BUCKET")
+        or "audio-files"
+    )
+
+
+def _headers() -> dict:
+    key = _api_key()
+    return {
+        "Authorization": f"Bearer {key}",
+        "apikey": key,
+        "Content-Type": "application/json",
+    }
 
 
 def _records_url(table: str) -> str:
-    return f"{_BASE_URL}/rest/v1/{table}"
+    return f"{_base_url()}/rest/v1/{table}"
 
 
 def _storage_url(path: str = "") -> str:
-    return f"{_BASE_URL}/storage/v1{path}"
+    return f"{_base_url()}/storage/v1{path}"
+
+
+# For code in server.py that reads database.AUDIO_BUCKET as a module attribute
+@property  # type: ignore[misc]
+def AUDIO_BUCKET(self) -> str:  # noqa: N802
+    return _audio_bucket()
 
 
 # ── Filter builder ─────────────────────────────────────────────────────────────
@@ -88,7 +105,6 @@ def _build_params(filter_dict: dict) -> dict:
 # ── Deep-merge helpers for $set / $unset ──────────────────────────────────────
 
 def _apply_set(doc: dict, set_dict: dict) -> dict:
-    """Return a new doc with $set values applied (supports dot-notation paths)."""
     result = copy.deepcopy(doc)
     for path, value in set_dict.items():
         parts = path.split(".")
@@ -111,7 +127,6 @@ def _apply_set(doc: dict, set_dict: dict) -> dict:
 
 
 def _apply_unset(doc: dict, unset_dict: dict) -> dict:
-    """Return a new doc with $unset keys removed."""
     result = copy.deepcopy(doc)
     for path in unset_dict:
         parts = path.split(".")
@@ -133,18 +148,18 @@ def _apply_unset(doc: dict, unset_dict: dict) -> dict:
 
 async def _get(table: str, params: dict) -> list:
     async with httpx.AsyncClient(timeout=30) as c:
-        r = await c.get(_records_url(table), headers=_HEADERS, params=params)
+        r = await c.get(_records_url(table), headers=_headers(), params=params)
         r.raise_for_status()
         data = r.json()
         return data if isinstance(data, list) else []
 
 
 async def _post(table: str, body: list, prefer: str = "") -> list:
-    headers = {**_HEADERS}
+    h = _headers()
     if prefer:
-        headers["Prefer"] = prefer
+        h["Prefer"] = prefer
     async with httpx.AsyncClient(timeout=30) as c:
-        r = await c.post(_records_url(table), headers=headers, json=body)
+        r = await c.post(_records_url(table), headers=h, json=body)
         r.raise_for_status()
         if r.status_code == 204:
             return body
@@ -153,9 +168,9 @@ async def _post(table: str, body: list, prefer: str = "") -> list:
 
 
 async def _patch(table: str, params: dict, body: dict, prefer: str = "return=representation") -> list:
-    headers = {**_HEADERS, "Prefer": prefer}
+    h = {**_headers(), "Prefer": prefer}
     async with httpx.AsyncClient(timeout=30) as c:
-        r = await c.patch(_records_url(table), headers=headers, params=params, json=body)
+        r = await c.patch(_records_url(table), headers=h, params=params, json=body)
         r.raise_for_status()
         if r.status_code == 204:
             return [body]
@@ -165,20 +180,20 @@ async def _patch(table: str, params: dict, body: dict, prefer: str = "return=rep
 
 async def _delete(table: str, params: dict) -> None:
     async with httpx.AsyncClient(timeout=30) as c:
-        r = await c.delete(_records_url(table), headers=_HEADERS, params=params)
+        r = await c.delete(_records_url(table), headers=_headers(), params=params)
         r.raise_for_status()
 
 
 async def _count(table: str, params: dict) -> int:
-    headers = {**_HEADERS, "Prefer": "count=exact"}
+    h = {**_headers(), "Prefer": "count=exact"}
     async with httpx.AsyncClient(timeout=30) as c:
         r = await c.get(
             _records_url(table),
-            headers=headers,
+            headers=h,
             params={**params, "limit": "0"},
         )
         r.raise_for_status()
-        # PostgREST returns Content-Range: 0-9/42  (or */42 when limit=0)
+        # PostgREST returns Content-Range: */42 when limit=0
         cr = r.headers.get("Content-Range", "")
         if "/" in cr:
             total_str = cr.split("/")[-1]
@@ -193,7 +208,6 @@ class FindQuery:
     def __init__(self, table: str, params: dict, projection: dict | None = None):
         self._table = table
         self._params = dict(params)
-        self._projection = projection
         self._sort_field: str | None = None
         self._sort_dir: str = "asc"
         self._limit_val: int | None = None
@@ -228,27 +242,22 @@ class Collection:
 
     def find(self, filter_dict: dict | None = None, projection: dict | None = None) -> FindQuery:
         params = _build_params(filter_dict or {})
-        return FindQuery(self._table, params, projection)
+        return FindQuery(self._table, params)
 
     async def insert_one(self, doc: dict) -> dict:
         rows = await _post(self._table, [doc], prefer="return=representation")
         return rows[0] if rows else doc
 
     async def update_one(self, filter_dict: dict, update: dict) -> None:
-        """
-        Fetch-merge-patch: required for nested JSONB column updates.
-        Supports $set and $unset operators.
-        """
+        """Fetch-merge-patch for nested JSONB updates. Supports $set / $unset."""
         existing = await self.find_one(filter_dict)
         if existing is None:
             return
-
         result = copy.deepcopy(existing)
         if "$set" in update:
             result = _apply_set(result, update["$set"])
         if "$unset" in update:
             result = _apply_unset(result, update["$unset"])
-
         params = _build_params(filter_dict)
         await _patch(self._table, params, result)
 
@@ -281,17 +290,16 @@ class DB:
 async def insert_audio_file(audio_id: str, exam_id: str, audio_bytes: bytes, metadata: dict) -> None:
     """Upload audio bytes to Supabase Storage and record metadata in audio_files."""
     object_key = f"{audio_id}.mp3"
-
+    key = _api_key()
     upload_headers = {
-        "Authorization": f"Bearer {_API_KEY}",
-        "apikey": _API_KEY,
+        "Authorization": f"Bearer {key}",
+        "apikey": key,
         "Content-Type": "audio/mpeg",
         "x-upsert": "true",
     }
-
     async with httpx.AsyncClient(timeout=60) as c:
         r = await c.post(
-            _storage_url(f"/object/{AUDIO_BUCKET}/{object_key}"),
+            _storage_url(f"/object/{_audio_bucket()}/{object_key}"),
             content=audio_bytes,
             headers=upload_headers,
         )
@@ -313,5 +321,4 @@ async def get_audio_path(audio_id: str) -> str | None:
 
 
 def get_audio_public_url(storage_path: str) -> str:
-    """Construct public URL for an object in the audio-files bucket."""
-    return f"{_BASE_URL}/storage/v1/object/public/{AUDIO_BUCKET}/{storage_path}"
+    return f"{_base_url()}/storage/v1/object/public/{_audio_bucket()}/{storage_path}"
